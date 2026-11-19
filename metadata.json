@@ -2,5 +2,7 @@
   "name": "MS FASHION",
   "description": "MS FASHION – Official online fashion storefront and commerce platform for men's and women's apparel in Bangladesh.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

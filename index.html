@@ -38,6 +38,17 @@
   }
   </script>
 
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js",
+      "firebase/storage": "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js"
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -2347,6 +2358,12 @@
         </div>
         <div id="admin-login-error" class="hidden" style="color:var(--danger);font-size:13px;font-weight:500;"></div>
         <button type="submit" id="admin-login-submit" class="btn btn-primary btn-block" data-i18n="admin_login_btn">লগইন করুন</button>
+        <div style="display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px;">
+          <span style="flex:1;height:1px;background:var(--border-hairline);"></span>
+          <span>OR</span>
+          <span style="flex:1;height:1px;background:var(--border-hairline);"></span>
+        </div>
+        <button type="button" id="admin-google-login-btn" class="btn btn-outline btn-block">Sign in with Admin Google Account</button>
       </form>
     </div>
   </div>
@@ -2456,7 +2473,28 @@
       getDownloadURL,
       deleteObject
     } from 'firebase/storage';
-    import firebaseConfig from './firebase-applet-config.json';
+
+    const DEFAULT_FIREBASE_CONFIG = {
+      projectId: 'turing-reducer-k5v9p',
+      appId: '1:692434569438:web:1a3376926e4df325c01a4f',
+      apiKey: 'AIzaSyDP2f62qisSy19OwzqKVsdDsDnhFcqvnSY',
+      authDomain: 'turing-reducer-k5v9p.firebaseapp.com',
+      firestoreDatabaseId: 'ai-studio-4e898927-dbee-4c10-bb58-4d76b9b84288',
+      storageBucket: 'turing-reducer-k5v9p.firebasestorage.app',
+      messagingSenderId: '692434569438'
+    };
+    let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
+    try {
+      const cfgResp = await fetch('./firebase-applet-config.json', { cache: 'no-store' });
+      if (cfgResp.ok) {
+        const parsedCfg = await cfgResp.json();
+        if (parsedCfg && parsedCfg.apiKey && parsedCfg.projectId) {
+          firebaseConfig = parsedCfg;
+        }
+      }
+    } catch {
+      // Static hosting fallback uses DEFAULT_FIREBASE_CONFIG
+    }
 
     // =========================================================================
     // 1. CENTRALIZED SINGLETON FIREBASE INITIALIZATION & ERROR HANDLER
@@ -5330,6 +5368,14 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password: pw })
           });
+          const ct = res.headers.get('content-type') || '';
+          if (!ct.includes('application/json')) {
+            throw new Error(
+              state.lang === 'bn'
+                ? 'স্ট্যাটিক হোস্টিংয়ে পাসওয়ার্ড সার্ভার নেই। নিচের "Admin Google Account" দিয়ে লগইন করুন।'
+                : 'Password server is unavailable on static hosting. Please use "Sign in with Admin Google Account" below.'
+            );
+          }
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Invalid password');
           state.adminSessionToken = data.sessionToken;
@@ -5347,6 +5393,23 @@
         errBox.classList.remove('hidden');
       } finally {
         submitBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('admin-google-login-btn').addEventListener('click', async () => {
+      const errBox = document.getElementById('admin-login-error');
+      errBox.classList.add('hidden');
+      try {
+        const res = await signInWithPopup(auth, new GoogleAuthProvider());
+        if (res.user.email !== BOOTSTRAP_ADMIN_EMAIL || !res.user.emailVerified) {
+          throw new Error(`Unauthorized account (${res.user.email || 'unknown'}). Admin access requires ${BOOTSTRAP_ADMIN_EMAIL}.`);
+        }
+        state.adminVerified = true;
+        document.getElementById('admin-login-modal').classList.add('hidden');
+        openAdminDashboard();
+      } catch (err) {
+        errBox.textContent = err.message || 'Google Admin sign-in failed';
+        errBox.classList.remove('hidden');
       }
     });
 
@@ -6942,7 +7005,12 @@
     async function bootstrapApp() {
       applyTranslations();
       updateHeaderBadges();
-      await Promise.all([loadSettings(), loadCategories(), loadBanners(), loadProducts(true), loadApprovedReviews()]);
+      try {
+        await handleRoute();
+      } catch (e) {
+        console.warn('Initial render error:', e);
+      }
+      await Promise.allSettled([loadSettings(), loadCategories(), loadBanners(), loadProducts(true), loadApprovedReviews()]);
       applyTranslations();
       await handleRoute();
     }
