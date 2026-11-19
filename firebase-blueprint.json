@@ -1,0 +1,393 @@
+{
+  "entities": {
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Trusted administrator marker document keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "role": { "type": "string", "enum": ["super_admin", "admin"], "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "createdAt"]
+    },
+    "CustomerProfile": {
+      "title": "CustomerProfile",
+      "description": "Private customer account profile containing PII isolated per user UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 160 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 300 },
+        "district": { "type": "string", "maxLength": 80 },
+        "city": { "type": "string", "maxLength": 80 },
+        "savedAddresses": { "type": "array" },
+        "recentlyViewed": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "createdAt", "updatedAt"]
+    },
+    "Wishlist": {
+      "title": "Wishlist",
+      "description": "Customer synchronized wishlist keyed by user UID.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productIds": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productIds", "updatedAt"]
+    },
+    "Cart": {
+      "title": "Cart",
+      "description": "Customer synchronized shopping cart keyed by user UID.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "items": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "items", "updatedAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Dynamic fashion category managed by admin.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "nameBn": { "type": "string", "maxLength": 120 },
+        "slug": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 500 },
+        "descriptionBn": { "type": "string", "maxLength": 500 },
+        "parentId": { "type": "string", "maxLength": 128 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "storagePath": { "type": "string", "maxLength": 500 },
+        "order": { "type": "number" },
+        "enabled": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "slug", "order", "enabled", "createdAt", "updatedAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Public fashion product catalog document without internal cost prices.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "nameBn": { "type": "string", "maxLength": 200 },
+        "sku": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "shortDescription": { "type": "string", "maxLength": 500 },
+        "shortDescriptionBn": { "type": "string", "maxLength": 500 },
+        "fullDescription": { "type": "string", "maxLength": 5000 },
+        "fullDescriptionBn": { "type": "string", "maxLength": 5000 },
+        "categoryId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "categoryName": { "type": "string", "maxLength": 120 },
+        "subcategory": { "type": "string", "maxLength": 120 },
+        "brand": { "type": "string", "maxLength": 120 },
+        "tags": { "type": "array" },
+        "keywords": { "type": "array" },
+        "regularPrice": { "type": "number" },
+        "salePrice": { "type": "number" },
+        "wholesalePrice": { "type": "number" },
+        "discountPercent": { "type": "number" },
+        "images": { "type": "array" },
+        "sizes": { "type": "array" },
+        "colors": { "type": "array" },
+        "variants": { "type": "array" },
+        "stock": { "type": "number" },
+        "soldCount": { "type": "number" },
+        "ratingAvg": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "isFeatured": { "type": "boolean" },
+        "isBestSeller": { "type": "boolean" },
+        "isNewArrival": { "type": "boolean" },
+        "isTrending": { "type": "boolean" },
+        "isSpecialCollection": { "type": "boolean" },
+        "isFlashSale": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "sku", "categoryId", "regularPrice", "salePrice", "stock", "images", "active", "published", "createdAt", "updatedAt"]
+    },
+    "ProductPrivate": {
+      "title": "ProductPrivate",
+      "description": "Admin-only cost price and profit margin data isolated from public catalog.",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "costPrice": { "type": "number" },
+        "supplierNote": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productId", "costPrice", "updatedAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Complete customer order snapshot including product images, variants, pricing, and status.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "minLength": 4, "maxLength": 40, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "phone": { "type": "string", "minLength": 6, "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 160 },
+        "district": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "city": { "type": "string", "maxLength": 80 },
+        "address": { "type": "string", "minLength": 3, "maxLength": 400 },
+        "instructions": { "type": "string", "maxLength": 500 },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "couponCode": { "type": "string", "maxLength": 60 },
+        "deliveryCharge": { "type": "number" },
+        "finalTotal": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Cash on Delivery", "bKash", "Nagad", "Rocket", "Bank Transfer"], "maxLength": 40 },
+        "paymentStatus": { "type": "string", "enum": ["Unpaid", "Pending Verification", "Paid", "Refunded"], "maxLength": 40 },
+        "paymentReference": { "type": "string", "maxLength": 120 },
+        "orderStatus": { "type": "string", "enum": ["Pending", "Confirmed", "Processing", "Packed", "Ready to Ship", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Returned", "Refunded"], "maxLength": 40 },
+        "orderSource": { "type": "string", "enum": ["Checkout", "WhatsApp"], "maxLength": 30 },
+        "adminNotes": { "type": "string", "maxLength": 1000 },
+        "trackingNumber": { "type": "string", "maxLength": 120 },
+        "courier": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["orderId", "customerName", "phone", "district", "address", "items", "subtotal", "discount", "deliveryCharge", "finalTotal", "paymentMethod", "paymentStatus", "orderStatus", "orderSource", "createdAt", "updatedAt"]
+    },
+    "OrderTracking": {
+      "title": "OrderTracking",
+      "description": "Non-PII order status projection accessible strictly by exact Order ID get.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "minLength": 4, "maxLength": 40, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderStatus": { "type": "string", "maxLength": 40 },
+        "paymentStatus": { "type": "string", "maxLength": 40 },
+        "courier": { "type": "string", "maxLength": 120 },
+        "trackingNumber": { "type": "string", "maxLength": 120 },
+        "itemCount": { "type": "number" },
+        "finalTotal": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["orderId", "orderStatus", "paymentStatus", "itemCount", "finalTotal", "createdAt", "updatedAt"]
+    },
+    "Coupon": {
+      "title": "Coupon",
+      "description": "Discount coupon configuration.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "minLength": 2, "maxLength": 60, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["percentage", "fixed", "free_delivery"], "maxLength": 30 },
+        "amount": { "type": "number" },
+        "minOrder": { "type": "number" },
+        "maxDiscount": { "type": "number" },
+        "startDate": { "type": "string", "maxLength": 40 },
+        "expiryDate": { "type": "string", "maxLength": 40 },
+        "usageLimit": { "type": "number" },
+        "usedCount": { "type": "number" },
+        "perCustomerLimit": { "type": "number" },
+        "productIds": { "type": "array" },
+        "categoryIds": { "type": "array" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["code", "type", "amount", "minOrder", "active", "createdAt", "updatedAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer product review subject to admin moderation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "userName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "orderId": { "type": "string", "maxLength": 40 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "minLength": 1, "maxLength": 1500 },
+        "images": { "type": "array" },
+        "verifiedPurchase": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "maxLength": 20 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "userId", "userName", "rating", "comment", "verifiedPurchase", "status", "createdAt", "updatedAt"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Homepage promotional hero banner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "maxLength": 160 },
+        "titleBn": { "type": "string", "maxLength": 160 },
+        "subtitle": { "type": "string", "maxLength": 300 },
+        "subtitleBn": { "type": "string", "maxLength": 300 },
+        "buttonText": { "type": "string", "maxLength": 60 },
+        "buttonTextBn": { "type": "string", "maxLength": 60 },
+        "buttonUrl": { "type": "string", "maxLength": 300 },
+        "imageUrl": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "storagePath": { "type": "string", "maxLength": 500 },
+        "order": { "type": "number" },
+        "enabled": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "imageUrl", "order", "enabled", "createdAt", "updatedAt"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Public storefront configuration for branding, shipping, social, and payment instructions.",
+      "type": "object",
+      "properties": {
+        "brandName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "logoUrl": { "type": "string", "maxLength": 1000 },
+        "faviconUrl": { "type": "string", "maxLength": 1000 },
+        "announcementText": { "type": "string", "maxLength": 300 },
+        "announcementTextBn": { "type": "string", "maxLength": 300 },
+        "primaryColor": { "type": "string", "maxLength": 20 },
+        "accentColor": { "type": "string", "maxLength": 20 },
+        "whatsappNumber": { "type": "string", "maxLength": 30 },
+        "facebookUrl": { "type": "string", "maxLength": 500 },
+        "tiktokUrl": { "type": "string", "maxLength": 500 },
+        "instagramUrl": { "type": "string", "maxLength": 500 },
+        "youtubeUrl": { "type": "string", "maxLength": 500 },
+        "footerAbout": { "type": "string", "maxLength": 600 },
+        "footerAboutBn": { "type": "string", "maxLength": 600 },
+        "currencySymbol": { "type": "string", "maxLength": 10 },
+        "defaultLanguage": { "type": "string", "enum": ["bn", "en"], "maxLength": 5 },
+        "guestCheckoutEnabled": { "type": "boolean" },
+        "minOrderValue": { "type": "number" },
+        "dhakaDeliveryCharge": { "type": "number" },
+        "outsideDhakaDeliveryCharge": { "type": "number" },
+        "freeDeliveryThreshold": { "type": "number" },
+        "dhakaDeliveryEstimate": { "type": "string", "maxLength": 100 },
+        "outsideDhakaDeliveryEstimate": { "type": "string", "maxLength": 100 },
+        "defaultCourier": { "type": "string", "maxLength": 100 },
+        "districtCharges": { "type": "object" },
+        "paymentMethods": { "type": "object" },
+        "homepageSections": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["brandName", "logoUrl", "whatsappNumber", "updatedAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app order and activity notifications.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "orderId": { "type": "string", "maxLength": 40 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "message", "read", "createdAt"]
+    },
+    "InventoryLog": {
+      "title": "InventoryLog",
+      "description": "Admin-only stock movement audit log.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "productName": { "type": "string", "maxLength": 200 },
+        "sku": { "type": "string", "maxLength": 80 },
+        "change": { "type": "number" },
+        "previousStock": { "type": "number" },
+        "newStock": { "type": "number" },
+        "reason": { "type": "string", "maxLength": 200 },
+        "orderId": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "change", "previousStock", "newStock", "reason", "createdAt"]
+    },
+    "NewsletterSubscriber": {
+      "title": "NewsletterSubscriber",
+      "description": "Newsletter subscription email record.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "minLength": 5, "maxLength": 160 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Admin role directory"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/CustomerProfile" },
+      "description": "Private customer profiles"
+    },
+    "/wishlists/{userId}": {
+      "schema": { "$ref": "#/entities/Wishlist" },
+      "description": "Private customer wishlists"
+    },
+    "/carts/{userId}": {
+      "schema": { "$ref": "#/entities/Cart" },
+      "description": "Private customer carts"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Storefront categories"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Public product catalog"
+    },
+    "/product_private/{productId}": {
+      "schema": { "$ref": "#/entities/ProductPrivate" },
+      "description": "Admin-only cost price records"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders"
+    },
+    "/order_tracking/{orderId}": {
+      "schema": { "$ref": "#/entities/OrderTracking" },
+      "description": "Non-PII order tracking snapshots"
+    },
+    "/coupons/{couponId}": {
+      "schema": { "$ref": "#/entities/Coupon" },
+      "description": "Discount coupons"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Customer product reviews"
+    },
+    "/banners/{bannerId}": {
+      "schema": { "$ref": "#/entities/Banner" },
+      "description": "Homepage banners"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SiteSettings" },
+      "description": "Storefront settings"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Order & admin notifications"
+    },
+    "/inventoryLogs/{logId}": {
+      "schema": { "$ref": "#/entities/InventoryLog" },
+      "description": "Stock audit logs"
+    },
+    "/newsletter_subscribers/{subId}": {
+      "schema": { "$ref": "#/entities/NewsletterSubscriber" },
+      "description": "Newsletter email subscribers"
+    }
+  }
+}
