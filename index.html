@@ -484,11 +484,11 @@
       left: 0;
       bottom: 0;
       z-index: 61;
-      width: min(85vw, 320px);
+      width: min(86vw, 336px);
       background: #ffffff;
       display: flex;
       flex-direction: column;
-      padding: 16px;
+      padding: 16px 14px 24px;
       overflow-y: auto;
       box-shadow: var(--shadow-md);
     }
@@ -496,27 +496,102 @@
     .drawer-nav-list {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 16px;
+      gap: 6px;
+      margin-top: 14px;
     }
 
     .drawer-nav-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 44px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      font-weight: 500;
+      gap: 10px;
+      min-height: 52px;
+      padding: 13px 16px;
+      border-radius: 8px;
+      font-size: 15.5px;
+      font-weight: 600;
+      line-height: 1.3;
       border: none;
       background: transparent;
       text-align: left;
       width: 100%;
       color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.14s ease, color 0.14s ease;
     }
 
-    .drawer-nav-item:hover {
+    .drawer-nav-item:hover,
+    .drawer-nav-item:active {
       background: var(--bg-surface);
+    }
+
+    .drawer-nav-item[aria-expanded="true"] {
+      background: var(--bg-surface);
+    }
+
+    .drawer-nav-label {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .drawer-sub-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: transform 0.18s ease, color 0.14s ease;
+    }
+
+    .drawer-nav-item[aria-expanded="true"] .drawer-sub-arrow {
+      transform: rotate(90deg);
+      color: var(--text-primary);
+    }
+
+    .drawer-submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin: 2px 0 6px 14px;
+      padding-left: 8px;
+      border-left: 2px solid var(--border-hairline);
+    }
+
+    .drawer-submenu.hidden {
+      display: none;
+    }
+
+    .drawer-sub-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 14.5px;
+      font-weight: 500;
+      line-height: 1.3;
+      border: none;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background-color 0.14s ease, color 0.14s ease;
+    }
+
+    .drawer-sub-item:hover,
+    .drawer-sub-item:active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    .drawer-sub-item.drawer-sub-all {
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
     /* Hero Banner */
@@ -679,88 +754,100 @@
       margin: 4px 0 0;
     }
 
-    /* Category Grid */
+    /* Category Grid — Bold Multi-Colored Boxes (No Logo) */
     .category-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    @media (min-width: 480px) {
+    @media (min-width: 640px) {
       .category-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
       }
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       .category-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 16px;
       }
     }
 
-    @media (min-width: 1024px) {
-      .category-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-      }
-    }
-
     .category-card {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 12px 10px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-hairline);
+      min-height: 92px;
+      padding: 16px 12px;
+      border: none;
       border-radius: var(--radius-md);
-      transition: transform 0.16s ease, border-color 0.16s ease;
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
       min-width: 0;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .category-card {
+        min-height: 112px;
+        padding: 20px 16px;
+      }
     }
 
     .category-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--border-strong);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      filter: brightness(1.06);
     }
 
-    .category-thumb {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      overflow: hidden;
-      background: #ffffff;
-      border: 1px solid var(--border-hairline);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-      flex-shrink: 0;
-    }
-
-    .category-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .category-card.cat-tone-0  { background: linear-gradient(135deg, #9f1239 0%, #be123c 100%); }
+    .category-card.cat-tone-1  { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
+    .category-card.cat-tone-2  { background: linear-gradient(135deg, #065f46 0%, #059669 100%); }
+    .category-card.cat-tone-3  { background: linear-gradient(135deg, #6b21a8 0%, #9333ea 100%); }
+    .category-card.cat-tone-4  { background: linear-gradient(135deg, #9a3412 0%, #ea580c 100%); }
+    .category-card.cat-tone-5  { background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%); }
+    .category-card.cat-tone-6  { background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%); }
+    .category-card.cat-tone-7  { background: linear-gradient(135deg, #78350f 0%, #b45309 100%); }
+    .category-card.cat-tone-8  { background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%); }
+    .category-card.cat-tone-9  { background: linear-gradient(135deg, #9d174d 0%, #db2777 100%); }
+    .category-card.cat-tone-10 { background: linear-gradient(135deg, #3f6212 0%, #65a30d 100%); }
+    .category-card.cat-tone-11 { background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%); }
 
     .category-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.3;
+      font-size: clamp(1rem, 2.5vw, 1.28rem);
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
       word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
-    /* Product Grid — Strict Mobile 2-col (1-col below 315px) & 39:43 Ratio */
+    .category-sub {
+      margin-top: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.86);
+      letter-spacing: 0.02em;
+    }
+
+    /* Product Grid — Mobile 2-col (1-col under 350px) & 39:43 Ratio */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    @media (max-width: 315px) {
+    @media (max-width: 349px) {
       .product-grid {
         grid-template-columns: 1fr;
+        gap: 14px;
       }
     }
 
@@ -911,6 +998,34 @@
       grid-template-columns: 1fr;
       gap: 6px;
       margin-top: 6px;
+    }
+
+    @media (max-width: 349px) {
+      .product-card-body {
+        padding: 14px;
+        gap: 6px;
+      }
+
+      .product-title {
+        font-size: 15px;
+      }
+
+      .price-current {
+        font-size: 16px;
+      }
+
+      .product-wish-btn {
+        width: 44px;
+        height: 44px;
+        top: 10px;
+        right: 10px;
+      }
+
+      .product-card-actions .btn {
+        min-height: 46px;
+        padding: 11px 16px;
+        font-size: 14px;
+      }
     }
 
     /* Empty State */
@@ -1575,19 +1690,417 @@
     .toast-msg.error { background: #991b1b; }
     .toast-msg.success { background: #166534; }
 
-    /* Print invoice */
-    @media print {
-      body * { visibility: hidden; }
-      #printable-invoice, #printable-invoice * { visibility: visible; }
-      #printable-invoice {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: #fff;
-        color: #000;
-        padding: 20px;
+    /* Print & Branded Invoice Sheet */
+    .msf-invoice-sheet {
+      background: #ffffff;
+      color: #111111;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .msf-inv-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #111111;
+      margin-bottom: 14px;
+    }
+
+    .msf-inv-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .msf-inv-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid var(--border-hairline);
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .msf-inv-meta {
+      text-align: right;
+      min-width: 0;
+    }
+
+    @media (max-width: 480px) {
+      .msf-inv-meta {
+        text-align: left;
       }
+    }
+
+    .msf-inv-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 640px) {
+      .msf-inv-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .msf-inv-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+
+    .msf-inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+    }
+
+    .msf-inv-table th {
+      background: #111111;
+      color: #ffffff;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 600;
+    }
+
+    .msf-inv-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e4e4e7;
+      vertical-align: top;
+    }
+
+    .msf-inv-totals {
+      margin-left: auto;
+      width: min(100%, 300px);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 13px;
+    }
+
+    .msf-inv-total-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .msf-inv-grand {
+      border-top: 2px solid #111111;
+      padding-top: 7px;
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .msf-inv-footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #52525b;
+    }
+
+    #printable-invoice {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: auto;
+        margin: 12mm;
+      }
+      body {
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body > *:not(#printable-invoice) {
+        display: none !important;
+      }
+      #printable-invoice {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #111111 !important;
+        padding: 0 !important;
+      }
+      #printable-invoice .msf-invoice-sheet {
+        border: none;
+        padding: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* Multi-Colored Admin Order Update Options & Status Badges */
+    .ao-mode-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .btn-print-invoice {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: #111111;
+      color: #ffffff;
+      border: 1.5px solid #111111;
+      box-shadow: 0 2px 8px rgba(17, 17, 17, 0.16);
+      font-weight: 700;
+    }
+
+    .btn-print-invoice:hover,
+    .btn-print-invoice:active {
+      background: #27272a;
+      border-color: #27272a;
+    }
+
+    .ao-chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .ao-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+    }
+
+    .ao-status-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .ao-status-chip .ao-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .ao-c-Pending    { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+    .ao-c-Pending.active { background: #d97706; color: #ffffff; border-color: #b45309; box-shadow: 0 0 0 3px rgba(217,119,6,0.22); }
+
+    .ao-c-Confirmed  { background: #e0f2fe; color: #0369a1; border-color: #38bdf8; }
+    .ao-c-Confirmed.active { background: #0284c7; color: #ffffff; border-color: #0369a1; box-shadow: 0 0 0 3px rgba(2,132,199,0.22); }
+
+    .ao-c-Processing { background: #e0e7ff; color: #4338ca; border-color: #818cf8; }
+    .ao-c-Processing.active { background: #4f46e5; color: #ffffff; border-color: #4338ca; box-shadow: 0 0 0 3px rgba(79,70,229,0.22); }
+
+    .ao-c-Packed     { background: #ccfbf1; color: #0f766e; border-color: #2dd4bf; }
+    .ao-c-Packed.active { background: #0d9488; color: #ffffff; border-color: #0f766e; box-shadow: 0 0 0 3px rgba(13,148,136,0.22); }
+
+    .ao-c-Ready      { background: #cffafe; color: #0e7490; border-color: #22d3ee; }
+    .ao-c-Ready.active { background: #0891b2; color: #ffffff; border-color: #0e7490; box-shadow: 0 0 0 3px rgba(8,145,178,0.22); }
+
+    .ao-c-Shipped    { background: #ede9fe; color: #6d28d9; border-color: #a78bfa; }
+    .ao-c-Shipped.active { background: #7c3aed; color: #ffffff; border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(124,58,237,0.22); }
+
+    .ao-c-Out        { background: #fae8ff; color: #a21caf; border-color: #e879f9; }
+    .ao-c-Out.active { background: #c026d3; color: #ffffff; border-color: #a21caf; box-shadow: 0 0 0 3px rgba(192,38,211,0.22); }
+
+    .ao-c-Delivered  { background: #dcfce7; color: #15803d; border-color: #4ade80; }
+    .ao-c-Delivered.active { background: #16a34a; color: #ffffff; border-color: #15803d; box-shadow: 0 0 0 3px rgba(22,163,74,0.22); }
+
+    .ao-c-Cancelled  { background: #fee2e2; color: #b91c1c; border-color: #f87171; }
+    .ao-c-Cancelled.active { background: #dc2626; color: #ffffff; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(220,38,38,0.22); }
+
+    .ao-c-Returned   { background: #ffedd5; color: #c2410c; border-color: #fb923c; }
+    .ao-c-Returned.active { background: #ea580c; color: #ffffff; border-color: #c2410c; box-shadow: 0 0 0 3px rgba(234,88,12,0.22); }
+
+    .ao-c-Refunded   { background: #f1f5f9; color: #475569; border-color: #94a3b8; }
+    .ao-c-Refunded.active { background: #475569; color: #ffffff; border-color: #334155; box-shadow: 0 0 0 3px rgba(71,85,105,0.22); }
+
+    .ao-c-Unpaid     { background: #ffe4e6; color: #be123c; border-color: #fb7185; }
+    .ao-c-Unpaid.active { background: #e11d48; color: #ffffff; border-color: #be123c; box-shadow: 0 0 0 3px rgba(225,29,72,0.22); }
+
+    .ao-c-Paid       { background: #dcfce7; color: #15803d; border-color: #4ade80; }
+    .ao-c-Paid.active { background: #16a34a; color: #ffffff; border-color: #15803d; box-shadow: 0 0 0 3px rgba(22,163,74,0.22); }
+
+    .ao-c-PendingVer { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+    .ao-c-PendingVer.active { background: #d97706; color: #ffffff; border-color: #b45309; box-shadow: 0 0 0 3px rgba(217,119,6,0.22); }
+
+    .ao-status-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    /* Admin Order Status Legend */
+    .ao-legend-box {
+      background: #ffffff;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      min-width: 0;
+    }
+
+    .ao-legend-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .ao-legend-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ao-legend-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .ao-legend-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      min-width: 0;
+    }
+
+    @media (min-width: 440px) {
+      .ao-legend-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 768px) {
+      .ao-legend-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1120px) {
+      .ao-legend-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .ao-legend-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      background: #fafafa;
+      text-align: left;
+      width: 100%;
+      min-width: 0;
+      cursor: pointer;
+      transition: border-color 0.14s ease, background-color 0.14s ease, transform 0.12s ease;
+    }
+
+    .ao-legend-item:hover {
+      background: #f4f4f5;
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .ao-legend-item.active {
+      background: #ffffff;
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.08);
+    }
+
+    .ao-legend-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .ao-legend-item-top .ao-status-chip {
+      padding: 4px 9px;
+      font-size: 11.5px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ao-legend-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: #ffffff;
+      border: 1px solid var(--border-hairline);
+      border-radius: 5px;
+      padding: 2px 6px;
+      flex-shrink: 0;
+    }
+
+    .ao-legend-desc {
+      font-size: 11.5px;
+      line-height: 1.35;
+      color: var(--text-muted);
+      word-break: break-word;
+    }
+
+    .ao-legend-pay-row {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-hairline);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ao-legend-pay-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 4px;
     }
     /* Real-Time Order Tracking Status Indicator */
     .pdp-track-section {
@@ -1668,6 +2181,37 @@
       background: #f0fdf4;
       border-color: rgba(21, 128, 61, 0.28);
       color: #15803d;
+    }
+
+    .track-header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .track-view-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      color: var(--text-primary);
+      text-decoration: none;
+      white-space: nowrap;
+      min-height: 32px;
+      transition: background-color 0.14s ease, border-color 0.14s ease;
+    }
+
+    .track-view-link:hover,
+    .track-view-link:active {
+      background: var(--bg-surface);
+      border-color: var(--text-primary);
     }
 
     .track-search-form {
@@ -2221,20 +2765,19 @@
           <img id="drawer-logo-img" src="https://imgur.com/Af1qii8.png" alt="MS FASHION" style="width:32px;height:32px;object-fit:contain;" referrerpolicy="no-referrer" />
           <strong id="drawer-brand-name">MS FASHION</strong>
         </div>
-        <button type="button" id="mobile-menu-close" class="icon-btn" aria-label="Close Menu">&times;</button>
+        <button type="button" id="mobile-menu-close" class="icon-btn" style="min-width:48px;min-height:48px;font-size:24px;" aria-label="Close Menu">&times;</button>
       </div>
       <div class="drawer-nav-list">
-        <button type="button" class="drawer-nav-item" data-route="#home" data-i18n="nav_home">হোম</button>
-        <button type="button" class="drawer-nav-item" data-route="#shop" data-i18n="nav_all">সব পণ্য</button>
-        <button type="button" class="drawer-nav-item" data-route="#category/mens-fashion" data-i18n="nav_men">মেনজ ফ্যাশন</button>
-        <button type="button" class="drawer-nav-item" data-route="#category/womens-fashion" data-i18n="nav_women">উইমেনজ ফ্যাশন</button>
-        <button type="button" class="drawer-nav-item" data-route="#new-arrivals" data-i18n="nav_new">নিউ অ্যারাইভালস</button>
-        <button type="button" class="drawer-nav-item" data-route="#special-collection" data-i18n="nav_special">স্পেশাল কালেকশন</button>
-        <button type="button" class="drawer-nav-item" data-route="#track" data-i18n="nav_track">অর্ডার ট্র্যাকিং</button>
-        <button type="button" class="drawer-nav-item" data-route="#wishlist" data-i18n="nav_wishlist">উইশলিস্ট</button>
-        <button type="button" class="drawer-nav-item" data-route="#account" data-i18n="nav_account">আমার অ্যাকাউন্ট</button>
+        <button type="button" class="drawer-nav-item" data-route="#home"><span class="drawer-nav-label" data-i18n="nav_home">হোম</span></button>
+        <button type="button" class="drawer-nav-item" data-route="#shop"><span class="drawer-nav-label" data-i18n="nav_all">সব পণ্য</span></button>
+        <div id="mobile-drawer-featured-cats" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <button type="button" class="drawer-nav-item" data-route="#new-arrivals"><span class="drawer-nav-label" data-i18n="nav_new">নিউ অ্যারাইভালস</span></button>
+        <button type="button" class="drawer-nav-item" data-route="#special-collection"><span class="drawer-nav-label" data-i18n="nav_special">স্পেশাল কালেকশন</span></button>
+        <button type="button" class="drawer-nav-item" data-route="#track"><span class="drawer-nav-label" data-i18n="nav_track">অর্ডার ট্র্যাকিং</span></button>
+        <button type="button" class="drawer-nav-item" data-route="#wishlist"><span class="drawer-nav-label" data-i18n="nav_wishlist">উইশলিস্ট</span></button>
+        <button type="button" class="drawer-nav-item" data-route="#account"><span class="drawer-nav-label" data-i18n="nav_account">আমার অ্যাকাউন্ট</span></button>
       </div>
-      <div id="mobile-drawer-categories" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border-hairline);"></div>
+      <div id="mobile-drawer-categories" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-hairline);"></div>
     </aside>
 
     <!-- Main Views Container -->
@@ -2812,6 +3355,7 @@
       catalogFilters: {
         search: '',
         category: '',
+        subcategory: '',
         sort: 'newest',
         minPrice: '',
         maxPrice: '',
@@ -2937,30 +3481,87 @@
       });
     }
 
-    async function uploadSingleFile(file, folderPath, onProgress) {
-      const compressed = await compressImageFile(file);
-      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${compressed.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-      const path = `${folderPath}/${safeName}`;
-      const ref = storageRef(storage, path);
+    async function compressImageToDataUrl(file, maxWidth = 860, quality = 0.78) {
       return new Promise((resolve, reject) => {
-        const task = uploadBytesResumable(ref, compressed, { contentType: compressed.type });
-        task.on(
-          'state_changed',
-          (snap) => {
-            const pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
-            if (onProgress) onProgress(pct);
-          },
-          (err) => reject(err),
-          async () => {
-            try {
-              const url = await getDownloadURL(task.snapshot.ref);
-              resolve({ url, storagePath: path });
-            } catch (e) {
-              reject(e);
-            }
-          }
-        );
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const tryEncode = (wLimit, q) => {
+              let { width, height } = img;
+              if (width > wLimit) {
+                height = Math.round((height * wLimit) / width);
+                width = wLimit;
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, width);
+              canvas.height = Math.max(1, height);
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              let dataUrl = canvas.toDataURL('image/webp', q);
+              if (!dataUrl.startsWith('data:image/webp')) {
+                dataUrl = canvas.toDataURL('image/jpeg', q);
+              }
+              return dataUrl;
+            };
+
+            let out = tryEncode(maxWidth, quality);
+            if (out.length > 220000) out = tryEncode(720, 0.7);
+            if (out.length > 220000) out = tryEncode(560, 0.62);
+            resolve(out);
+          };
+          img.onerror = () => reject(new Error(`Unable to read image: ${file.name}`));
+          img.src = ev.target.result;
+        };
+        reader.onerror = () => reject(new Error(`Failed to load file: ${file.name}`));
+        reader.readAsDataURL(file);
       });
+    }
+
+    async function uploadSingleFile(file, folderPath, onProgress) {
+      if (onProgress) onProgress(15);
+      const compressed = await compressImageFile(file);
+      if (onProgress) onProgress(35);
+
+      if (isFirebaseAdminUser()) {
+        try {
+          storage.maxUploadRetryTime = 7000;
+          const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${compressed.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          const path = `${folderPath}/${safeName}`;
+          const ref = storageRef(storage, path);
+
+          const storageResult = await Promise.race([
+            new Promise((resolve, reject) => {
+              const task = uploadBytesResumable(ref, compressed, { contentType: compressed.type });
+              task.on(
+                'state_changed',
+                (snap) => {
+                  const rawPct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 50;
+                  if (onProgress) onProgress(Math.max(40, Math.min(95, rawPct)));
+                },
+                (err) => reject(err),
+                async () => {
+                  try {
+                    const url = await getDownloadURL(task.snapshot.ref);
+                    resolve({ url, storagePath: path });
+                  } catch (e) {
+                    reject(e);
+                  }
+                }
+              );
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Storage timeout')), 8000))
+          ]);
+          if (onProgress) onProgress(100);
+          return storageResult;
+        } catch (storageErr) {
+          console.warn('Storage upload fallback to optimized inline image:', storageErr.message);
+        }
+      }
+
+      const dataUrl = await compressImageToDataUrl(compressed);
+      if (onProgress) onProgress(100);
+      return { url: dataUrl, storagePath: '' };
     }
     // =========================================================================
     // 6. FIRESTORE DATA LOADING & REAL-TIME LISTENERS
@@ -3107,6 +3708,7 @@
           console.warn('Products load error:', e2);
         }
       }
+      renderMobileDrawerCategories();
     }
 
     async function loadApprovedReviews() {
@@ -3141,16 +3743,101 @@
       document.getElementById('wishlist-count-badge').textContent = String(state.wishlist.length);
     }
 
+    const MENS_DEFAULT_SUB_SLUGS = [
+      't-shirts', 'polo-shirts', 'casual-shirts', 'formal-shirts',
+      'jeans', 'pants', 'hoodies', 'sweatshirts', 'jackets', 'sportswear', 'tracksuits'
+    ];
+
+    function getCategorySubmenuItems(parentCat, allCats) {
+      const pid = parentCat.id || parentCat.slug;
+      const pslug = parentCat.slug || parentCat.id;
+      const seenRoutes = new Set();
+      const items = [];
+
+      // 1. Explicit child categories linked via parentId
+      allCats.forEach((c) => {
+        const cParent = String(c.parentId || '').trim();
+        const isExplicitChild = cParent && (cParent === pid || cParent === pslug);
+        const isDefaultMensChild = !cParent && (pid === 'mens-fashion' || pslug === 'mens-fashion') && MENS_DEFAULT_SUB_SLUGS.includes(c.slug || c.id);
+        if (isExplicitChild || isDefaultMensChild) {
+          const route = `#category/${c.slug || c.id}`;
+          if (!seenRoutes.has(route)) {
+            seenRoutes.add(route);
+            items.push({
+              label: state.lang === 'bn' ? (c.nameBn || c.name) : c.name,
+              route
+            });
+          }
+        }
+      });
+
+      // 2. Product-level subcategories attached to this parent category
+      state.products.forEach((p) => {
+        const matchesParent = p.categoryId === pid || p.categoryId === pslug || slugify(p.categoryName || '') === pslug;
+        const sub = String(p.subcategory || '').trim();
+        if (matchesParent && sub) {
+          const route = `#category/${pslug}?sub=${encodeURIComponent(sub)}`;
+          if (!seenRoutes.has(route)) {
+            seenRoutes.add(route);
+            items.push({ label: sub, route });
+          }
+        }
+      });
+
+      return items;
+    }
+
+    function renderMobileDrawerMenuItemHTML(cat, allCats, scopeKey) {
+      const label = state.lang === 'bn' ? (cat.nameBn || cat.name) : cat.name;
+      const slug = cat.slug || cat.id;
+      const subs = getCategorySubmenuItems(cat, allCats);
+      if (!subs.length) {
+        return `
+          <button type="button" class="drawer-nav-item" data-route="#category/${esc(slug)}">
+            <span class="drawer-nav-label">${esc(label)}</span>
+          </button>
+        `;
+      }
+      const subId = `drawer-sub-${scopeKey}-${slugify(slug || cat.id)}`;
+      const allLabel = state.lang === 'bn' ? `সব ${label}` : `All ${label}`;
+      return `
+        <div class="drawer-nav-group">
+          <button type="button" class="drawer-nav-item has-submenu" data-submenu-toggle="${esc(subId)}" aria-expanded="false" aria-controls="${esc(subId)}">
+            <span class="drawer-nav-label">${esc(label)}</span>
+            <span class="drawer-sub-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+            </span>
+          </button>
+          <div id="${esc(subId)}" class="drawer-submenu hidden">
+            <button type="button" class="drawer-sub-item drawer-sub-all" data-route="#category/${esc(slug)}">${esc(allLabel)}</button>
+            ${subs.map((sub) => `
+              <button type="button" class="drawer-sub-item" data-route="${esc(sub.route)}">${esc(sub.label)}</button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function renderMobileDrawerCategories() {
+      const cats = state.categories.length ? state.categories : INITIAL_CATEGORIES;
+      const featuredHost = document.getElementById('mobile-drawer-featured-cats');
+      if (featuredHost) {
+        const mensCat = cats.find((c) => (c.slug || c.id) === 'mens-fashion') || { id: 'mens-fashion', slug: 'mens-fashion', name: "Men's Fashion", nameBn: t('nav_men') };
+        const womensCat = cats.find((c) => (c.slug || c.id) === 'womens-fashion') || { id: 'womens-fashion', slug: 'womens-fashion', name: "Women's Fashion", nameBn: t('nav_women') };
+        featuredHost.innerHTML = [mensCat, womensCat]
+          .map((cat) => renderMobileDrawerMenuItemHTML(cat, cats, 'feat'))
+          .join('');
+      }
+
       const host = document.getElementById('mobile-drawer-categories');
       if (!host) return;
-      const cats = state.categories.length ? state.categories : INITIAL_CATEGORIES;
-      host.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;">${state.lang === 'bn' ? 'ক্যাটাগরি সমূহ' : 'Categories'}</div>` +
-        cats.map((c) => `
-          <button type="button" class="drawer-nav-item" data-route="#category/${esc(c.slug || c.id)}">
-            <span>${esc(state.lang === 'bn' ? (c.nameBn || c.name) : c.name)}</span>
-          </button>
-        `).join('');
+      const topCats = cats.filter((c) => !String(c.parentId || '').trim());
+      host.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;padding:0 16px 8px;">${state.lang === 'bn' ? 'ক্যাটাগরি সমূহ' : 'Categories'}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${topCats.map((c) => renderMobileDrawerMenuItemHTML(c, cats, 'cat')).join('')}
+        </div>
+      `;
     }
 
     // =========================================================================
@@ -3271,14 +3958,16 @@
               <a href="#shop" class="btn btn-outline btn-sm">${t('view_all')}</a>
             </div>
             <div class="category-grid">
-              ${cats.map((c) => `
-                <a href="#category/${esc(c.slug || c.id)}" class="category-card">
-                  <div class="category-thumb">
-                    <img src="${esc(c.imageUrl || OFFICIAL_LOGO)}" alt="${esc(c.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
-                  </div>
-                  <span class="category-name">${esc(state.lang === 'bn' ? (c.nameBn || c.name) : c.name)}</span>
-                </a>
-              `).join('')}
+              ${cats.map((c, idx) => {
+                const primaryName = state.lang === 'bn' ? (c.nameBn || c.name) : c.name;
+                const altName = state.lang === 'bn' ? c.name : (c.nameBn || '');
+                return `
+                  <a href="#category/${esc(c.slug || c.id)}" class="category-card cat-tone-${idx % 12}">
+                    <span class="category-name">${esc(primaryName)}</span>
+                    ${altName && altName !== primaryName ? `<span class="category-sub">${esc(altName)}</span>` : ''}
+                  </a>
+                `;
+              }).join('')}
             </div>
           </div>
         </section>
@@ -3392,6 +4081,10 @@
           (cat && (p.categoryId === cat.id || p.categoryName === cat.name))
         );
       }
+      if (f.subcategory) {
+        const subLower = f.subcategory.toLowerCase();
+        list = list.filter((p) => String(p.subcategory || '').trim().toLowerCase() === subLower);
+      }
       if (f.search) {
         const q = f.search.toLowerCase();
         list = list.filter((p) =>
@@ -3433,6 +4126,7 @@
       else if (f.category) {
         const c = cats.find((x) => x.slug === f.category || x.id === f.category);
         if (c) title = state.lang === 'bn' ? (c.nameBn || c.name) : c.name;
+        if (f.subcategory) title = `${title} · ${f.subcategory}`;
       } else if (f.search) {
         title = `${t('btn_search')}: "${f.search}"`;
       }
@@ -3519,6 +4213,7 @@
       });
       document.getElementById('filter-cat-select')?.addEventListener('change', (e) => {
         state.catalogFilters.category = e.target.value;
+        state.catalogFilters.subcategory = '';
         renderCatalog();
       });
       document.getElementById('filter-min-price')?.addEventListener('change', (e) => {
@@ -3546,7 +4241,7 @@
         renderCatalog();
       });
       document.getElementById('filter-reset-btn')?.addEventListener('click', () => {
-        state.catalogFilters = { search: '', category: '', sort: 'newest', minPrice: '', maxPrice: '', size: '', color: '', inStockOnly: false, discountOnly: false, flag: '' };
+        state.catalogFilters = { search: '', category: '', subcategory: '', sort: 'newest', minPrice: '', maxPrice: '', size: '', color: '', inStockOnly: false, discountOnly: false, flag: '' };
         renderCatalog();
       });
       document.getElementById('catalog-load-more')?.addEventListener('click', async () => {
@@ -3701,7 +4396,10 @@
               <div class="panel-box" style="background:var(--bg-surface);font-size:13px;display:flex;flex-direction:column;gap:6px;">
                 <div><strong>${state.lang === 'bn' ? 'ডেলিভারি তথ্য:' : 'Delivery Info:'}</strong> Dhaka ${formatPrice(state.settings.dhakaDeliveryCharge)} (${esc(state.settings.dhakaDeliveryEstimate)}) · Outside Dhaka ${formatPrice(state.settings.outsideDhakaDeliveryCharge)} (${esc(state.settings.outsideDhakaDeliveryEstimate)})</div>
                 <div><strong>${state.lang === 'bn' ? 'রিটার্ন পলিসি:' : 'Return Policy:'}</strong> ${state.lang === 'bn' ? 'ডেলিভারি ম্যানের সামনে পণ্য যাচাই করে নেওয়ার সুবিধা এবং ৭ দিনের ইজি এক্সচেঞ্জ।' : 'Check product on delivery. 7-day easy size/defect exchange policy.'}</div>
-                <button type="button" id="pdp-jump-track" class="pdp-track-jump-btn">${state.lang === 'bn' ? 'অর্ডার ট্র্যাক করুন ↓ (লাইভ স্ট্যাটাস)' : 'Track Your Order ↓ (Live Status)'}</button>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
+                  <button type="button" id="pdp-jump-track" class="pdp-track-jump-btn">${state.lang === 'bn' ? 'অর্ডার ট্র্যাক করুন ↓ (লাইভ স্ট্যাটাস)' : 'Track Your Order ↓ (Live Status)'}</button>
+                  <a href="#track" class="pdp-track-jump-btn" data-pdp-open-track-view>${state.lang === 'bn' ? 'অর্ডার ট্র্যাকিং পেজ →' : 'Order Tracking Page →'}</a>
+                </div>
               </div>
 
               <div>
@@ -3713,7 +4411,7 @@
 
           <!-- Track Your Order (Real-Time Firestore Status Indicator) -->
           <section id="pdp-track-order-section" class="pdp-track-section" aria-label="${esc(t('track_title'))}">
-            ${renderOrderTrackingSectionHTML({ compactTitle: false })}
+            ${renderOrderTrackingSectionHTML({ compactTitle: false, showTrackViewLink: true })}
           </section>
 
           <!-- Reviews -->
@@ -3756,6 +4454,16 @@
 
       document.getElementById('pdp-jump-track')?.addEventListener('click', () => {
         document.getElementById('pdp-track-order-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      host.querySelector('[data-pdp-open-track-view]')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const typedId = String(document.querySelector('#pdp-track-order-section [data-track-input]')?.value || '').trim().toUpperCase();
+        if (/^[A-Z0-9_-]{4,40}$/.test(typedId)) {
+          state.lastTrackedOrderId = typedId;
+          state.lastTrackedExplicit = true;
+        }
+        navigateTo('#track');
       });
 
       mountOrderTracker(document.getElementById('pdp-track-order-section'), {
@@ -4798,7 +5506,7 @@
       };
     }
 
-    function renderOrderTrackingSectionHTML({ compactTitle = false } = {}) {
+    function renderOrderTrackingSectionHTML({ compactTitle = false, showTrackViewLink = false } = {}) {
       const bn = state.lang === 'bn';
       const titleTag = compactTitle ? 'h1' : 'h2';
       return `
@@ -4812,9 +5520,17 @@
                   : 'Watch live order progress in real time across Packed, Shipped, Out for Delivery, and Delivered.'}
               </p>
             </div>
-            <div class="track-live-badge" data-track-live-badge>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
-              <span data-track-live-label>${bn ? 'লাইভ ট্র্যাকিং প্রস্তুত' : 'Live Sync Ready'}</span>
+            <div class="track-header-actions">
+              <div class="track-live-badge" data-track-live-badge>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+                <span data-track-live-label>${bn ? 'লাইভ ট্র্যাকিং প্রস্তুত' : 'Live Sync Ready'}</span>
+              </div>
+              ${showTrackViewLink ? `
+                <a href="#track" class="track-view-link" data-open-track-view>
+                  <span>${bn ? 'অর্ডার ট্র্যাকিং পেজ' : 'Full Tracking View'}</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              ` : ''}
             </div>
           </div>
 
@@ -5049,6 +5765,18 @@
         });
       });
 
+      sectionEl.querySelectorAll('[data-open-track-view]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const typedId = String(inputEl.value || '').trim().toUpperCase();
+          if (/^[A-Z0-9_-]{4,40}$/.test(typedId)) {
+            state.lastTrackedOrderId = typedId;
+            state.lastTrackedExplicit = true;
+          }
+          navigateTo('#track');
+        });
+      });
+
       if (initialOrderId && autoSelectLatest) {
         subscribeToOrder(initialOrderId, { isAuto: !state.lastTrackedExplicit });
       } else {
@@ -5103,22 +5831,29 @@
         renderHome();
       } else if (hash === '#shop') {
         state.catalogFilters.category = '';
+        state.catalogFilters.subcategory = '';
         state.catalogFilters.flag = '';
         showOnlyView('view-catalog');
         renderCatalog();
       } else if (hash === '#new-arrivals') {
         state.catalogFilters.category = '';
+        state.catalogFilters.subcategory = '';
         state.catalogFilters.flag = 'new';
         showOnlyView('view-catalog');
         renderCatalog();
       } else if (hash === '#special-collection') {
         state.catalogFilters.category = '';
+        state.catalogFilters.subcategory = '';
         state.catalogFilters.flag = 'special';
         showOnlyView('view-catalog');
         renderCatalog();
       } else if (hash.startsWith('#category/')) {
+        const rawCat = hash.replace('#category/', '');
+        const [catPart, queryPart] = rawCat.split('?');
+        const params = new URLSearchParams(queryPart || '');
         state.catalogFilters.flag = '';
-        state.catalogFilters.category = decodeURIComponent(hash.replace('#category/', ''));
+        state.catalogFilters.category = decodeURIComponent(catPart);
+        state.catalogFilters.subcategory = params.get('sub') || '';
         showOnlyView('view-catalog');
         renderCatalog();
       } else if (hash.startsWith('#product/')) {
@@ -5221,6 +5956,17 @@
     document.getElementById('mobile-menu-close').addEventListener('click', closeMobileDrawer);
     document.getElementById('mobile-drawer-backdrop').addEventListener('click', closeMobileDrawer);
     document.getElementById('mobile-drawer').addEventListener('click', (e) => {
+      const subToggle = e.target.closest('[data-submenu-toggle]');
+      if (subToggle) {
+        const targetId = subToggle.getAttribute('data-submenu-toggle');
+        const subEl = document.getElementById(targetId);
+        if (subEl) {
+          const isOpen = subToggle.getAttribute('aria-expanded') === 'true';
+          subToggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+          subEl.classList.toggle('hidden', isOpen);
+        }
+        return;
+      }
       const btn = e.target.closest('[data-route]');
       if (btn) {
         closeMobileDrawer();
@@ -5340,12 +6086,28 @@
       document.getElementById('admin-login-modal').classList.add('hidden');
     });
 
-    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const pw = document.getElementById('admin-password-input').value;
+    const DEFAULT_ADMIN_PASS_HASH = 'f415da33a6ba7e900f34a2d6239c3e73540c7cf1e051447121c0aef5e94bbf80';
+
+    async function hashAdminPasswordClient(pw) {
+      const data = new TextEncoder().encode(`msf-admin-salt-2026:${String(pw || '')}`);
+      const buf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyAdminPasswordLocalHash(pw) {
+      if (!window.crypto?.subtle) return false;
+      const digest = await hashAdminPasswordClient(pw);
+      const expected = localStorage.getItem('msf_local_admin_hash') || DEFAULT_ADMIN_PASS_HASH;
+      return digest === expected;
+    }
+
+    let adminUnlockBusy = false;
+    async function attemptAdminPasswordUnlock(pw, { silentError = false } = {}) {
+      if (adminUnlockBusy) return;
       const errBox = document.getElementById('admin-login-error');
       const submitBtn = document.getElementById('admin-login-submit');
       errBox.classList.add('hidden');
+      adminUnlockBusy = true;
       submitBtn.disabled = true;
 
       try {
@@ -5363,37 +6125,67 @@
           }
           verified = true;
         } else {
-          const res = await fetch('/api/admin/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: pw })
-          });
-          const ct = res.headers.get('content-type') || '';
-          if (!ct.includes('application/json')) {
-            throw new Error(
-              state.lang === 'bn'
-                ? 'স্ট্যাটিক হোস্টিংয়ে পাসওয়ার্ড সার্ভার নেই। নিচের "Admin Google Account" দিয়ে লগইন করুন।'
-                : 'Password server is unavailable on static hosting. Please use "Sign in with Admin Google Account" below.'
-            );
+          let serverHandled = false;
+          try {
+            const res = await fetch('/api/admin/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ password: pw })
+            });
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              serverHandled = true;
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Invalid password');
+              state.adminSessionToken = data.sessionToken;
+              sessionStorage.setItem('msf_admin_token', data.sessionToken);
+              verified = true;
+            }
+          } catch (netErr) {
+            if (serverHandled) throw netErr;
           }
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Invalid password');
-          state.adminSessionToken = data.sessionToken;
-          sessionStorage.setItem('msf_admin_token', data.sessionToken);
-          verified = true;
+
+          if (!serverHandled) {
+            const ok = await verifyAdminPasswordLocalHash(pw);
+            if (!ok) {
+              throw new Error(state.lang === 'bn' ? 'পাসওয়ার্ড সঠিক নয়' : 'Incorrect password');
+            }
+            verified = true;
+          }
         }
 
         if (verified) {
           state.adminVerified = true;
           document.getElementById('admin-login-modal').classList.add('hidden');
+          document.getElementById('admin-password-input').value = '';
           openAdminDashboard();
         }
       } catch (err) {
-        errBox.textContent = err.message || 'Authentication failed';
-        errBox.classList.remove('hidden');
+        if (!silentError) {
+          errBox.textContent = err.message || 'Authentication failed';
+          errBox.classList.remove('hidden');
+        }
       } finally {
+        adminUnlockBusy = false;
         submitBtn.disabled = false;
       }
+    }
+
+    document.getElementById('admin-password-input').addEventListener('input', async (e) => {
+      const val = e.target.value;
+      if (!val || val.length < 6) return;
+      try {
+        const matched = await verifyAdminPasswordLocalHash(val);
+        if (matched) {
+          await attemptAdminPasswordUnlock(val, { silentError: true });
+        }
+      } catch {}
+    });
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pw = document.getElementById('admin-password-input').value;
+      await attemptAdminPasswordUnlock(pw, { silentError: false });
     });
 
     document.getElementById('admin-google-login-btn').addEventListener('click', async () => {
@@ -5803,11 +6595,11 @@
         const renderImagePreviews = () => {
           const grid = document.getElementById('pf-image-previews');
           grid.innerHTML = editorProductImages.map((im, idx) => `
-            <div class="upload-item">
+            <div class="upload-item" data-upload-item="${idx}">
               <div class="upload-thumb"><img src="${esc(im.url)}" alt="" /></div>
-              <div class="progress-bar"><div class="progress-fill" style="width:${im.progress ?? 100}%;"></div></div>
-              <div style="font-size:10px;color:${im.status === 'error' ? 'var(--danger)' : 'var(--text-muted)'};">
-                ${im.status === 'error' ? 'Failed' : (im.isMain ? 'MAIN IMAGE' : `#${idx + 1}`)}
+              <div class="progress-bar"><div class="progress-fill" data-upload-fill="${idx}" style="width:${im.progress ?? 100}%;background:${im.status === 'done' ? '#15803d' : (im.status === 'error' ? '#b91c1c' : 'var(--bg-dark)')};"></div></div>
+              <div data-upload-status="${idx}" style="font-size:10px;font-weight:600;color:${im.status === 'error' ? 'var(--danger)' : (im.status === 'done' ? '#15803d' : 'var(--text-muted)')};">
+                ${im.status === 'error' ? 'Failed' : (im.status === 'uploading' ? `Uploading ${im.progress || 0}%` : (im.isMain ? '✓ MAIN IMAGE' : `✓ Ready #${idx + 1}`))}
               </div>
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
                 <button type="button" class="btn btn-outline btn-sm" style="min-height:26px;padding:2px 6px;font-size:11px;" data-img-main="${idx}">Main</button>
@@ -5820,54 +6612,91 @@
         };
         renderImagePreviews();
 
+        let activeUploadPromise = null;
         const processFileQueue = async (files) => {
           const pidTemp = editingProductId || `prod_${Date.now()}`;
           const ov = document.getElementById('pf-overall-progress');
           const ovText = document.getElementById('pf-overall-text');
           const ovBar = document.getElementById('pf-overall-bar');
           ov.classList.remove('hidden');
+          ovText.style.color = 'var(--text-primary)';
+          ovText.textContent = `Uploading 0 / ${files.length}...`;
+          ovBar.style.width = '10%';
+          ovBar.style.background = 'var(--bg-dark)';
 
-          const items = files.map((file) => {
+          const startIdx = editorProductImages.length;
+          const items = files.map((file, offset) => {
             const entry = {
               url: URL.createObjectURL(file),
               storagePath: '',
               isMain: editorProductImages.length === 0,
               order: editorProductImages.length,
-              progress: 0,
+              progress: 10,
               status: 'uploading',
-              file
+              file,
+              _idx: startIdx + offset
             };
             editorProductImages.push(entry);
             return entry;
           });
           renderImagePreviews();
 
-          let completed = 0;
+          let succeeded = 0;
+          let failed = 0;
           const concurrency = 3;
           const queue = [...items];
-          async function worker() {
-            while (queue.length) {
-              const entry = queue.shift();
-              try {
-                const res = await uploadSingleFile(entry.file, `products/${pidTemp}`, (pct) => {
-                  entry.progress = pct;
-                  renderImagePreviews();
-                });
-                entry.url = res.url;
-                entry.storagePath = res.storagePath;
-                entry.status = 'done';
-                entry.progress = 100;
-              } catch (err) {
-                entry.status = 'error';
-                showToast(`Upload failed (${entry.file.name}): ${err.message}`, 'error');
+
+          const runPromise = (async () => {
+            async function worker() {
+              while (queue.length) {
+                const entry = queue.shift();
+                const currentIdx = editorProductImages.indexOf(entry);
+                try {
+                  const res = await uploadSingleFile(entry.file, `products/${pidTemp}`, (pct) => {
+                    entry.progress = pct;
+                    const idxNow = editorProductImages.indexOf(entry);
+                    const fillEl = document.querySelector(`[data-upload-fill="${idxNow}"]`);
+                    const stEl = document.querySelector(`[data-upload-status="${idxNow}"]`);
+                    if (fillEl) fillEl.style.width = `${pct}%`;
+                    if (stEl && entry.status === 'uploading') stEl.textContent = `Uploading ${pct}%`;
+                  });
+                  entry.url = res.url;
+                  entry.storagePath = res.storagePath;
+                  entry.status = 'done';
+                  entry.progress = 100;
+                  succeeded++;
+                } catch (err) {
+                  entry.status = 'error';
+                  failed++;
+                  showToast(`Upload failed (${entry.file.name}): ${err.message}`, 'error');
+                }
+                const doneCount = succeeded + failed;
+                ovBar.style.width = `${Math.round((doneCount / items.length) * 100)}%`;
+                if (doneCount < items.length) {
+                  ovText.textContent = `Uploading ${doneCount} / ${items.length}...`;
+                } else if (failed === 0) {
+                  ovBar.style.background = '#15803d';
+                  ovText.style.color = '#15803d';
+                  ovText.textContent = state.lang === 'bn'
+                    ? `✓ সবগুলো ছবি (${succeeded}/${items.length}) সফলভাবে আপলোড হয়েছে!`
+                    : `✓ All ${succeeded} image(s) uploaded successfully!`;
+                } else {
+                  ovBar.style.background = '#b45309';
+                  ovText.style.color = '#b91c1c';
+                  ovText.textContent = `Uploaded ${succeeded}, Failed ${failed}`;
+                }
+                if (currentIdx >= 0) renderImagePreviews();
               }
-              completed++;
-              ovText.textContent = `Uploaded ${completed} / ${items.length} images`;
-              ovBar.style.width = `${Math.round((completed / items.length) * 100)}%`;
-              renderImagePreviews();
             }
+            await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+          })();
+
+          activeUploadPromise = runPromise;
+          try {
+            await runPromise;
+          } finally {
+            if (activeUploadPromise === runPromise) activeUploadPromise = null;
           }
-          await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
         };
 
         document.getElementById('pf-image-files').addEventListener('change', (e) => {
@@ -5905,7 +6734,10 @@
           if (retryBtn) {
             const i = Number(retryBtn.getAttribute('data-img-retry'));
             const item = editorProductImages[i];
-            if (item?.file) processFileQueue([item.file]);
+            if (item?.file) {
+              editorProductImages.splice(i, 1);
+              processFileQueue([item.file]);
+            }
             return;
           }
           const delBtn = e.target.closest('[data-img-del]');
@@ -5931,61 +6763,83 @@
 
         document.getElementById('adm-product-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const pid = editingProductId || `prod_${Date.now()}`;
-          const catId = document.getElementById('pf-cat').value;
-          const catObj = cats.find((c) => c.id === catId);
-          const regPrice = Number(document.getElementById('pf-reg-price').value || 0);
-          const salePrice = Number(document.getElementById('pf-sale-price').value || 0);
-          const discPct = regPrice > 0 && salePrice > 0 && salePrice < regPrice ? Math.round(((regPrice - salePrice) / regPrice) * 100) : 0;
-
-          let parsedVariants = [];
-          const varRaw = document.getElementById('pf-variants').value.trim();
-          if (varRaw) {
-            try { parsedVariants = JSON.parse(varRaw); } catch { showToast('Invalid Variants JSON', 'error'); return; }
-          }
-
-          const cleanImages = editorProductImages
-            .filter((im) => im.status !== 'error' && im.url && !im.url.startsWith('blob:'))
-            .map((im, idx) => ({ url: im.url, storagePath: im.storagePath || '', isMain: Boolean(im.isMain), order: idx }));
-
-          const productDoc = {
-            id: pid,
-            name: document.getElementById('pf-name').value.trim(),
-            nameBn: document.getElementById('pf-name-bn').value.trim(),
-            sku: document.getElementById('pf-sku').value.trim(),
-            shortDescription: document.getElementById('pf-short-desc').value.trim(),
-            fullDescription: document.getElementById('pf-full-desc').value.trim(),
-            categoryId: catId,
-            categoryName: catObj?.name || catId,
-            subcategory: document.getElementById('pf-subcat').value.trim(),
-            brand: document.getElementById('pf-brand').value.trim(),
-            tags: document.getElementById('pf-tags').value.split(',').map((s) => s.trim()).filter(Boolean),
-            keywords: document.getElementById('pf-tags').value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean),
-            regularPrice: regPrice,
-            salePrice,
-            wholesalePrice: Number(document.getElementById('pf-wholesale').value || 0),
-            discountPercent: discPct,
-            images: cleanImages,
-            sizes: document.getElementById('pf-sizes').value.split(',').map((s) => s.trim()).filter(Boolean),
-            colors: document.getElementById('pf-colors').value.split(',').map((s) => s.trim()).filter(Boolean),
-            variants: parsedVariants,
-            stock: Number(document.getElementById('pf-stock').value || 0),
-            soldCount: Number(p.soldCount || 0),
-            ratingAvg: Number(p.ratingAvg || 5),
-            reviewCount: Number(p.reviewCount || 0),
-            isFeatured: document.getElementById('pf-featured').checked,
-            isBestSeller: document.getElementById('pf-best').checked,
-            isNewArrival: document.getElementById('pf-new').checked,
-            isTrending: document.getElementById('pf-trending').checked,
-            isSpecialCollection: document.getElementById('pf-special').checked,
-            isFlashSale: document.getElementById('pf-flash').checked,
-            active: document.getElementById('pf-active').checked,
-            published: document.getElementById('pf-published').checked,
-            createdAt: p.createdAt || serverTimestamp(),
-            updatedAt: serverTimestamp()
-          };
+          const saveBtn = document.getElementById('pf-save-btn');
+          const origBtnText = saveBtn.textContent;
+          saveBtn.disabled = true;
+          saveBtn.textContent = state.lang === 'bn' ? 'আপলোড হচ্ছে...' : 'Saving & Publishing...';
 
           try {
+            if (activeUploadPromise) {
+              await activeUploadPromise;
+            }
+
+            if (!isFirebaseAdminUser() && !CLOUD_FUNCTIONS_BASE) {
+              const authRes = await signInWithPopup(auth, new GoogleAuthProvider());
+              if (authRes.user.email !== BOOTSTRAP_ADMIN_EMAIL || !authRes.user.emailVerified) {
+                throw new Error(`Admin write requires ${BOOTSTRAP_ADMIN_EMAIL}`);
+              }
+              updateAdminFirebaseSyncBanner();
+            }
+
+            const pid = editingProductId || `prod_${Date.now()}`;
+            const catId = document.getElementById('pf-cat').value;
+            const catObj = cats.find((c) => c.id === catId);
+            const regPrice = Number(document.getElementById('pf-reg-price').value || 0);
+            const salePrice = Number(document.getElementById('pf-sale-price').value || 0);
+            const discPct = regPrice > 0 && salePrice > 0 && salePrice < regPrice ? Math.round(((regPrice - salePrice) / regPrice) * 100) : 0;
+
+            let parsedVariants = [];
+            const varRaw = document.getElementById('pf-variants').value.trim();
+            if (varRaw) {
+              try { parsedVariants = JSON.parse(varRaw); } catch { showToast('Invalid Variants JSON', 'error'); return; }
+            }
+
+            const cleanImages = editorProductImages
+              .filter((im) => im.status !== 'error' && im.url && !im.url.startsWith('blob:'))
+              .map((im, idx) => ({ url: im.url, storagePath: im.storagePath || '', isMain: Boolean(im.isMain), order: idx }));
+
+            const productDoc = {
+              id: pid,
+              name: document.getElementById('pf-name').value.trim(),
+              nameBn: document.getElementById('pf-name-bn').value.trim(),
+              sku: document.getElementById('pf-sku').value.trim(),
+              shortDescription: document.getElementById('pf-short-desc').value.trim(),
+              fullDescription: document.getElementById('pf-full-desc').value.trim(),
+              categoryId: catId,
+              categoryName: catObj?.name || catId,
+              subcategory: document.getElementById('pf-subcat').value.trim(),
+              brand: document.getElementById('pf-brand').value.trim(),
+              tags: document.getElementById('pf-tags').value.split(',').map((s) => s.trim()).filter(Boolean),
+              keywords: document.getElementById('pf-tags').value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean),
+              regularPrice: regPrice,
+              salePrice,
+              wholesalePrice: Number(document.getElementById('pf-wholesale').value || 0),
+              discountPercent: discPct,
+              images: cleanImages,
+              sizes: document.getElementById('pf-sizes').value.split(',').map((s) => s.trim()).filter(Boolean),
+              colors: document.getElementById('pf-colors').value.split(',').map((s) => s.trim()).filter(Boolean),
+              variants: parsedVariants,
+              stock: Number(document.getElementById('pf-stock').value || 0),
+              soldCount: Number(p.soldCount || 0),
+              ratingAvg: Number(p.ratingAvg || 5),
+              reviewCount: Number(p.reviewCount || 0),
+              isFeatured: document.getElementById('pf-featured').checked,
+              isBestSeller: document.getElementById('pf-best').checked,
+              isNewArrival: document.getElementById('pf-new').checked,
+              isTrending: document.getElementById('pf-trending').checked,
+              isSpecialCollection: document.getElementById('pf-special').checked,
+              isFlashSale: document.getElementById('pf-flash').checked,
+              active: document.getElementById('pf-active').checked,
+              published: document.getElementById('pf-published').checked,
+              createdAt: p.createdAt || serverTimestamp(),
+              updatedAt: serverTimestamp()
+            };
+
+            const estBytes = JSON.stringify(productDoc).length;
+            if (estBytes > 950000) {
+              throw new Error('Too many large inline images for one document. Please keep fewer photos per product or verify Firebase Storage.');
+            }
+
             await setDoc(doc(db, 'products', pid), productDoc);
             const costVal = Number(document.getElementById('pf-cost').value || 0);
             await setDoc(doc(db, 'product_private', pid), {
@@ -5993,7 +6847,7 @@
               costPrice: costVal,
               updatedAt: serverTimestamp()
             });
-            showToast('Product saved to Firestore!', 'success');
+            showToast(state.lang === 'bn' ? 'পণ্যটি সফলভাবে আপলোড ও পাবলিশ হয়েছে!' : 'Product successfully uploaded & published!', 'success');
             editingProductId = null;
             editorProductImages = [];
             await loadAdminCollections();
@@ -6001,7 +6855,12 @@
             state.adminTab = 'products';
             renderAdminTab('products');
           } catch (err) {
-            showToast(err.message || 'Save failed. Ensure Firebase Admin session is connected.', 'error');
+            showToast(err.message || 'Save failed. Please verify Admin Google session.', 'error');
+          } finally {
+            if (saveBtn.isConnected) {
+              saveBtn.disabled = false;
+              saveBtn.textContent = origBtnText;
+            }
           }
         });
       } else if (tab === 'categories') {
@@ -6055,10 +6914,64 @@
         });
         document.getElementById('adm-add-cat-btn').addEventListener('click', () => openCategoryEditor(null));
       } else if (tab === 'orders') {
-        const statuses = ['All', 'Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+        const orderLegendItems = [
+          { key: 'Pending', desc: 'New order awaiting verification' },
+          { key: 'Confirmed', desc: 'Verified & approved by admin' },
+          { key: 'Processing', desc: 'Preparing & quality checking' },
+          { key: 'Packed', desc: 'Parcel packed & sealed' },
+          { key: 'Ready to Ship', desc: 'Ready for courier handover' },
+          { key: 'Shipped', desc: 'In transit with courier' },
+          { key: 'Out for Delivery', desc: 'Rider out for final drop' },
+          { key: 'Delivered', desc: 'Completed & handed to buyer' },
+          { key: 'Cancelled', desc: 'Order cancelled before delivery' },
+          { key: 'Returned', desc: 'Parcel returned by customer' },
+          { key: 'Refunded', desc: 'Order payment refunded' }
+        ];
+        const paymentLegendItems = ['Unpaid', 'Pending Verification', 'Paid', 'Refunded'];
+        const statuses = ['All', ...orderLegendItems.map((it) => it.key)];
+        const statusCounts = state.adminOrders.reduce((acc, o) => {
+          const k = o.orderStatus || 'Pending';
+          acc[k] = (acc[k] || 0) + 1;
+          return acc;
+        }, {});
+
         host.innerHTML = `
+          <section class="ao-legend-box" aria-label="Order Status Legend">
+            <div class="ao-legend-head">
+              <div>
+                <h3 class="ao-legend-title">Order Status Legend</h3>
+                <div class="ao-legend-sub">Quick color-coded reference for all order &amp; payment stages (tap a status card to filter)</div>
+              </div>
+              <span class="ao-legend-count tabular-nums">Total: ${state.adminOrders.length}</span>
+            </div>
+            <div class="ao-legend-grid" id="adm-order-legend">
+              ${orderLegendItems.map((item) => {
+                const cls = getOrderStatusClassKey(item.key);
+                const cnt = statusCounts[item.key] || 0;
+                return `
+                  <button type="button" class="ao-legend-item" data-legend-status="${esc(item.key)}">
+                    <div class="ao-legend-item-top">
+                      <span class="ao-status-chip ao-c-${esc(cls)}"><span class="ao-dot"></span><span>${esc(item.key)}</span></span>
+                      <span class="ao-legend-count tabular-nums">${cnt}</span>
+                    </div>
+                    <span class="ao-legend-desc">${esc(item.desc)}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+            <div class="ao-legend-pay-row">
+              <span class="ao-legend-pay-label">Payment Statuses:</span>
+              ${paymentLegendItems.map((ps) => {
+                const cls = getOrderStatusClassKey(ps);
+                return `<span class="ao-status-chip ao-c-${esc(cls)}" style="padding:3px 9px;font-size:11px;cursor:default;"><span class="ao-dot"></span><span>${esc(ps)}</span></span>`;
+              }).join('')}
+            </div>
+          </section>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="adm-order-tabs">
-            ${statuses.map((st, idx) => `<button type="button" class="btn ${idx === 0 ? 'btn-primary' : 'btn-outline'} btn-sm" data-ord-filter="${st}">${st}</button>`).join('')}
+            ${statuses.map((st, idx) => {
+              const cls = st === 'All' ? '' : `ao-c-${getOrderStatusClassKey(st)}`;
+              return `<button type="button" class="btn ${idx === 0 ? 'btn-primary' : 'btn-outline'} btn-sm ${cls}" data-ord-filter="${esc(st)}">${esc(st)}</button>`;
+            }).join('')}
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
             <input type="search" id="adm-ord-search" class="form-control" style="max-width:280px;" placeholder="Search Order ID or Phone..." />
@@ -6072,6 +6985,16 @@
           </div>
         `;
         let curStatus = 'All';
+        const syncOrderFilterUI = () => {
+          document.querySelectorAll('#adm-order-tabs [data-ord-filter]').forEach((x) => {
+            const isMatch = x.getAttribute('data-ord-filter') === curStatus;
+            x.classList.toggle('btn-primary', isMatch);
+            x.classList.toggle('btn-outline', !isMatch);
+          });
+          document.querySelectorAll('#adm-order-legend [data-legend-status]').forEach((card) => {
+            card.classList.toggle('active', card.getAttribute('data-legend-status') === curStatus);
+          });
+        };
         const drawOrders = () => {
           const q = (document.getElementById('adm-ord-search').value || '').toLowerCase();
           const dtFilter = document.getElementById('adm-ord-date').value;
@@ -6087,6 +7010,8 @@
           document.getElementById('adm-ord-tbody').innerHTML = filtered.map((o) => {
             const dt = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : '';
             const firstImg = o.items?.[0]?.imageUrl || OFFICIAL_LOGO;
+            const stKey = getOrderStatusClassKey(o.orderStatus || 'Pending');
+            const payKey = getOrderStatusClassKey(o.paymentStatus || 'Unpaid');
             return `
               <tr>
                 <td class="mono"><strong>${esc(o.orderId)}</strong></td>
@@ -6100,22 +7025,28 @@
                   </div>
                 </td>
                 <td class="tabular-nums"><strong>${formatPrice(o.finalTotal)}</strong></td>
-                <td>${esc(o.paymentMethod)}<br><small>${esc(o.paymentStatus)}</small></td>
-                <td><span class="status-text status-${esc((o.orderStatus || '').split(' ')[0])}">${esc(o.orderStatus)}</span></td>
+                <td>${esc(o.paymentMethod)}<br><span class="ao-status-pill ao-c-${esc(payKey)}" style="margin-top:3px;font-size:10.5px;padding:1px 6px;">${esc(o.paymentStatus)}</span></td>
+                <td><span class="ao-status-pill ao-c-${esc(stKey)}">${esc(o.orderStatus)}</span></td>
                 <td><button type="button" class="btn btn-primary btn-sm" data-view-order="${esc(o.orderId)}">Open Order</button></td>
               </tr>
             `;
           }).join('') || '<tr><td colspan="9">No matching orders.</td></tr>';
         };
+        syncOrderFilterUI();
         drawOrders();
+        document.getElementById('adm-order-legend').addEventListener('click', (e) => {
+          const card = e.target.closest('[data-legend-status]');
+          if (!card) return;
+          const clickedStatus = card.getAttribute('data-legend-status');
+          curStatus = curStatus === clickedStatus ? 'All' : clickedStatus;
+          syncOrderFilterUI();
+          drawOrders();
+        });
         document.getElementById('adm-order-tabs').addEventListener('click', (e) => {
           const b = e.target.closest('[data-ord-filter]');
           if (!b) return;
           curStatus = b.getAttribute('data-ord-filter');
-          document.querySelectorAll('[data-ord-filter]').forEach((x) => {
-            x.classList.toggle('btn-primary', x === b);
-            x.classList.toggle('btn-outline', x !== b);
-          });
+          syncOrderFilterUI();
           drawOrders();
         });
         document.getElementById('adm-ord-search').addEventListener('input', drawOrders);
@@ -6371,13 +7302,27 @@
               const d = await res.json();
               if (!res.ok) throw new Error(d.error || 'Failed');
             } else {
-              const res = await fetch('/api/admin/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionToken: state.adminSessionToken, currentPassword, newPassword })
-              });
-              const d = await res.json();
-              if (!res.ok) throw new Error(d.error || 'Failed');
+              let serverHandled = false;
+              try {
+                const res = await fetch('/api/admin/change-password', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sessionToken: state.adminSessionToken, currentPassword, newPassword })
+                });
+                const ct = res.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                  serverHandled = true;
+                  const d = await res.json();
+                  if (!res.ok) throw new Error(d.error || 'Failed');
+                }
+              } catch (netErr) {
+                if (serverHandled) throw netErr;
+              }
+              if (!serverHandled) {
+                const ok = await verifyAdminPasswordLocalHash(currentPassword);
+                if (!ok) throw new Error('Current password is incorrect');
+                localStorage.setItem('msf_local_admin_hash', await hashAdminPasswordClient(newPassword));
+              }
             }
             showToast('Admin password updated!', 'success');
             e.target.reset();
@@ -6642,109 +7587,511 @@
       });
     }
 
-    function openAdminOrderModal(orderId) {
-      const o = state.adminOrders.find((x) => x.orderId === orderId);
-      if (!o) return;
-      const dt = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : '';
-      const statuses = ['Pending', 'Confirmed', 'Processing', 'Packed', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned', 'Refunded'];
-      const payStatuses = ['Unpaid', 'Pending Verification', 'Paid', 'Refunded'];
+    function getOrderStatusClassKey(st) {
+      const first = String(st || 'Pending').split(' ')[0];
+      if (first === 'Pending' && String(st).includes('Verification')) return 'PendingVer';
+      return first;
+    }
 
-      openAdminModal(`Order ${o.orderId}`, `
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div class="form-grid-2" style="background:var(--bg-surface);padding:12px;border-radius:8px;font-size:13px;">
-            <div>
-              <div><strong>Order ID:</strong> <span class="mono">${esc(o.orderId)}</span></div>
-              <div><strong>Date:</strong> ${esc(dt)}</div>
-              <div><strong>Source:</strong> ${esc(o.orderSource)}</div>
-              <div><strong>Payment:</strong> ${esc(o.paymentMethod)} (${esc(o.paymentStatus)})</div>
-              ${o.paymentReference ? `<div><strong>TrxID:</strong> <span class="mono">${esc(o.paymentReference)}</span></div>` : ''}
+    function buildBrandedInvoiceHTML(o, dtStr, overrides = {}) {
+      const s = state.settings || DEFAULT_SETTINGS;
+      const brand = s.brandName || 'MS FASHION';
+      const logo = s.logoUrl || OFFICIAL_LOGO;
+      const wa = s.whatsappNumber || OFFICIAL_WHATSAPP;
+      const orderStatus = overrides.orderStatus || o.orderStatus || 'Pending';
+      const paymentStatus = overrides.paymentStatus || o.paymentStatus || 'Unpaid';
+      const courier = overrides.courier !== undefined ? overrides.courier : (o.courier || '');
+      const trackingNumber = overrides.trackingNumber !== undefined ? overrides.trackingNumber : (o.trackingNumber || '');
+      const stCls = getOrderStatusClassKey(orderStatus);
+      const payCls = getOrderStatusClassKey(paymentStatus);
+
+      return `
+        <div class="msf-invoice-sheet">
+          <div class="msf-inv-header">
+            <div class="msf-inv-brand">
+              <img src="${esc(logo)}" alt="${esc(brand)}" class="msf-inv-logo" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+              <div>
+                <div style="font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1.1;letter-spacing:0.03em;">${esc(brand)}</div>
+                <div style="font-size:12px;color:#52525b;">Official Fashion Store · Bangladesh</div>
+                <div style="font-size:12px;color:#52525b;">WhatsApp: <span class="mono">${esc(wa)}</span></div>
+              </div>
             </div>
-            <div>
-              <div><strong>Customer:</strong> ${esc(o.customerName)}</div>
-              <div><strong>Phone:</strong> <a href="tel:${esc(o.phone)}" class="mono">${esc(o.phone)}</a></div>
-              <div><strong>Address:</strong> ${esc(o.address)}, ${esc(o.city || '')}, ${esc(o.district)}</div>
-              ${o.instructions ? `<div><strong>Customer Notes:</strong> ${esc(o.instructions)}</div>` : ''}
+            <div class="msf-inv-meta">
+              <div style="font-size:16px;font-weight:800;letter-spacing:0.06em;">INVOICE / RECEIPT</div>
+              <div class="mono" style="font-size:13px;font-weight:700;margin-top:2px;">#${esc(o.orderId)}</div>
+              <div style="font-size:12px;color:#52525b;">${esc(dtStr || new Date().toLocaleString())}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px;">
+                <span class="ao-status-pill ao-c-${esc(stCls)}">${esc(orderStatus)}</span>
+                <span class="ao-status-pill ao-c-${esc(payCls)}">${esc(paymentStatus)}</span>
+              </div>
             </div>
           </div>
 
-          <!-- MANDATORY PART 18: ORDERED PRODUCTS WITH ACTUAL SAVED PRODUCT IMAGE SNAPSHOTS -->
+          <div class="msf-inv-grid">
+            <div class="msf-inv-box">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px;">Bill &amp; Ship To</div>
+              <div style="font-weight:700;font-size:14px;">${esc(o.customerName)}</div>
+              <div class="mono" style="font-size:12.5px;">${esc(o.phone)}</div>
+              <div style="margin-top:3px;">${esc(o.address)}${o.city ? ', ' + esc(o.city) : ''}, ${esc(o.district)}</div>
+              ${o.instructions ? `<div style="margin-top:4px;font-size:12px;color:#475569;"><strong>Note:</strong> ${esc(o.instructions)}</div>` : ''}
+            </div>
+            <div class="msf-inv-box">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px;">Payment &amp; Dispatch</div>
+              <div><strong>Payment Method:</strong> ${esc(o.paymentMethod || 'COD')}</div>
+              <div><strong>Payment Status:</strong> ${esc(paymentStatus)}</div>
+              ${o.paymentReference ? `<div><strong>TrxID:</strong> <span class="mono">${esc(o.paymentReference)}</span></div>` : ''}
+              ${courier ? `<div><strong>Courier:</strong> ${esc(courier)}</div>` : ''}
+              ${trackingNumber ? `<div><strong>Tracking #:</strong> <span class="mono">${esc(trackingNumber)}</span></div>` : ''}
+            </div>
+          </div>
+
           <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>Product Image</th><th>Product &amp; Variant</th><th>SKU</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+            <table class="msf-inv-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Item &amp; Variant</th>
+                  <th>SKU</th>
+                  <th style="text-align:center;">Qty</th>
+                  <th style="text-align:right;">Price</th>
+                  <th style="text-align:right;">Total</th>
+                </tr>
+              </thead>
               <tbody>
-                ${(o.items || []).map((it) => `
+                ${(o.items || []).map((it, idx) => `
                   <tr>
+                    <td>${idx + 1}</td>
                     <td>
-                      <img src="${esc(it.imageUrl || OFFICIAL_LOGO)}" alt="${esc(it.productName)}" style="width:54px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border-radius:4px;" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+                      <strong>${esc(it.productName)}</strong>
+                      <div style="font-size:11.5px;color:#52525b;">Size: ${esc(it.size || '-')} · Color: ${esc(it.color || '-')}</div>
                     </td>
-                    <td>
-                      <strong>${esc(it.productName)}</strong><br>
-                      <small style="color:var(--text-muted);">Size: ${esc(it.size || '-')} · Color: ${esc(it.color || '-')}</small>
-                    </td>
-                    <td class="mono">${esc(it.sku)}</td>
-                    <td class="tabular-nums">${it.quantity}</td>
-                    <td class="tabular-nums">${formatPrice(it.unitPrice)}</td>
-                    <td class="tabular-nums"><strong>${formatPrice(it.subtotal)}</strong></td>
+                    <td class="mono">${esc(it.sku || '-')}</td>
+                    <td style="text-align:center;" class="tabular-nums">${Number(it.quantity || 1)}</td>
+                    <td style="text-align:right;" class="tabular-nums">${formatPrice(it.unitPrice)}</td>
+                    <td style="text-align:right;" class="tabular-nums"><strong>${formatPrice(it.subtotal)}</strong></td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:4px;font-size:14px;align-items:flex-end;">
-            <div>Subtotal: <strong class="tabular-nums">${formatPrice(o.subtotal)}</strong></div>
-            <div>Discount ${o.couponCode ? `(${esc(o.couponCode)})` : ''}: <strong class="tabular-nums">-${formatPrice(o.discount)}</strong></div>
-            <div>Delivery Charge: <strong class="tabular-nums">${formatPrice(o.deliveryCharge)}</strong></div>
-            <div style="font-size:17px;">Final Total: <strong class="tabular-nums">${formatPrice(o.finalTotal)}</strong></div>
+          <div class="msf-inv-totals">
+            <div class="msf-inv-total-row"><span>Subtotal</span><span class="tabular-nums">${formatPrice(o.subtotal)}</span></div>
+            <div class="msf-inv-total-row"><span>Discount ${o.couponCode ? `(${esc(o.couponCode)})` : ''}</span><span class="tabular-nums">-${formatPrice(o.discount || 0)}</span></div>
+            <div class="msf-inv-total-row"><span>Delivery Charge</span><span class="tabular-nums">${formatPrice(o.deliveryCharge || 0)}</span></div>
+            <div class="msf-inv-total-row msf-inv-grand"><span>Grand Total</span><span class="tabular-nums">${formatPrice(o.finalTotal)}</span></div>
           </div>
 
-          <form id="adm-order-update-form" style="border-top:1px solid var(--border-hairline);padding-top:12px;display:flex;flex-direction:column;gap:10px;">
-            <div class="form-grid-2">
+          <div class="msf-inv-footer">
+            <div><strong>${esc(brand)}</strong> — Thank you for shopping with us!</div>
+            <div>7-day easy size/defect exchange · Track order at ${esc(brand)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildStandaloneReceiptDocumentHTML(o, dtStr, overrides = {}) {
+      const s = state.settings || DEFAULT_SETTINGS;
+      const brand = s.brandName || 'MS FASHION';
+      const sheetHtml = buildBrandedInvoiceHTML(o, dtStr, overrides);
+      return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice #${esc(o.orderId)} — ${esc(brand)}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f5;
+      color: #111111;
+      font-family: 'Hind Siliguri', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    .receipt-page { max-width: 820px; margin: 0 auto; }
+    .receipt-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      background: #111111;
+      color: #ffffff;
+      border-radius: 8px;
+    }
+    .receipt-toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .receipt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.28);
+      background: transparent;
+      color: #ffffff;
+    }
+    .receipt-btn-primary {
+      background: #ffffff;
+      color: #111111;
+      border-color: #ffffff;
+    }
+    .msf-invoice-sheet {
+      background: #ffffff;
+      color: #111111;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      padding: 24px;
+      font-size: 13px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    .msf-inv-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid #111111;
+      margin-bottom: 14px;
+    }
+    .msf-inv-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .msf-inv-logo {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #e4e4e7;
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+    .msf-inv-meta { text-align: right; min-width: 0; }
+    .msf-inv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 520px) {
+      .msf-inv-grid { grid-template-columns: 1fr; }
+      .msf-inv-meta { text-align: left; }
+    }
+    .msf-inv-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    .msf-inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+    }
+    .msf-inv-table th {
+      background: #111111;
+      color: #ffffff;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 600;
+    }
+    .msf-inv-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e4e4e7;
+      vertical-align: top;
+    }
+    .msf-inv-totals {
+      margin-left: auto;
+      width: min(100%, 300px);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 13px;
+    }
+    .msf-inv-total-row { display: flex; justify-content: space-between; gap: 10px; }
+    .msf-inv-grand {
+      border-top: 2px solid #111111;
+      padding-top: 7px;
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .msf-inv-footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #52525b;
+    }
+    .ao-status-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .ao-c-Pending    { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+    .ao-c-Confirmed  { background: #e0f2fe; color: #0369a1; border-color: #38bdf8; }
+    .ao-c-Processing { background: #e0e7ff; color: #4338ca; border-color: #818cf8; }
+    .ao-c-Packed     { background: #ccfbf1; color: #0f766e; border-color: #2dd4bf; }
+    .ao-c-Ready      { background: #cffafe; color: #0e7490; border-color: #22d3ee; }
+    .ao-c-Shipped    { background: #ede9fe; color: #6d28d9; border-color: #a78bfa; }
+    .ao-c-Out        { background: #fae8ff; color: #a21caf; border-color: #e879f9; }
+    .ao-c-Delivered  { background: #dcfce7; color: #15803d; border-color: #4ade80; }
+    .ao-c-Cancelled  { background: #fee2e2; color: #b91c1c; border-color: #f87171; }
+    .ao-c-Returned   { background: #ffedd5; color: #c2410c; border-color: #fb923c; }
+    .ao-c-Refunded   { background: #f1f5f9; color: #475569; border-color: #94a3b8; }
+    .ao-c-Unpaid     { background: #ffe4e6; color: #be123c; border-color: #fb7185; }
+    .ao-c-Paid       { background: #dcfce7; color: #15803d; border-color: #4ade80; }
+    .ao-c-PendingVer { background: #fef3c7; color: #b45309; border-color: #f59e0b; }
+    @media print {
+      @page { size: auto; margin: 12mm; }
+      body { padding: 0; background: #ffffff; }
+      .receipt-toolbar { display: none !important; }
+      .msf-invoice-sheet { border: none; padding: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-page">
+    <div class="receipt-toolbar">
+      <div><strong>${esc(brand)}</strong> · Official Receipt <span class="mono">#${esc(o.orderId)}</span></div>
+      <div class="receipt-toolbar-actions">
+        <button type="button" class="receipt-btn receipt-btn-primary" onclick="window.print()">Print / Save PDF</button>
+        <button type="button" class="receipt-btn" onclick="window.close()">Close</button>
+      </div>
+    </div>
+    ${sheetHtml}
+  </div>
+</body>
+</html>`;
+    }
+
+    function openAdminOrderModal(orderId) {
+      const o = state.adminOrders.find((x) => x.orderId === orderId);
+      if (!o) return;
+      const dt = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : '';
+      const statuses = ['Pending', 'Confirmed', 'Processing', 'Packed', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned', 'Refunded'];
+      const payStatuses = ['Unpaid', 'Pending Verification', 'Paid', 'Refunded'];
+      const printerIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+
+      openAdminModal(`Order ${o.orderId}`, `
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="ao-mode-tabs">
+            <button type="button" id="ao-tab-details" class="btn btn-primary btn-sm">Order Details &amp; Update</button>
+            <button type="button" id="ao-tab-invoice" class="btn btn-outline btn-sm">Invoice / Receipt View</button>
+            <button type="button" id="ao-quick-print-btn" class="btn btn-sm btn-print-invoice" style="margin-left:auto;">${printerIcon}<span>Print Invoice</span></button>
+          </div>
+
+          <div id="ao-panel-details" style="display:flex;flex-direction:column;gap:14px;">
+            <div class="form-grid-2" style="background:var(--bg-surface);padding:12px;border-radius:8px;font-size:13px;">
               <div>
-                <label style="font-size:12px;font-weight:600;">Order Status</label>
-                <select id="ao-status" class="form-control">${statuses.map((st) => `<option value="${esc(st)}" ${o.orderStatus === st ? 'selected' : ''}>${esc(st)}</option>`).join('')}</select>
+                <div><strong>Order ID:</strong> <span class="mono">${esc(o.orderId)}</span></div>
+                <div><strong>Date:</strong> ${esc(dt)}</div>
+                <div><strong>Source:</strong> ${esc(o.orderSource)}</div>
+                <div><strong>Payment:</strong> ${esc(o.paymentMethod)} (<span class="ao-status-pill ao-c-${esc(getOrderStatusClassKey(o.paymentStatus))}">${esc(o.paymentStatus)}</span>)</div>
+                ${o.paymentReference ? `<div><strong>TrxID:</strong> <span class="mono">${esc(o.paymentReference)}</span></div>` : ''}
               </div>
               <div>
-                <label style="font-size:12px;font-weight:600;">Payment Status</label>
-                <select id="ao-pay-status" class="form-control">${payStatuses.map((ps) => `<option value="${esc(ps)}" ${o.paymentStatus === ps ? 'selected' : ''}>${esc(ps)}</option>`).join('')}</select>
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;">Courier</label>
-                <input type="text" id="ao-courier" class="form-control" value="${esc(o.courier || '')}" />
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;">Tracking Number</label>
-                <input type="text" id="ao-tracking" class="form-control" value="${esc(o.trackingNumber || '')}" />
+                <div><strong>Customer:</strong> ${esc(o.customerName)}</div>
+                <div><strong>Phone:</strong> <a href="tel:${esc(o.phone)}" class="mono">${esc(o.phone)}</a></div>
+                <div><strong>Address:</strong> ${esc(o.address)}, ${o.city ? esc(o.city) + ', ' : ''}${esc(o.district)}</div>
+                ${o.instructions ? `<div><strong>Customer Notes:</strong> ${esc(o.instructions)}</div>` : ''}
               </div>
             </div>
-            <div>
-              <label style="font-size:12px;font-weight:600;">Admin Notes</label>
-              <textarea id="ao-notes" class="form-control">${esc(o.adminNotes || '')}</textarea>
+
+            <!-- MANDATORY PART 18: ORDERED PRODUCTS WITH ACTUAL SAVED PRODUCT IMAGE SNAPSHOTS -->
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Product Image</th><th>Product &amp; Variant</th><th>SKU</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+                <tbody>
+                  ${(o.items || []).map((it) => `
+                    <tr>
+                      <td>
+                        <img src="${esc(it.imageUrl || OFFICIAL_LOGO)}" alt="${esc(it.productName)}" style="width:54px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border-radius:4px;" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+                      </td>
+                      <td>
+                        <strong>${esc(it.productName)}</strong><br>
+                        <small style="color:var(--text-muted);">Size: ${esc(it.size || '-')} · Color: ${esc(it.color || '-')}</small>
+                      </td>
+                      <td class="mono">${esc(it.sku)}</td>
+                      <td class="tabular-nums">${it.quantity}</td>
+                      <td class="tabular-nums">${formatPrice(it.unitPrice)}</td>
+                      <td class="tabular-nums"><strong>${formatPrice(it.subtotal)}</strong></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button type="submit" class="btn btn-primary">Save Order Update</button>
-              <button type="button" id="ao-print-btn" class="btn btn-outline">Print Invoice</button>
-              <a href="https://wa.me/${esc((o.phone || '').replace(/[^0-9]/g, ''))}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">Contact Customer</a>
+
+            <div style="display:flex;flex-direction:column;gap:4px;font-size:14px;align-items:flex-end;">
+              <div>Subtotal: <strong class="tabular-nums">${formatPrice(o.subtotal)}</strong></div>
+              <div>Discount ${o.couponCode ? `(${esc(o.couponCode)})` : ''}: <strong class="tabular-nums">-${formatPrice(o.discount)}</strong></div>
+              <div>Delivery Charge: <strong class="tabular-nums">${formatPrice(o.deliveryCharge)}</strong></div>
+              <div style="font-size:17px;">Final Total: <strong class="tabular-nums">${formatPrice(o.finalTotal)}</strong></div>
             </div>
-          </form>
+
+            <form id="adm-order-update-form" style="border-top:1px solid var(--border-hairline);padding-top:12px;display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Order Status (Tap a color-coded status)</label>
+                <input type="hidden" id="ao-status" value="${esc(o.orderStatus || 'Pending')}" />
+                <div class="ao-chip-group" id="ao-status-chips">
+                  ${statuses.map((st) => {
+                    const cls = getOrderStatusClassKey(st);
+                    const active = o.orderStatus === st ? 'active' : '';
+                    return `<button type="button" class="ao-status-chip ao-c-${esc(cls)} ${active}" data-ao-status-opt="${esc(st)}"><span class="ao-dot"></span><span>${esc(st)}</span></button>`;
+                  }).join('')}
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Payment Status</label>
+                <input type="hidden" id="ao-pay-status" value="${esc(o.paymentStatus || 'Unpaid')}" />
+                <div class="ao-chip-group" id="ao-pay-chips">
+                  ${payStatuses.map((ps) => {
+                    const cls = getOrderStatusClassKey(ps);
+                    const active = o.paymentStatus === ps ? 'active' : '';
+                    return `<button type="button" class="ao-status-chip ao-c-${esc(cls)} ${active}" data-ao-pay-opt="${esc(ps)}"><span class="ao-dot"></span><span>${esc(ps)}</span></button>`;
+                  }).join('')}
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div>
+                  <label style="font-size:12px;font-weight:600;">Courier</label>
+                  <input type="text" id="ao-courier" class="form-control" value="${esc(o.courier || '')}" />
+                </div>
+                <div>
+                  <label style="font-size:12px;font-weight:600;">Tracking Number</label>
+                  <input type="text" id="ao-tracking" class="form-control" value="${esc(o.trackingNumber || '')}" />
+                </div>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;">Admin Notes</label>
+                <textarea id="ao-notes" class="form-control">${esc(o.adminNotes || '')}</textarea>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button type="submit" id="ao-save-btn" class="btn btn-primary">Save Order Update</button>
+                <button type="button" id="ao-print-btn" class="btn btn-print-invoice">${printerIcon}<span>Print Invoice</span></button>
+                <a href="https://wa.me/${esc((o.phone || '').replace(/[^0-9]/g, ''))}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">Contact Customer</a>
+              </div>
+            </form>
+          </div>
+
+          <div id="ao-panel-invoice" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+            <div id="ao-invoice-preview-host"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+              <button type="button" id="ao-inv-back-btn" class="btn btn-outline">Back to Order Details</button>
+              <button type="button" id="ao-inv-print-btn" class="btn btn-print-invoice">${printerIcon}<span>Print Invoice (New Window)</span></button>
+            </div>
+          </div>
         </div>
       `);
 
-      document.getElementById('ao-print-btn').addEventListener('click', () => {
+      const getOverrides = () => ({
+        orderStatus: document.getElementById('ao-status')?.value || o.orderStatus,
+        paymentStatus: document.getElementById('ao-pay-status')?.value || o.paymentStatus,
+        courier: document.getElementById('ao-courier')?.value.trim() ?? o.courier,
+        trackingNumber: document.getElementById('ao-tracking')?.value.trim() ?? o.trackingNumber
+      });
+
+      const refreshInvoicePreview = () => {
+        const host = document.getElementById('ao-invoice-preview-host');
+        if (host) host.innerHTML = buildBrandedInvoiceHTML(o, dt, getOverrides());
+      };
+
+      const triggerPrintInvoice = () => {
+        const overrides = getOverrides();
+        const receiptHtml = buildStandaloneReceiptDocumentHTML(o, dt, overrides);
+        let printWin = null;
+        try {
+          printWin = window.open('', '_blank', 'width=860,height=920,scrollbars=yes,resizable=yes');
+        } catch {
+          printWin = null;
+        }
+        if (printWin && printWin.document) {
+          try {
+            printWin.document.open();
+            printWin.document.write(receiptHtml);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => {
+              try {
+                if (!printWin.closed) printWin.print();
+              } catch {}
+            }, 300);
+            return;
+          } catch {}
+        }
+        // Seamless fallback if popup window is restricted inside an embedded preview iframe
         const inv = document.getElementById('printable-invoice');
         inv.classList.remove('hidden');
-        inv.innerHTML = `
-          <h2>MS FASHION — INVOICE</h2>
-          <p><strong>Order ID:</strong> ${esc(o.orderId)} | <strong>Date:</strong> ${esc(dt)}</p>
-          <p><strong>Customer:</strong> ${esc(o.customerName)} (${esc(o.phone)})<br>${esc(o.address)}, ${esc(o.district)}</p>
-          <table border="1" cellpadding="6" cellspacing="0" width="100%">
-            <tr><th>Item</th><th>SKU</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th></tr>
-            ${(o.items || []).map((it) => `<tr><td>${esc(it.productName)}</td><td>${esc(it.sku)}</td><td>${esc(it.size || '-')} / ${esc(it.color || '-')}</td><td>${it.quantity}</td><td>৳${it.unitPrice}</td><td>৳${it.subtotal}</td></tr>`).join('')}
-          </table>
-          <p>Subtotal: ৳${o.subtotal} | Discount: -৳${o.discount} | Delivery: ৳${o.deliveryCharge} | <strong>Total: ৳${o.finalTotal}</strong></p>
-        `;
+        inv.innerHTML = buildBrandedInvoiceHTML(o, dt, overrides);
         window.print();
-        inv.classList.add('hidden');
+      };
+
+      const switchOrderModalTab = (mode) => {
+        const det = document.getElementById('ao-panel-details');
+        const invP = document.getElementById('ao-panel-invoice');
+        const tDet = document.getElementById('ao-tab-details');
+        const tInv = document.getElementById('ao-tab-invoice');
+        if (mode === 'invoice') {
+          refreshInvoicePreview();
+          det.classList.add('hidden');
+          invP.classList.remove('hidden');
+          tDet.className = 'btn btn-outline btn-sm';
+          tInv.className = 'btn btn-primary btn-sm';
+        } else {
+          invP.classList.add('hidden');
+          det.classList.remove('hidden');
+          tDet.className = 'btn btn-primary btn-sm';
+          tInv.className = 'btn btn-outline btn-sm';
+        }
+      };
+
+      document.getElementById('ao-tab-details')?.addEventListener('click', () => switchOrderModalTab('details'));
+      document.getElementById('ao-tab-invoice')?.addEventListener('click', () => switchOrderModalTab('invoice'));
+      document.getElementById('ao-inv-back-btn')?.addEventListener('click', () => switchOrderModalTab('details'));
+      document.getElementById('ao-quick-print-btn')?.addEventListener('click', triggerPrintInvoice);
+      document.getElementById('ao-print-btn')?.addEventListener('click', triggerPrintInvoice);
+      document.getElementById('ao-inv-print-btn')?.addEventListener('click', triggerPrintInvoice);
+
+      document.getElementById('ao-status-chips')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-ao-status-opt]');
+        if (!btn) return;
+        const val = btn.getAttribute('data-ao-status-opt');
+        document.getElementById('ao-status').value = val;
+        document.querySelectorAll('#ao-status-chips [data-ao-status-opt]').forEach((el) => {
+          el.classList.toggle('active', el === btn);
+        });
+      });
+
+      document.getElementById('ao-pay-chips')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-ao-pay-opt]');
+        if (!btn) return;
+        const val = btn.getAttribute('data-ao-pay-opt');
+        document.getElementById('ao-pay-status').value = val;
+        document.querySelectorAll('#ao-pay-chips [data-ao-pay-opt]').forEach((el) => {
+          el.classList.toggle('active', el === btn);
+        });
       });
 
       document.getElementById('adm-order-update-form').addEventListener('submit', async (e) => {
@@ -6754,8 +8101,18 @@
         const courier = document.getElementById('ao-courier').value.trim();
         const trackingNumber = document.getElementById('ao-tracking').value.trim();
         const adminNotes = document.getElementById('ao-notes').value.trim();
+        const saveBtn = document.getElementById('ao-save-btn');
+        saveBtn.disabled = true;
 
         try {
+          if (!isFirebaseAdminUser() && !CLOUD_FUNCTIONS_BASE) {
+            const authRes = await signInWithPopup(auth, new GoogleAuthProvider());
+            if (authRes.user.email !== BOOTSTRAP_ADMIN_EMAIL || !authRes.user.emailVerified) {
+              throw new Error(`Admin write requires ${BOOTSTRAP_ADMIN_EMAIL}`);
+            }
+            updateAdminFirebaseSyncBanner();
+          }
+
           if (CLOUD_FUNCTIONS_BASE && auth.currentUser) {
             const token = await auth.currentUser.getIdToken();
             const res = await fetch(`${CLOUD_FUNCTIONS_BASE}/updateOrderStatus`, {
@@ -6803,7 +8160,11 @@
           }
           document.getElementById('admin-modal').classList.add('hidden');
           showToast('Order updated!', 'success');
-        } catch (err) { showToast(err.message, 'error'); }
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          if (saveBtn.isConnected) saveBtn.disabled = false;
+        }
       });
     }
 
@@ -7004,6 +8365,7 @@
 
     async function bootstrapApp() {
       applyTranslations();
+      renderMobileDrawerCategories();
       updateHeaderBadges();
       try {
         await handleRoute();
