@@ -3415,11 +3415,145 @@
     }
 
     function isFirebaseAdminUser() {
+      const u = auth.currentUser || state.user;
       return Boolean(
-        state.user &&
-        ((state.user.email === BOOTSTRAP_ADMIN_EMAIL && state.user.emailVerified) ||
-          state.user.uid === 'ms_fashion_admin')
+        u &&
+        ((String(u.email || '').toLowerCase() === BOOTSTRAP_ADMIN_EMAIL.toLowerCase() && u.emailVerified) ||
+          u.uid === 'ms_fashion_admin')
       );
+    }
+
+    function parseStructuredFirestoreError(err) {
+      const raw = String(err?.message || '');
+      if (raw.startsWith('{') && raw.endsWith('}')) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed.error === 'string' && 'operationType' in parsed) {
+            return parsed;
+          }
+        } catch {}
+      }
+      return null;
+    }
+
+    function isFirestorePermissionError(err) {
+      const code = String(err?.code || '').toLowerCase();
+      const structured = parseStructuredFirestoreError(err);
+      const msg = String(structured?.error || err?.message || '').toLowerCase();
+      return (
+        code === 'permission-denied' ||
+        code === 'unauthenticated' ||
+        msg.includes('missing or insufficient permissions') ||
+        msg.includes('permission-denied') ||
+        msg.includes('permission denied') ||
+        msg.includes('admin write requires') ||
+        msg.includes('ভুল অ্যাকাউন্ট') ||
+        msg.includes('unauthorized account')
+      );
+    }
+
+    function formatFirebaseAdminError(err, fallbackMsg = '') {
+      const code = String(err?.code || '');
+      const structured = parseStructuredFirestoreError(err);
+      const rawMsg = String(structured?.error || err?.message || '');
+      const lower = rawMsg.toLowerCase();
+
+      if (code === 'auth/unauthorized-domain' || lower.includes('unauthorized-domain')) {
+        const hostName = window.location.hostname || 'this domain';
+        return state.lang === 'bn'
+          ? `Firebase Authentication-এ "${hostName}" ডোমেইনটি অনুমোদিত নয় (auth/unauthorized-domain)। Firebase Console → Authentication → Settings → Authorized domains-এ "${hostName}" যোগ করুন।`
+          : `Domain "${hostName}" is not authorized in Firebase Authentication (auth/unauthorized-domain). Add "${hostName}" under Firebase Console → Authentication → Settings → Authorized domains.`;
+      }
+      if (code === 'auth/popup-blocked' || lower.includes('popup-blocked')) {
+        return state.lang === 'bn'
+          ? 'ব্রাউজারে Google লগইন পপআপ ব্লক হয়েছে। পপআপ Allow করুন অথবা ফর্মের উপরে "Connect Google Admin" বাটনে ক্লিক করে আগে লগইন করুন।'
+          : 'Google sign-in popup was blocked by your browser. Please allow popups or click "Connect Google Admin" first.';
+      }
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        return state.lang === 'bn'
+          ? `Google লগইন পপআপ সম্পূর্ণ না করেই বন্ধ হয়েছে। পণ্য পাবলিশ করতে ${BOOTSTRAP_ADMIN_EMAIL} দিয়ে লগইন করুন।`
+          : `Google sign-in popup was closed. Please sign in with ${BOOTSTRAP_ADMIN_EMAIL} to publish.`;
+      }
+      if (code === 'resource-exhausted' || lower.includes('quota exceeded')) {
+        return state.lang === 'bn'
+          ? 'Firebase ফ্রি প্ল্যানের দৈনিক কোটা শেষ হয়েছে (Quota exceeded)। আগামীকাল কোটা রিসেট হবে অথবা Firebase Spark/Blaze প্ল্যান চেক করুন।'
+          : 'Firebase daily free quota exceeded. Quota resets tomorrow or upgrade your Firebase plan.';
+      }
+      if (isFirestorePermissionError(err)) {
+        const curEmail = structured?.authInfo?.email || (auth.currentUser || state.user)?.email || 'none';
+        const opPath = structured?.path ? ` [${structured.operationType}: ${structured.path}]` : '';
+        return state.lang === 'bn'
+          ? `Firestore Permission Error (${curEmail})${opPath}: পণ্য পাবলিশ করতে ভেরিফায়েড অ্যাডমিন জিমেইল (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে লগইন থাকতে হবে এবং সব ফিল্ড সঠিক ফরম্যাট/সীমার মধ্যে থাকতে হবে।`
+          : `Firestore Permission Denied (signed in: ${curEmail})${opPath}. Publishing requires verified ${BOOTSTRAP_ADMIN_EMAIL} and schema-valid product fields.`;
+      }
+      return rawMsg || fallbackMsg || 'Firebase write failed.';
+    }
+
+    let activeAdminSessionPromise = null;
+    async function ensureFirebaseAdminSession({ forceRefresh = false } = {}) {
+      if (typeof auth.authStateReady === 'function') {
+        await auth.authStateReady().catch(() => {});
+      }
+
+      const validateAdminIdentity = async (user) => {
+        if (!user) return false;
+        const emailMatches =
+          String(user.email || '').toLowerCase() === BOOTSTRAP_ADMIN_EMAIL.toLowerCase() &&
+          Boolean(user.emailVerified);
+        if (emailMatches) {
+          await user.getIdToken(forceRefresh);
+          return true;
+        }
+        if (user.uid === 'ms_fashion_admin') {
+          await user.getIdToken(forceRefresh);
+          const adminSnap = await getDoc(doc(db, 'admins', user.uid)).catch(() => null);
+          if (adminSnap?.exists()) return true;
+        }
+        return false;
+      };
+
+      if (auth.currentUser && (await validateAdminIdentity(auth.currentUser))) {
+        state.user = auth.currentUser;
+        state.adminVerified = true;
+        updateAdminFirebaseSyncBanner();
+        return true;
+      }
+
+      if (activeAdminSessionPromise) {
+        return activeAdminSessionPromise;
+      }
+
+      activeAdminSessionPromise = (async () => {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({
+          prompt: 'select_account',
+          login_hint: BOOTSTRAP_ADMIN_EMAIL
+        });
+        try {
+          const authRes = await signInWithPopup(auth, provider);
+          const valid = await validateAdminIdentity(authRes.user);
+          if (!valid) {
+            throw new Error(
+              state.lang === 'bn'
+                ? `ভুল অ্যাকাউন্ট (${authRes.user?.email || 'unknown'}) দিয়ে লগইন হয়েছে। পাবলিশ করতে অবশ্যই ${BOOTSTRAP_ADMIN_EMAIL} সিলেক্ট করুন।`
+                : `Signed in as ${authRes.user?.email || 'unknown'}. Admin publishing requires verified ${BOOTSTRAP_ADMIN_EMAIL}.`
+            );
+          }
+          state.user = authRes.user;
+          state.adminVerified = true;
+          updateAdminFirebaseSyncBanner();
+          if (!document.getElementById('admin-app').classList.contains('hidden')) {
+            startAdminRealtimeListeners();
+          }
+          return true;
+        } catch (authErr) {
+          throw new Error(formatFirebaseAdminError(authErr));
+        } finally {
+          activeAdminSessionPromise = null;
+        }
+      })();
+
+      return activeAdminSessionPromise;
     }
 
     function getProductMainImage(product) {
@@ -3440,11 +3574,16 @@
     // 5. IMAGE COMPRESSION & UNLIMITED BATCH UPLOAD QUEUE (FIREBASE STORAGE)
     // =========================================================================
     async function compressImageFile(file, maxWidth = 1400, quality = 0.84) {
-      if (!file.type.startsWith('image/')) {
-        throw new Error(`Invalid file type: ${file.name}`);
+      const mime = String(file?.type || '');
+      const hasImageExt = /\.(jpe?g|png|webp|gif|avif|bmp|heic|heif)$/i.test(file?.name || '');
+      if (!mime.startsWith('image/') && !hasImageExt) {
+        throw new Error(`Invalid file type: ${file?.name || 'unknown'}`);
       }
-      if (file.type === 'image/gif' || file.size < 180 * 1024) {
-        return file;
+      const normalizedFile = mime.startsWith('image/')
+        ? file
+        : new File([file], file.name || `photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+      if ((normalizedFile.type === 'image/gif' && normalizedFile.size < 9 * 1024 * 1024) || normalizedFile.size < 180 * 1024) {
+        return normalizedFile;
       }
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -3457,31 +3596,31 @@
               width = maxWidth;
             }
             const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = Math.max(1, width);
+            canvas.height = Math.max(1, height);
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             canvas.toBlob(
               (blob) => {
-                if (blob && blob.size < file.size) {
-                  resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }));
+                if (blob && (blob.size < normalizedFile.size || normalizedFile.size > 9 * 1024 * 1024)) {
+                  resolve(new File([blob], normalizedFile.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }));
                 } else {
-                  resolve(file);
+                  resolve(normalizedFile);
                 }
               },
               'image/webp',
               quality
             );
           };
-          img.onerror = () => resolve(file);
+          img.onerror = () => resolve(normalizedFile);
           img.src = ev.target.result;
         };
-        reader.onerror = () => resolve(file);
-        reader.readAsDataURL(file);
+        reader.onerror = () => resolve(normalizedFile);
+        reader.readAsDataURL(normalizedFile);
       });
     }
 
-    async function compressImageToDataUrl(file, maxWidth = 860, quality = 0.78) {
+    async function compressImageToDataUrl(file, maxWidth = 800, quality = 0.76) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
@@ -3506,8 +3645,8 @@
             };
 
             let out = tryEncode(maxWidth, quality);
-            if (out.length > 220000) out = tryEncode(720, 0.7);
-            if (out.length > 220000) out = tryEncode(560, 0.62);
+            if (out.length > 140000) out = tryEncode(640, 0.66);
+            if (out.length > 140000) out = tryEncode(480, 0.56);
             resolve(out);
           };
           img.onerror = () => reject(new Error(`Unable to read image: ${file.name}`));
@@ -3518,50 +3657,85 @@
       });
     }
 
+    async function recompressDataUrl(dataUrl, maxWidth = 520, quality = 0.60) {
+      if (!String(dataUrl || '').startsWith('data:image/')) return dataUrl;
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, width);
+          canvas.height = Math.max(1, height);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          let out = canvas.toDataURL('image/webp', quality);
+          if (!out.startsWith('data:image/webp')) {
+            out = canvas.toDataURL('image/jpeg', quality);
+          }
+          resolve(out.length < dataUrl.length ? out : dataUrl);
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
+    }
+
+    async function uploadFileToStorage(file, folderPath, onProgress, timeoutMs = 8000) {
+      storage.maxUploadRetryTime = Math.max(3000, timeoutMs - 1000);
+      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${(file.name || 'image.webp').replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const path = `${folderPath}/${safeName}`;
+      const ref = storageRef(storage, path);
+      const contentType = String(file.type || '').startsWith('image/') ? file.type : 'image/jpeg';
+
+      return Promise.race([
+        new Promise((resolve, reject) => {
+          const task = uploadBytesResumable(ref, file, { contentType });
+          task.on(
+            'state_changed',
+            (snap) => {
+              const rawPct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 50;
+              if (onProgress) onProgress(Math.max(40, Math.min(95, rawPct)));
+            },
+            (err) => reject(err),
+            async () => {
+              try {
+                const url = await getDownloadURL(task.snapshot.ref);
+                resolve({ url, storagePath: path });
+              } catch (e) {
+                reject(e);
+              }
+            }
+          );
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Storage timeout')), timeoutMs))
+      ]);
+    }
+
     async function uploadSingleFile(file, folderPath, onProgress) {
       if (onProgress) onProgress(15);
+      if (typeof auth.authStateReady === 'function') {
+        await auth.authStateReady().catch(() => {});
+      }
       const compressed = await compressImageFile(file);
       if (onProgress) onProgress(35);
 
-      if (isFirebaseAdminUser()) {
+      if (isFirebaseAdminUser() && auth.currentUser) {
         try {
-          storage.maxUploadRetryTime = 7000;
-          const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${compressed.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-          const path = `${folderPath}/${safeName}`;
-          const ref = storageRef(storage, path);
-
-          const storageResult = await Promise.race([
-            new Promise((resolve, reject) => {
-              const task = uploadBytesResumable(ref, compressed, { contentType: compressed.type });
-              task.on(
-                'state_changed',
-                (snap) => {
-                  const rawPct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 50;
-                  if (onProgress) onProgress(Math.max(40, Math.min(95, rawPct)));
-                },
-                (err) => reject(err),
-                async () => {
-                  try {
-                    const url = await getDownloadURL(task.snapshot.ref);
-                    resolve({ url, storagePath: path });
-                  } catch (e) {
-                    reject(e);
-                  }
-                }
-              );
-            }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Storage timeout')), 8000))
-          ]);
+          await auth.currentUser.getIdToken();
+          const storageResult = await uploadFileToStorage(compressed, folderPath, onProgress, 8000);
           if (onProgress) onProgress(100);
-          return storageResult;
+          return { ...storageResult, compressedFile: compressed };
         } catch (storageErr) {
-          console.warn('Storage upload fallback to optimized inline image:', storageErr.message);
+          console.warn('Storage upload fallback to optimized inline image:', storageErr?.code || storageErr?.message);
         }
       }
 
       const dataUrl = await compressImageToDataUrl(compressed);
       if (onProgress) onProgress(100);
-      return { url: dataUrl, storagePath: '' };
+      return { url: dataUrl, storagePath: '', compressedFile: compressed };
     }
     // =========================================================================
     // 6. FIRESTORE DATA LOADING & REAL-TIME LISTENERS
@@ -6192,15 +6366,18 @@
       const errBox = document.getElementById('admin-login-error');
       errBox.classList.add('hidden');
       try {
-        const res = await signInWithPopup(auth, new GoogleAuthProvider());
-        if (res.user.email !== BOOTSTRAP_ADMIN_EMAIL || !res.user.emailVerified) {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account', login_hint: BOOTSTRAP_ADMIN_EMAIL });
+        const res = await signInWithPopup(auth, provider);
+        if (String(res.user.email || '').toLowerCase() !== BOOTSTRAP_ADMIN_EMAIL.toLowerCase() || !res.user.emailVerified) {
           throw new Error(`Unauthorized account (${res.user.email || 'unknown'}). Admin access requires ${BOOTSTRAP_ADMIN_EMAIL}.`);
         }
+        state.user = res.user;
         state.adminVerified = true;
         document.getElementById('admin-login-modal').classList.add('hidden');
         openAdminDashboard();
       } catch (err) {
-        errBox.textContent = err.message || 'Google Admin sign-in failed';
+        errBox.textContent = formatFirebaseAdminError(err, 'Google Admin sign-in failed');
         errBox.classList.remove('hidden');
       }
     });
@@ -6224,18 +6401,32 @@
 
     function updateAdminFirebaseSyncBanner() {
       const btn = document.getElementById('admin-firebase-sync-btn');
-      btn.classList.toggle('hidden', isFirebaseAdminUser());
+      if (btn) btn.classList.toggle('hidden', isFirebaseAdminUser());
+      const pfBanner = document.getElementById('pf-auth-banner');
+      if (pfBanner) {
+        const connected = isFirebaseAdminUser();
+        pfBanner.style.background = connected ? '#f0fdf4' : '#fffbeb';
+        pfBanner.style.borderColor = connected ? '#86efac' : '#fcd34d';
+        pfBanner.style.color = connected ? '#166534' : '#92400e';
+        const statusEl = document.getElementById('pf-auth-status-text');
+        const connectBtn = document.getElementById('pf-connect-google-btn');
+        if (statusEl) {
+          statusEl.textContent = connected
+            ? (state.lang === 'bn'
+              ? `✓ Firebase Admin সংযুক্ত (${BOOTSTRAP_ADMIN_EMAIL}) — এখন সরাসরি পণ্য পাবলিশ করতে পারবেন।`
+              : `✓ Firebase Admin connected (${BOOTSTRAP_ADMIN_EMAIL}) — ready to publish.`)
+            : (state.lang === 'bn'
+              ? `পণ্য Firebase-এ পাবলিশ করতে Google (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে একবার Connect করুন (অথবা নিচে Save চাপলে পপআপ আসবে)।`
+              : `Connect ${BOOTSTRAP_ADMIN_EMAIL} once to publish products to Firebase (or click Save below).`);
+        }
+        if (connectBtn) connectBtn.classList.toggle('hidden', connected);
+      }
     }
 
     document.getElementById('admin-firebase-sync-btn').addEventListener('click', async () => {
       try {
-        const res = await signInWithPopup(auth, new GoogleAuthProvider());
-        if (res.user.email !== BOOTSTRAP_ADMIN_EMAIL) {
-          showToast(`Signed in as ${res.user.email}. Admin writes require ${BOOTSTRAP_ADMIN_EMAIL} or deployed Cloud Function.`, 'error');
-        } else {
-          showToast('Firebase Admin write session connected!', 'success');
-        }
-        updateAdminFirebaseSyncBanner();
+        await ensureFirebaseAdminSession();
+        showToast(state.lang === 'bn' ? 'Firebase Admin সেশন সংযুক্ত হয়েছে!' : 'Firebase Admin write session connected!', 'success');
         startAdminRealtimeListeners();
       } catch (err) {
         showToast(err.message, 'error');
@@ -6516,21 +6707,29 @@
           } catch {}
         }
         const cats = state.adminCategories.length ? state.adminCategories : INITIAL_CATEGORIES;
+        const hasExistingCat = p.categoryId && cats.some((c) => c.id === p.categoryId);
+        const catOptions = hasExistingCat || !p.categoryId
+          ? cats
+          : [{ id: p.categoryId, name: p.categoryName || p.categoryId }, ...cats];
         host.innerHTML = `
           <form id="adm-product-form" class="panel-box" style="display:flex;flex-direction:column;gap:14px;max-width:920px;">
             <h3 style="margin:0;">${editingProductId ? 'Edit Product' : 'Add Product (Unlimited Catalog & Unlimited Images)'}</h3>
+            <div id="pf-auth-banner" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid #fcd34d;background:#fffbeb;color:#92400e;border-radius:6px;font-size:12.5px;font-weight:600;">
+              <span id="pf-auth-status-text"></span>
+              <button type="button" id="pf-connect-google-btn" class="btn btn-primary btn-sm">Connect Google Admin</button>
+            </div>
             <div class="form-grid-2">
-              <div><label style="font-size:12px;font-weight:600;">Product Name (English) *</label><input type="text" id="pf-name" class="form-control" required value="${esc(p.name || '')}" /></div>
-              <div><label style="font-size:12px;font-weight:600;">Product Name (Bengali)</label><input type="text" id="pf-name-bn" class="form-control" value="${esc(p.nameBn || '')}" /></div>
-              <div><label style="font-size:12px;font-weight:600;">SKU *</label><input type="text" id="pf-sku" class="form-control" required value="${esc(p.sku || '')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">Product Name (English) *</label><input type="text" id="pf-name" class="form-control" maxlength="200" required value="${esc(p.name || '')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">Product Name (Bengali)</label><input type="text" id="pf-name-bn" class="form-control" maxlength="200" value="${esc(p.nameBn || '')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">SKU *</label><input type="text" id="pf-sku" class="form-control" maxlength="80" required value="${esc(p.sku || '')}" /></div>
               <div>
                 <label style="font-size:12px;font-weight:600;">Category *</label>
                 <select id="pf-cat" class="form-control" required>
-                  ${cats.map((c) => `<option value="${esc(c.id)}" ${p.categoryId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+                  ${catOptions.map((c) => `<option value="${esc(c.id)}" ${p.categoryId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
                 </select>
               </div>
-              <div><label style="font-size:12px;font-weight:600;">Subcategory</label><input type="text" id="pf-subcat" class="form-control" value="${esc(p.subcategory || '')}" /></div>
-              <div><label style="font-size:12px;font-weight:600;">Brand</label><input type="text" id="pf-brand" class="form-control" value="${esc(p.brand || 'MS FASHION')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">Subcategory</label><input type="text" id="pf-subcat" class="form-control" maxlength="120" value="${esc(p.subcategory || '')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">Brand</label><input type="text" id="pf-brand" class="form-control" maxlength="120" value="${esc(p.brand || 'MS FASHION')}" /></div>
               <div><label style="font-size:12px;font-weight:600;">Regular Price (৳) *</label><input type="number" id="pf-reg-price" class="form-control" min="0" required value="${esc(p.regularPrice ?? '')}" /></div>
               <div><label style="font-size:12px;font-weight:600;">Sale Price (৳)</label><input type="number" id="pf-sale-price" class="form-control" min="0" value="${esc(p.salePrice ?? 0)}" /></div>
               <div><label style="font-size:12px;font-weight:600;">Wholesale Price (৳)</label><input type="number" id="pf-wholesale" class="form-control" min="0" value="${esc(p.wholesalePrice ?? 0)}" /></div>
@@ -6543,11 +6742,11 @@
 
             <div>
               <label style="font-size:12px;font-weight:600;">Short Description</label>
-              <input type="text" id="pf-short-desc" class="form-control" value="${esc(p.shortDescription || '')}" />
+              <input type="text" id="pf-short-desc" class="form-control" maxlength="500" value="${esc(p.shortDescription || '')}" />
             </div>
             <div>
               <label style="font-size:12px;font-weight:600;">Full Description</label>
-              <textarea id="pf-full-desc" class="form-control">${esc(p.fullDescription || '')}</textarea>
+              <textarea id="pf-full-desc" class="form-control" maxlength="5000">${esc(p.fullDescription || '')}</textarea>
             </div>
 
             <div>
@@ -6585,15 +6784,69 @@
               <div id="pf-image-previews" class="upload-preview-grid"></div>
             </div>
 
+            <div id="pf-save-error" class="hidden" role="alert" style="padding:10px 12px;border-radius:6px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:13px;font-weight:600;line-height:1.45;"></div>
+
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
               <button type="submit" id="pf-save-btn" class="btn btn-primary">${editingProductId ? 'Update Product' : 'Save & Publish Product'}</button>
               <button type="button" id="pf-cancel-btn" class="btn btn-outline">Cancel</button>
             </div>
           </form>
         `;
+        updateAdminFirebaseSyncBanner();
+        const showProductSaveError = (err, fallbackMsg = '') => {
+          const errBox = document.getElementById('pf-save-error');
+          if (!errBox) return;
+          const isPerm = isFirestorePermissionError(err);
+          const msg = formatFirebaseAdminError(err, fallbackMsg);
+          errBox.innerHTML = '';
+          const msgDiv = document.createElement('div');
+          msgDiv.textContent = msg;
+          errBox.appendChild(msgDiv);
+          if (isPerm) {
+            const actionWrap = document.createElement('div');
+            actionWrap.style.marginTop = '8px';
+            const reconnectBtn = document.createElement('button');
+            reconnectBtn.type = 'button';
+            reconnectBtn.className = 'btn btn-outline btn-sm';
+            reconnectBtn.style.background = '#ffffff';
+            reconnectBtn.textContent = state.lang === 'bn'
+              ? `Google Admin (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে পুনরায় সংযুক্ত হন`
+              : `Connect / Switch to ${BOOTSTRAP_ADMIN_EMAIL}`;
+            reconnectBtn.addEventListener('click', async () => {
+              try {
+                await signOut(auth).catch(() => {});
+                state.user = null;
+                await ensureFirebaseAdminSession({ forceRefresh: true });
+                errBox.classList.add('hidden');
+                errBox.innerHTML = '';
+                showToast(state.lang === 'bn' ? 'Google Admin সেশন আপডেট হয়েছে! এখন আবার Save চাপুন।' : 'Admin session refreshed! Click Save & Publish again.', 'success');
+              } catch (reAuthErr) {
+                showProductSaveError(reAuthErr);
+              }
+            });
+            actionWrap.appendChild(reconnectBtn);
+            errBox.appendChild(actionWrap);
+          }
+          errBox.classList.remove('hidden');
+          showToast(msg, 'error');
+        };
+
+        document.getElementById('pf-connect-google-btn').addEventListener('click', async () => {
+          const errBox = document.getElementById('pf-save-error');
+          errBox.classList.add('hidden');
+          errBox.innerHTML = '';
+          try {
+            await ensureFirebaseAdminSession({ forceRefresh: true });
+            showToast(state.lang === 'bn' ? 'Google Admin সংযুক্ত হয়েছে!' : 'Google Admin connected!', 'success');
+            startAdminRealtimeListeners();
+          } catch (err) {
+            showProductSaveError(err);
+          }
+        });
 
         const renderImagePreviews = () => {
           const grid = document.getElementById('pf-image-previews');
+          if (!grid) return;
           grid.innerHTML = editorProductImages.map((im, idx) => `
             <div class="upload-item" data-upload-item="${idx}">
               <div class="upload-thumb"><img src="${esc(im.url)}" alt="" /></div>
@@ -6612,8 +6865,8 @@
         };
         renderImagePreviews();
 
-        let activeUploadPromise = null;
-        const processFileQueue = async (files) => {
+        const activeUploadPromises = new Set();
+        const processFileQueue = (files) => {
           const pidTemp = editingProductId || `prod_${Date.now()}`;
           const ov = document.getElementById('pf-overall-progress');
           const ovText = document.getElementById('pf-overall-text');
@@ -6624,17 +6877,17 @@
           ovBar.style.width = '10%';
           ovBar.style.background = 'var(--bg-dark)';
 
-          const startIdx = editorProductImages.length;
-          const items = files.map((file, offset) => {
+          const items = files.map((file) => {
+            const blobUrl = URL.createObjectURL(file);
             const entry = {
-              url: URL.createObjectURL(file),
+              url: blobUrl,
+              blobUrl,
               storagePath: '',
               isMain: editorProductImages.length === 0,
               order: editorProductImages.length,
               progress: 10,
               status: 'uploading',
-              file,
-              _idx: startIdx + offset
+              file
             };
             editorProductImages.push(entry);
             return entry;
@@ -6650,18 +6903,24 @@
             async function worker() {
               while (queue.length) {
                 const entry = queue.shift();
-                const currentIdx = editorProductImages.indexOf(entry);
+                if (!editorProductImages.includes(entry)) continue;
                 try {
                   const res = await uploadSingleFile(entry.file, `products/${pidTemp}`, (pct) => {
                     entry.progress = pct;
                     const idxNow = editorProductImages.indexOf(entry);
+                    if (idxNow < 0) return;
                     const fillEl = document.querySelector(`[data-upload-fill="${idxNow}"]`);
                     const stEl = document.querySelector(`[data-upload-status="${idxNow}"]`);
                     if (fillEl) fillEl.style.width = `${pct}%`;
                     if (stEl && entry.status === 'uploading') stEl.textContent = `Uploading ${pct}%`;
                   });
+                  if (entry.blobUrl) {
+                    URL.revokeObjectURL(entry.blobUrl);
+                    entry.blobUrl = '';
+                  }
                   entry.url = res.url;
                   entry.storagePath = res.storagePath;
+                  if (res.compressedFile) entry.compressedFile = res.compressedFile;
                   entry.status = 'done';
                   entry.progress = 100;
                   succeeded++;
@@ -6671,32 +6930,31 @@
                   showToast(`Upload failed (${entry.file.name}): ${err.message}`, 'error');
                 }
                 const doneCount = succeeded + failed;
-                ovBar.style.width = `${Math.round((doneCount / items.length) * 100)}%`;
-                if (doneCount < items.length) {
-                  ovText.textContent = `Uploading ${doneCount} / ${items.length}...`;
-                } else if (failed === 0) {
-                  ovBar.style.background = '#15803d';
-                  ovText.style.color = '#15803d';
-                  ovText.textContent = state.lang === 'bn'
-                    ? `✓ সবগুলো ছবি (${succeeded}/${items.length}) সফলভাবে আপলোড হয়েছে!`
-                    : `✓ All ${succeeded} image(s) uploaded successfully!`;
-                } else {
-                  ovBar.style.background = '#b45309';
-                  ovText.style.color = '#b91c1c';
-                  ovText.textContent = `Uploaded ${succeeded}, Failed ${failed}`;
+                if (ovBar && ovText) {
+                  ovBar.style.width = `${Math.round((doneCount / items.length) * 100)}%`;
+                  if (doneCount < items.length) {
+                    ovText.textContent = `Uploading ${doneCount} / ${items.length}...`;
+                  } else if (failed === 0) {
+                    ovBar.style.background = '#15803d';
+                    ovText.style.color = '#15803d';
+                    ovText.textContent = state.lang === 'bn'
+                      ? `✓ সবগুলো ছবি (${succeeded}/${items.length}) সফলভাবে আপলোড হয়েছে!`
+                      : `✓ All ${succeeded} image(s) uploaded successfully!`;
+                  } else {
+                    ovBar.style.background = '#b45309';
+                    ovText.style.color = '#b91c1c';
+                    ovText.textContent = `Uploaded ${succeeded}, Failed ${failed}`;
+                  }
                 }
-                if (currentIdx >= 0) renderImagePreviews();
+                renderImagePreviews();
               }
             }
             await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
           })();
 
-          activeUploadPromise = runPromise;
-          try {
-            await runPromise;
-          } finally {
-            if (activeUploadPromise === runPromise) activeUploadPromise = null;
-          }
+          activeUploadPromises.add(runPromise);
+          runPromise.finally(() => activeUploadPromises.delete(runPromise));
+          return runPromise;
         };
 
         document.getElementById('pf-image-files').addEventListener('change', (e) => {
@@ -6735,6 +6993,7 @@
             const i = Number(retryBtn.getAttribute('data-img-retry'));
             const item = editorProductImages[i];
             if (item?.file) {
+              if (item.blobUrl) URL.revokeObjectURL(item.blobUrl);
               editorProductImages.splice(i, 1);
               processFileQueue([item.file]);
             }
@@ -6744,6 +7003,7 @@
           if (delBtn) {
             const i = Number(delBtn.getAttribute('data-img-del'));
             const removed = editorProductImages.splice(i, 1)[0];
+            if (removed?.blobUrl) URL.revokeObjectURL(removed.blobUrl);
             if (removed?.storagePath) {
               deleteObject(storageRef(storage, removed.storagePath)).catch(() => {});
             }
@@ -6755,6 +7015,7 @@
         });
 
         document.getElementById('pf-cancel-btn').addEventListener('click', () => {
+          editorProductImages.forEach((im) => { if (im?.blobUrl) URL.revokeObjectURL(im.blobUrl); });
           editingProductId = null;
           editorProductImages = [];
           state.adminTab = 'products';
@@ -6764,65 +7025,163 @@
         document.getElementById('adm-product-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           const saveBtn = document.getElementById('pf-save-btn');
+          const errBox = document.getElementById('pf-save-error');
           const origBtnText = saveBtn.textContent;
+          errBox.classList.add('hidden');
+          errBox.innerHTML = '';
+
+          const safeNum = (val, fallback = 0) => {
+            const n = Number(val);
+            return Number.isFinite(n) && n >= 0 ? n : fallback;
+          };
+
+          const rawName = document.getElementById('pf-name').value.trim().slice(0, 200);
+          const rawSku = document.getElementById('pf-sku').value.trim().slice(0, 80);
+          const catId = (document.getElementById('pf-cat').value || 'mens-fashion').trim().slice(0, 128);
+          if (!rawName || !rawSku || !catId) {
+            showProductSaveError(new Error(
+              state.lang === 'bn'
+                ? 'পণ্যের নাম, SKU এবং ক্যাটাগরি অবশ্যই পূরণ করতে হবে।'
+                : 'Product Name, SKU, and Category are required.'
+            ));
+            return;
+          }
+
+          let parsedVariants = [];
+          const varRaw = document.getElementById('pf-variants').value.trim();
+          if (varRaw) {
+            try {
+              const parsed = JSON.parse(varRaw);
+              if (!Array.isArray(parsed) || parsed.some((v) => !v || typeof v !== 'object' || Array.isArray(v))) {
+                throw new Error('Variants must be a JSON array of objects');
+              }
+              parsedVariants = parsed.slice(0, 200);
+            } catch {
+              showProductSaveError(new Error(
+                state.lang === 'bn'
+                  ? 'Variants JSON ফরম্যাট সঠিক নয় (Array অবজেক্ট দিন, যেমন [{"size":"M","stock":5}])।'
+                  : 'Invalid Variants JSON. Must be a JSON array of variant objects.'
+              ));
+              return;
+            }
+          }
+
           saveBtn.disabled = true;
-          saveBtn.textContent = state.lang === 'bn' ? 'আপলোড হচ্ছে...' : 'Saving & Publishing...';
+          saveBtn.textContent = state.lang === 'bn' ? 'পাবলিশ হচ্ছে...' : 'Saving & Publishing...';
 
           try {
-            if (activeUploadPromise) {
-              await activeUploadPromise;
+            // 1. Validate/connect admin Firebase session FIRST while still inside synchronous click gesture
+            await ensureFirebaseAdminSession();
+
+            // 2. Drain ALL concurrent upload queues so no image races against batch serialization
+            while (activeUploadPromises.size > 0) {
+              await Promise.all([...activeUploadPromises]);
             }
 
-            if (!isFirebaseAdminUser() && !CLOUD_FUNCTIONS_BASE) {
-              const authRes = await signInWithPopup(auth, new GoogleAuthProvider());
-              if (authRes.user.email !== BOOTSTRAP_ADMIN_EMAIL || !authRes.user.emailVerified) {
-                throw new Error(`Admin write requires ${BOOTSTRAP_ADMIN_EMAIL}`);
+            if (editorProductImages.some((im) => im.status === 'uploading')) {
+              throw new Error(
+                state.lang === 'bn'
+                  ? 'ছবি আপলোড এখনো চলছে। কয়েক সেকেন্ড অপেক্ষা করে আবার চেষ্টা করুন।'
+                  : 'Image uploads are still in progress. Please wait a moment and try again.'
+              );
+            }
+
+            const rawPid = editingProductId && /^[a-zA-Z0-9_\-]+$/.test(editingProductId)
+              ? editingProductId.slice(0, 128)
+              : `prod_${Date.now()}`;
+            const pid = rawPid;
+
+            // 3. Concurrently upgrade any pre-auth inline data URLs to Firebase Storage now that admin auth is verified
+            if (isFirebaseAdminUser() && auth.currentUser) {
+              const upgradeTasks = editorProductImages
+                .filter((im) => im && im.status !== 'error' && String(im.url || '').startsWith('data:image/') && (im.compressedFile || im.file))
+                .map(async (im) => {
+                  try {
+                    const up = await uploadFileToStorage(im.compressedFile || im.file, `products/${pid}`, null, 4500);
+                    if (editorProductImages.includes(im)) {
+                      im.url = up.url;
+                      im.storagePath = up.storagePath;
+                    }
+                  } catch {
+                    // Storage unavailable/timeout: keep optimized inline data URL
+                  }
+                });
+              if (upgradeTasks.length) {
+                await Promise.all(upgradeTasks);
+                renderImagePreviews();
               }
-              updateAdminFirebaseSyncBanner();
             }
 
-            const pid = editingProductId || `prod_${Date.now()}`;
-            const catId = document.getElementById('pf-cat').value;
-            const catObj = cats.find((c) => c.id === catId);
-            const regPrice = Number(document.getElementById('pf-reg-price').value || 0);
-            const salePrice = Number(document.getElementById('pf-sale-price').value || 0);
-            const discPct = regPrice > 0 && salePrice > 0 && salePrice < regPrice ? Math.round(((regPrice - salePrice) / regPrice) * 100) : 0;
+            const catObj = catOptions.find((c) => c.id === catId);
+            const regPrice = safeNum(document.getElementById('pf-reg-price').value, 0);
+            const salePrice = safeNum(document.getElementById('pf-sale-price').value, 0);
+            const rawDisc = regPrice > 0 && salePrice > 0 && salePrice < regPrice
+              ? Math.round(((regPrice - salePrice) / regPrice) * 100)
+              : 0;
+            const discPct = Math.max(0, Math.min(100, rawDisc));
 
-            let parsedVariants = [];
-            const varRaw = document.getElementById('pf-variants').value.trim();
-            if (varRaw) {
-              try { parsedVariants = JSON.parse(varRaw); } catch { showToast('Invalid Variants JSON', 'error'); return; }
+            let cleanImages = editorProductImages
+              .filter((im) => im && im.status !== 'error' && im.url && !String(im.url).startsWith('blob:'))
+              .slice(0, 500)
+              .map((im, idx) => ({
+                url: String(im.url),
+                storagePath: String(im.storagePath || '').slice(0, 500),
+                isMain: Boolean(im.isMain),
+                order: idx
+              }));
+            if (cleanImages.length && !cleanImages.some((im) => im.isMain)) {
+              cleanImages[0].isMain = true;
             }
 
-            const cleanImages = editorProductImages
-              .filter((im) => im.status !== 'error' && im.url && !im.url.startsWith('blob:'))
-              .map((im, idx) => ({ url: im.url, storagePath: im.storagePath || '', isMain: Boolean(im.isMain), order: idx }));
+            // 4. Re-validate admin auth right before reading existing doc / committing batch
+            await ensureFirebaseAdminSession();
+
+            let createdAtVal = serverTimestamp();
+            if (editingProductId) {
+              try {
+                const existingSnap = await getDoc(doc(db, 'products', pid));
+                if (existingSnap.exists() && existingSnap.data()?.createdAt) {
+                  createdAtVal = existingSnap.data().createdAt;
+                }
+              } catch (readErr) {
+                if (isFirestorePermissionError(readErr)) {
+                  handleFirestoreError(readErr, OperationType.GET, `products/${pid}`);
+                }
+                if (p.createdAt && typeof p.createdAt.toDate === 'function') {
+                  createdAtVal = p.createdAt;
+                }
+              }
+            }
+
+            const rawTags = document.getElementById('pf-tags').value.split(',').map((s) => s.trim()).filter(Boolean);
+            const rawSizes = document.getElementById('pf-sizes').value.split(',').map((s) => s.trim()).filter(Boolean);
+            const rawColors = document.getElementById('pf-colors').value.split(',').map((s) => s.trim()).filter(Boolean);
 
             const productDoc = {
               id: pid,
-              name: document.getElementById('pf-name').value.trim(),
-              nameBn: document.getElementById('pf-name-bn').value.trim(),
-              sku: document.getElementById('pf-sku').value.trim(),
-              shortDescription: document.getElementById('pf-short-desc').value.trim(),
-              fullDescription: document.getElementById('pf-full-desc').value.trim(),
+              name: rawName,
+              nameBn: document.getElementById('pf-name-bn').value.trim().slice(0, 200),
+              sku: rawSku,
+              shortDescription: document.getElementById('pf-short-desc').value.trim().slice(0, 500),
+              fullDescription: document.getElementById('pf-full-desc').value.trim().slice(0, 5000),
               categoryId: catId,
-              categoryName: catObj?.name || catId,
-              subcategory: document.getElementById('pf-subcat').value.trim(),
-              brand: document.getElementById('pf-brand').value.trim(),
-              tags: document.getElementById('pf-tags').value.split(',').map((s) => s.trim()).filter(Boolean),
-              keywords: document.getElementById('pf-tags').value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean),
+              categoryName: String(catObj?.name || catId).slice(0, 120),
+              subcategory: document.getElementById('pf-subcat').value.trim().slice(0, 120),
+              brand: document.getElementById('pf-brand').value.trim().slice(0, 120),
+              tags: rawTags.slice(0, 30),
+              keywords: rawTags.map((s) => s.toLowerCase()).slice(0, 50),
               regularPrice: regPrice,
               salePrice,
-              wholesalePrice: Number(document.getElementById('pf-wholesale').value || 0),
+              wholesalePrice: safeNum(document.getElementById('pf-wholesale').value, 0),
               discountPercent: discPct,
               images: cleanImages,
-              sizes: document.getElementById('pf-sizes').value.split(',').map((s) => s.trim()).filter(Boolean),
-              colors: document.getElementById('pf-colors').value.split(',').map((s) => s.trim()).filter(Boolean),
+              sizes: rawSizes.slice(0, 30),
+              colors: rawColors.slice(0, 30),
               variants: parsedVariants,
-              stock: Number(document.getElementById('pf-stock').value || 0),
-              soldCount: Number(p.soldCount || 0),
-              ratingAvg: Number(p.ratingAvg || 5),
-              reviewCount: Number(p.reviewCount || 0),
+              stock: safeNum(document.getElementById('pf-stock').value, 0),
+              soldCount: safeNum(p.soldCount, 0),
+              ratingAvg: Math.max(0, Math.min(5, safeNum(p.ratingAvg, 5))),
+              reviewCount: safeNum(p.reviewCount, 0),
               isFeatured: document.getElementById('pf-featured').checked,
               isBestSeller: document.getElementById('pf-best').checked,
               isNewArrival: document.getElementById('pf-new').checked,
@@ -6831,22 +7190,58 @@
               isFlashSale: document.getElementById('pf-flash').checked,
               active: document.getElementById('pf-active').checked,
               published: document.getElementById('pf-published').checked,
-              createdAt: p.createdAt || serverTimestamp(),
+              createdAt: createdAtVal,
               updatedAt: serverTimestamp()
             };
 
-            const estBytes = JSON.stringify(productDoc).length;
-            if (estBytes > 950000) {
-              throw new Error('Too many large inline images for one document. Please keep fewer photos per product or verify Firebase Storage.');
+            const getUtf8ByteSize = (obj) => new Blob([JSON.stringify(obj)]).size;
+            if (getUtf8ByteSize(productDoc) > 780000) {
+              const passes = [
+                { maxW: 520, q: 0.62 },
+                { maxW: 400, q: 0.52 },
+                { maxW: 300, q: 0.45 }
+              ];
+              for (const pass of passes) {
+                if (getUtf8ByteSize(productDoc) <= 780000) break;
+                for (let idx = 0; idx < cleanImages.length; idx++) {
+                  if (String(cleanImages[idx].url).startsWith('data:image/')) {
+                    cleanImages[idx].url = await recompressDataUrl(cleanImages[idx].url, pass.maxW, pass.q);
+                  }
+                }
+              }
             }
 
-            await setDoc(doc(db, 'products', pid), productDoc);
-            const costVal = Number(document.getElementById('pf-cost').value || 0);
-            await setDoc(doc(db, 'product_private', pid), {
+            if (getUtf8ByteSize(productDoc) > 920000) {
+              throw new Error(
+                state.lang === 'bn'
+                  ? 'ছবির মোট সাইজ Firestore সীমা (1MB) অতিক্রম করেছে। অনুগ্রহ করে কিছু কম ছবি দিন অথবা ইমেজ URL ব্যবহার করুন।'
+                  : 'Total inline image size exceeds Firestore 1MB limit. Please attach fewer photos or use external image URLs.'
+              );
+            }
+
+            // 5. Final auth validation immediately before atomic batch commit
+            await ensureFirebaseAdminSession({ forceRefresh: false });
+            const costVal = safeNum(document.getElementById('pf-cost').value, 0);
+            const batch = writeBatch(db);
+            batch.set(doc(db, 'products', pid), productDoc);
+            batch.set(doc(db, 'product_private', pid), {
               productId: pid,
               costPrice: costVal,
               updatedAt: serverTimestamp()
             });
+            try {
+              await batch.commit();
+            } catch (commitErr) {
+              if (isFirestorePermissionError(commitErr)) {
+                handleFirestoreError(
+                  commitErr,
+                  editingProductId ? OperationType.UPDATE : OperationType.CREATE,
+                  `products/${pid}`
+                );
+              }
+              throw commitErr;
+            }
+
             showToast(state.lang === 'bn' ? 'পণ্যটি সফলভাবে আপলোড ও পাবলিশ হয়েছে!' : 'Product successfully uploaded & published!', 'success');
             editingProductId = null;
             editorProductImages = [];
@@ -6855,7 +7250,8 @@
             state.adminTab = 'products';
             renderAdminTab('products');
           } catch (err) {
-            showToast(err.message || 'Save failed. Please verify Admin Google session.', 'error');
+            console.error('Product save error:', err);
+            showProductSaveError(err, 'Save failed. Please verify Admin Google session.');
           } finally {
             if (saveBtn.isConnected) {
               saveBtn.disabled = false;
@@ -6894,6 +7290,7 @@
         `;
         document.getElementById('adm-seed-cats-btn').addEventListener('click', async () => {
           try {
+            await ensureFirebaseAdminSession();
             const batch = writeBatch(db);
             INITIAL_CATEGORIES.forEach((c) => {
               batch.set(doc(db, 'categories', c.id), {
@@ -6909,7 +7306,7 @@
             await loadCategories();
             renderAdminTab('categories');
           } catch (err) {
-            showToast(err.message, 'error');
+            showToast(formatFirebaseAdminError(err), 'error');
           }
         });
         document.getElementById('adm-add-cat-btn').addEventListener('click', () => openCategoryEditor(null));
@@ -7159,13 +7556,14 @@
           const code = document.getElementById('cp-code').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
           if (!code) return;
           try {
+            await ensureFirebaseAdminSession();
             await setDoc(doc(db, 'coupons', code), {
               code,
               type: document.getElementById('cp-type').value,
-              amount: Number(document.getElementById('cp-amount').value || 0),
-              minOrder: Number(document.getElementById('cp-min').value || 0),
-              maxDiscount: Number(document.getElementById('cp-max').value || 0),
-              usageLimit: Number(document.getElementById('cp-limit').value || 0),
+              amount: Math.max(0, Number(document.getElementById('cp-amount').value || 0)),
+              minOrder: Math.max(0, Number(document.getElementById('cp-min').value || 0)),
+              maxDiscount: Math.max(0, Number(document.getElementById('cp-max').value || 0)),
+              usageLimit: Math.max(0, Number(document.getElementById('cp-limit').value || 0)),
               usedCount: 0,
               startDate: document.getElementById('cp-start').value,
               expiryDate: document.getElementById('cp-expiry').value,
@@ -7176,7 +7574,7 @@
             showToast('Coupon saved', 'success');
             await loadAdminCollections();
             renderAdminTab('coupons');
-          } catch (err) { showToast(err.message, 'error'); }
+          } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         });
       } else if (tab === 'reviews') {
         host.innerHTML = `
@@ -7247,6 +7645,7 @@
           let storagePath = '';
           const file = document.getElementById('bn-file').files?.[0];
           try {
+            await ensureFirebaseAdminSession();
             if (file) {
               const up = await uploadSingleFile(file, `banners/${bid}`);
               imageUrl = up.url;
@@ -7254,15 +7653,15 @@
             }
             await setDoc(doc(db, 'banners', bid), {
               id: bid,
-              title: document.getElementById('bn-title').value.trim(),
-              titleBn: document.getElementById('bn-title-bn').value.trim(),
-              subtitle: document.getElementById('bn-sub').value.trim(),
-              subtitleBn: document.getElementById('bn-sub-bn').value.trim(),
-              buttonText: document.getElementById('bn-btn').value.trim(),
-              buttonTextBn: document.getElementById('bn-btn').value.trim(),
-              buttonUrl: document.getElementById('bn-url').value.trim() || '#shop',
-              imageUrl,
-              storagePath,
+              title: document.getElementById('bn-title').value.trim().slice(0, 160),
+              titleBn: document.getElementById('bn-title-bn').value.trim().slice(0, 160),
+              subtitle: document.getElementById('bn-sub').value.trim().slice(0, 300),
+              subtitleBn: document.getElementById('bn-sub-bn').value.trim().slice(0, 300),
+              buttonText: document.getElementById('bn-btn').value.trim().slice(0, 60),
+              buttonTextBn: document.getElementById('bn-btn').value.trim().slice(0, 60),
+              buttonUrl: (document.getElementById('bn-url').value.trim() || '#shop').slice(0, 300),
+              imageUrl: imageUrl.slice(0, 1000),
+              storagePath: storagePath.slice(0, 500),
               order: Number(document.getElementById('bn-order').value || 1),
               enabled: document.getElementById('bn-enabled').checked,
               createdAt: serverTimestamp(),
@@ -7272,7 +7671,7 @@
             await loadAdminCollections();
             await loadBanners();
             renderAdminTab('banners');
-          } catch (err) { showToast(err.message, 'error'); }
+          } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         });
       } else if (['logo', 'settings', 'shipping', 'payments', 'social'].includes(tab)) {
         renderAdminSettingsPanel(tab, host);
@@ -7495,13 +7894,14 @@
 
     async function savePublicSettings(partial) {
       try {
+        await ensureFirebaseAdminSession();
         const merged = { ...state.settings, ...partial, updatedAt: serverTimestamp() };
         await setDoc(doc(db, 'settings', 'public'), merged);
         state.settings = { ...state.settings, ...partial };
         applyDynamicBranding();
         showToast('Settings saved & synced!', 'success');
       } catch (err) {
-        showToast(err.message || 'Settings save failed', 'error');
+        showToast(formatFirebaseAdminError(err, 'Settings save failed'), 'error');
       }
     }
 
@@ -7554,28 +7954,40 @@
       `);
       document.getElementById('adm-cat-modal-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('cm-name').value.trim();
+        const name = document.getElementById('cm-name').value.trim().slice(0, 120);
         const id = catId || slugify(name);
         let imageUrl = document.getElementById('cm-img').value.trim() || OFFICIAL_LOGO;
         const file = document.getElementById('cm-file').files?.[0];
         try {
+          await ensureFirebaseAdminSession();
           if (file) {
             const up = await uploadSingleFile(file, `categories/${id}`);
             imageUrl = up.url;
           }
+          let catCreatedAt = serverTimestamp();
+          if (catId) {
+            if (c?.createdAt && typeof c.createdAt.toDate === 'function') {
+              catCreatedAt = c.createdAt;
+            } else {
+              try {
+                const cSnap = await getDoc(doc(db, 'categories', id));
+                if (cSnap.exists() && cSnap.data()?.createdAt) catCreatedAt = cSnap.data().createdAt;
+              } catch {}
+            }
+          }
           await setDoc(doc(db, 'categories', id), {
             id,
             name,
-            nameBn: document.getElementById('cm-name-bn').value.trim(),
-            slug: slugify(name),
-            parentId: document.getElementById('cm-parent').value.trim(),
+            nameBn: document.getElementById('cm-name-bn').value.trim().slice(0, 120),
+            slug: slugify(name).slice(0, 128),
+            parentId: document.getElementById('cm-parent').value.trim().slice(0, 128),
             order: Number(document.getElementById('cm-order').value || 1),
-            imageUrl,
+            imageUrl: imageUrl.slice(0, 1000),
             storagePath: '',
-            description: document.getElementById('cm-desc').value.trim(),
+            description: document.getElementById('cm-desc').value.trim().slice(0, 500),
             descriptionBn: '',
             enabled: document.getElementById('cm-enabled').checked,
-            createdAt: c?.createdAt || serverTimestamp(),
+            createdAt: catCreatedAt,
             updatedAt: serverTimestamp()
           });
           document.getElementById('admin-modal').classList.add('hidden');
@@ -7583,7 +7995,7 @@
           await loadAdminCollections();
           await loadCategories();
           renderAdminTab('categories');
-        } catch (err) { showToast(err.message, 'error'); }
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
       });
     }
 
@@ -8105,13 +8517,7 @@
         saveBtn.disabled = true;
 
         try {
-          if (!isFirebaseAdminUser() && !CLOUD_FUNCTIONS_BASE) {
-            const authRes = await signInWithPopup(auth, new GoogleAuthProvider());
-            if (authRes.user.email !== BOOTSTRAP_ADMIN_EMAIL || !authRes.user.emailVerified) {
-              throw new Error(`Admin write requires ${BOOTSTRAP_ADMIN_EMAIL}`);
-            }
-            updateAdminFirebaseSyncBanner();
-          }
+          await ensureFirebaseAdminSession();
 
           if (CLOUD_FUNCTIONS_BASE && auth.currentUser) {
             const token = await auth.currentUser.getIdToken();
@@ -8161,7 +8567,7 @@
           document.getElementById('admin-modal').classList.add('hidden');
           showToast('Order updated!', 'success');
         } catch (err) {
-          showToast(err.message, 'error');
+          showToast(formatFirebaseAdminError(err), 'error');
         } finally {
           if (saveBtn.isConnected) saveBtn.disabled = false;
         }
@@ -8186,14 +8592,21 @@
       if (dupProd) {
         const orig = state.adminProducts.find((p) => p.id === dupProd.getAttribute('data-dup-prod'));
         if (!orig) return;
-        const newId = `prod_${Date.now()}`;
-        await setDoc(doc(db, 'products', newId), {
-          ...orig, id: newId, name: `${orig.name} (Copy)`, sku: `${orig.sku}-COPY`,
-          createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-        });
-        showToast('Product duplicated', 'success');
-        await loadAdminCollections();
-        renderAdminTab('products');
+        try {
+          await ensureFirebaseAdminSession();
+          const newId = `prod_${Date.now()}`;
+          await setDoc(doc(db, 'products', newId), {
+            ...orig,
+            id: newId,
+            name: `${orig.name} (Copy)`.slice(0, 200),
+            sku: `${orig.sku}-COPY`.slice(0, 80),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          showToast('Product duplicated', 'success');
+          await loadAdminCollections();
+          renderAdminTab('products');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
@@ -8202,6 +8615,7 @@
         const pid = delProd.getAttribute('data-del-prod');
         const prod = state.adminProducts.find((p) => p.id === pid);
         try {
+          await ensureFirebaseAdminSession();
           if (prod && Array.isArray(prod.images)) {
             for (const im of prod.images) {
               if (im.storagePath) deleteObject(storageRef(storage, im.storagePath)).catch(() => {});
@@ -8213,7 +8627,7 @@
           await loadAdminCollections();
           await loadProducts(true);
           renderAdminTab('products');
-        } catch (err) { showToast(err.message, 'error'); }
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
@@ -8222,11 +8636,14 @@
 
       const delCat = e.target.closest('[data-del-cat]');
       if (delCat) {
-        await deleteDoc(doc(db, 'categories', delCat.getAttribute('data-del-cat')));
-        showToast('Category deleted');
-        await loadAdminCollections();
-        await loadCategories();
-        renderAdminTab('categories');
+        try {
+          await ensureFirebaseAdminSession();
+          await deleteDoc(doc(db, 'categories', delCat.getAttribute('data-del-cat')));
+          showToast('Category deleted');
+          await loadAdminCollections();
+          await loadCategories();
+          renderAdminTab('categories');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
@@ -8235,59 +8652,74 @@
         const pid = invSave.getAttribute('data-inv-save');
         const prod = state.adminProducts.find((p) => p.id === pid);
         const delta = Number(document.getElementById(`inv-adj-${pid}`).value || 0);
-        const reason = document.getElementById(`inv-rsn-${pid}`).value.trim() || 'Manual Adjustment';
+        const reason = (document.getElementById(`inv-rsn-${pid}`).value.trim() || 'Manual Adjustment').slice(0, 200);
         if (!prod || !delta) return;
-        const prev = Number(prod.stock || 0);
-        const next = Math.max(0, prev + delta);
-        const batch = writeBatch(db);
-        batch.update(doc(db, 'products', pid), { stock: next, updatedAt: serverTimestamp() });
-        const lid = `adj_${pid}_${Date.now()}`.slice(0, 120);
-        batch.set(doc(db, 'inventoryLogs', lid), {
-          id: lid, productId: pid, productName: prod.name, sku: prod.sku,
-          change: delta, previousStock: prev, newStock: next, reason, createdAt: serverTimestamp()
-        });
-        await batch.commit();
-        showToast('Stock updated', 'success');
-        await loadAdminCollections();
-        renderAdminTab('inventory');
+        try {
+          await ensureFirebaseAdminSession();
+          const prev = Number(prod.stock || 0);
+          const next = Math.max(0, prev + delta);
+          const batch = writeBatch(db);
+          batch.update(doc(db, 'products', pid), { stock: next, updatedAt: serverTimestamp() });
+          const lid = `adj_${pid}_${Date.now()}`.slice(0, 120);
+          batch.set(doc(db, 'inventoryLogs', lid), {
+            id: lid, productId: pid, productName: prod.name, sku: prod.sku,
+            change: delta, previousStock: prev, newStock: next, reason, createdAt: serverTimestamp()
+          });
+          await batch.commit();
+          showToast('Stock updated', 'success');
+          await loadAdminCollections();
+          renderAdminTab('inventory');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
       const delCoupon = e.target.closest('[data-del-coupon]');
       if (delCoupon) {
-        await deleteDoc(doc(db, 'coupons', delCoupon.getAttribute('data-del-coupon')));
-        showToast('Coupon deleted');
-        await loadAdminCollections();
-        renderAdminTab('coupons');
+        try {
+          await ensureFirebaseAdminSession();
+          await deleteDoc(doc(db, 'coupons', delCoupon.getAttribute('data-del-coupon')));
+          showToast('Coupon deleted');
+          await loadAdminCollections();
+          renderAdminTab('coupons');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
       const revStatus = e.target.closest('[data-rev-status]');
       if (revStatus) {
-        const [rid, status] = revStatus.getAttribute('data-rev-status').split(':');
-        await updateDoc(doc(db, 'reviews', rid), { status, updatedAt: serverTimestamp() });
-        showToast(`Review ${status}`);
-        await loadAdminCollections();
-        renderAdminTab('reviews');
+        try {
+          await ensureFirebaseAdminSession();
+          const [rid, status] = revStatus.getAttribute('data-rev-status').split(':');
+          await updateDoc(doc(db, 'reviews', rid), { status, updatedAt: serverTimestamp() });
+          showToast(`Review ${status}`);
+          await loadAdminCollections();
+          renderAdminTab('reviews');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
       const revDel = e.target.closest('[data-rev-del]');
       if (revDel) {
-        await deleteDoc(doc(db, 'reviews', revDel.getAttribute('data-rev-del')));
-        showToast('Review deleted');
-        await loadAdminCollections();
-        renderAdminTab('reviews');
+        try {
+          await ensureFirebaseAdminSession();
+          await deleteDoc(doc(db, 'reviews', revDel.getAttribute('data-rev-del')));
+          showToast('Review deleted');
+          await loadAdminCollections();
+          renderAdminTab('reviews');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
       const delBan = e.target.closest('[data-del-banner]');
       if (delBan) {
-        await deleteDoc(doc(db, 'banners', delBan.getAttribute('data-del-banner')));
-        showToast('Banner deleted');
-        await loadAdminCollections();
-        await loadBanners();
-        renderAdminTab('banners');
+        try {
+          await ensureFirebaseAdminSession();
+          await deleteDoc(doc(db, 'banners', delBan.getAttribute('data-del-banner')));
+          showToast('Banner deleted');
+          await loadAdminCollections();
+          await loadBanners();
+          renderAdminTab('banners');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
       }
 
