@@ -314,19 +314,28 @@ service cloud.firestore {
           'defaultLanguage', 'guestCheckoutEnabled', 'minOrderValue', 'dhakaDeliveryCharge',
           'outsideDhakaDeliveryCharge', 'freeDeliveryThreshold', 'dhakaDeliveryEstimate',
           'outsideDhakaDeliveryEstimate', 'defaultCourier', 'districtCharges',
-          'paymentMethods', 'homepageSections', 'updatedAt'
+          'paymentMethods', 'homepageSections', 'socialPosts', 'stockAlertConfig', 'updatedAt'
         ]) &&
         isNonEmptyString(data.brandName, 100) &&
         isOptionalString(data.logoUrl, 1000) &&
         isOptionalString(data.whatsappNumber, 30) &&
+        (!('socialPosts' in data) || isMapList(data.socialPosts, 0, 24)) &&
+        (!('stockAlertConfig' in data) || (
+          data.stockAlertConfig is map &&
+          (!('defaultThreshold' in data.stockAlertConfig) || (data.stockAlertConfig.defaultThreshold is number && data.stockAlertConfig.defaultThreshold >= 0)) &&
+          (!('alertEmail' in data.stockAlertConfig) || isOptionalString(data.stockAlertConfig.alertEmail, 160))
+        )) &&
         data.updatedAt == request.time;
     }
 
     function isValidNotification(data, notifId) {
       return data.keys().hasAll(['id', 'userId', 'title', 'message', 'read', 'createdAt']) &&
-        data.keys().hasOnly(['id', 'userId', 'orderId', 'title', 'message', 'read', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'userId', 'type', 'productId', 'sku', 'orderId', 'title', 'message', 'read', 'createdAt']) &&
         data.id == notifId &&
         isNonEmptyString(data.userId, 128) &&
+        (!('type' in data) || isOptionalString(data.type, 40)) &&
+        (!('productId' in data) || isOptionalString(data.productId, 128)) &&
+        (!('sku' in data) || isOptionalString(data.sku, 80)) &&
         (!('orderId' in data) || isOptionalString(data.orderId, 40)) &&
         isNonEmptyString(data.title, 160) &&
         isNonEmptyString(data.message, 500) &&

@@ -1000,6 +1000,37 @@
       margin-top: 6px;
     }
 
+    .product-compare-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .product-compare-btn:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--text-primary);
+    }
+
+    .product-compare-btn.active {
+      background: #fff1f2;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     @media (max-width: 349px) {
       .product-card-body {
         padding: 14px;
@@ -1021,10 +1052,11 @@
         right: 10px;
       }
 
-      .product-card-actions .btn {
-        min-height: 46px;
-        padding: 11px 16px;
-        font-size: 14px;
+      .product-card-actions .btn,
+      .product-compare-btn {
+        min-height: 44px;
+        padding: 10px 14px;
+        font-size: 13.5px;
       }
     }
 
@@ -1127,15 +1159,325 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transition: transform 0.2s ease;
+      transform-origin: 50% 50%;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .pdp-main-media:not(.zoomed):hover img {
+      transform: scale(1.02);
     }
 
     .pdp-main-media.zoomed {
       cursor: zoom-out;
+      touch-action: none;
     }
 
     .pdp-main-media.zoomed img {
-      transform: scale(1.75);
+      transform: scale(2.15);
+    }
+
+    .pdp-main-media:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 2px;
+    }
+
+    .pdp-media-controls {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .pdp-media-ctrl {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(17, 17, 17, 0.82);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pdp-media-ctrl:hover,
+    .pdp-media-ctrl:focus-visible {
+      background: rgba(17, 17, 17, 0.96);
+      border-color: rgba(255, 255, 255, 0.48);
+      outline: 2px solid #ffffff;
+      outline-offset: -3px;
+    }
+
+    .pdp-media-ctrl.active {
+      background: #ffffff;
+      color: #111111;
+      border-color: #111111;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    }
+
+    .pdp-media-ctrl.active:hover,
+    .pdp-media-ctrl.active:focus-visible {
+      background: #f3f4f6;
+      color: #111111;
+      outline: 2px solid #111111;
+      outline-offset: -3px;
+    }
+
+    /* Full-Screen PDP Lightbox Gallery Modal */
+    .pdp-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: rgba(10, 10, 12, 0.96);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      overscroll-behavior: contain;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .pdp-lightbox-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+
+    .pdp-lightbox-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .pdp-lightbox-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pdp-lightbox-counter {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.78);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pdp-lightbox-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .pdp-lightbox-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pdp-lightbox-btn:hover,
+    .pdp-lightbox-btn:focus-visible {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.5);
+      outline: none;
+    }
+
+    .pdp-lightbox-btn.active {
+      background: #ffffff;
+      color: #111111;
+      border-color: #ffffff;
+    }
+
+    .pdp-lightbox-stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .pdp-lightbox-stage.is-zoomed {
+      touch-action: none;
+    }
+
+    .pdp-lightbox-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    .pdp-lightbox-track.is-dragging {
+      transition: none;
+    }
+
+    .pdp-lightbox-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .pdp-lightbox-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      cursor: zoom-in;
+      transform-origin: center center;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+      -webkit-user-drag: none;
+    }
+
+    .pdp-lightbox-stage.is-zoomed .pdp-lightbox-slide.active img {
+      cursor: zoom-out;
+    }
+
+    .pdp-lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(17, 17, 17, 0.68);
+      color: #ffffff;
+      font-size: 28px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .pdp-lightbox-nav.prev {
+      left: 12px;
+    }
+
+    .pdp-lightbox-nav.next {
+      right: 12px;
+    }
+
+    .pdp-lightbox-nav:hover,
+    .pdp-lightbox-nav:focus-visible {
+      background: rgba(255, 255, 255, 0.22);
+      outline: none;
+    }
+
+    .pdp-lightbox-thumbs {
+      display: flex;
+      align-items: center;
+      justify-content: safe center;
+      gap: 8px;
+      padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: thin;
+    }
+
+    .pdp-lightbox-thumb {
+      width: 52px;
+      height: 58px;
+      flex-shrink: 0;
+      padding: 0;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      opacity: 0.62;
+      cursor: pointer;
+      transition: opacity 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pdp-lightbox-thumb.active {
+      border-color: #ffffff;
+      opacity: 1;
+    }
+
+    .pdp-lightbox-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    @media (max-width: 639px) {
+      .pdp-lightbox-slide {
+        padding: 8px;
+      }
+
+      .pdp-lightbox-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+      }
+
+      .pdp-lightbox-nav.prev {
+        left: 8px;
+      }
+
+      .pdp-lightbox-nav.next {
+        right: 8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pdp-lightbox-track,
+      .pdp-lightbox-slide img,
+      .pdp-main-media img {
+        transition: none;
+      }
     }
 
     .pdp-thumbs {
@@ -1325,6 +1667,601 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-hairline);
       border-radius: var(--radius-md);
+    }
+
+    /* Dedicated Homepage Social Feed (Instagram & TikTok) */
+    .social-feed-section {
+      border-top: 1px solid var(--border-hairline);
+      background: #ffffff;
+    }
+
+    .social-feed-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .social-feed-kicker {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .social-feed-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social-feed-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+    }
+
+    .social-feed-tab {
+      min-height: 36px;
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .social-feed-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .social-feed-tab.active {
+      background: var(--bg-dark);
+      color: #ffffff;
+    }
+
+    .social-feed-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .social-feed-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 349px) {
+      .social-feed-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .social-feed-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+      }
+    }
+
+    .social-post-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-post-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .social-post-card:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
+    .social-post-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #f3f3f3;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .social-post-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-post-card:hover .social-post-media img {
+      transform: scale(1.03);
+    }
+
+    .social-reel-play {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(17, 17, 17, 0.78);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .social-post-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .social-post-meta svg {
+      flex-shrink: 0;
+      color: var(--text-primary);
+    }
+
+    .social-post-caption {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .social-post-cta {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .social-post-card,
+      .social-post-media img {
+        transition: none;
+      }
+    }
+
+    /* Product Comparison Dock & Side-by-Side Table Modal */
+    body.has-compare-dock #storefront-app {
+      padding-bottom: 72px;
+    }
+
+    .catalog-header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .compare-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 65;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border-strong);
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .compare-dock-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .compare-dock-slots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .compare-dock-slots::-webkit-scrollbar {
+      display: none;
+    }
+
+    .compare-dock-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      max-width: 220px;
+      padding: 4px 8px 4px 4px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    .compare-dock-chip img {
+      width: 32px;
+      height: 36px;
+      object-fit: contain;
+      background: #ffffff;
+      border-radius: 4px;
+      border: 1px solid var(--border-hairline);
+      flex-shrink: 0;
+    }
+
+    .compare-dock-chip-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 135px;
+    }
+
+    .compare-dock-remove {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .compare-dock-remove:hover {
+      background: rgba(17, 17, 17, 0.08);
+      color: var(--text-primary);
+    }
+
+    .compare-dock-empty-slot {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .compare-dock-summary-mobile {
+      display: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .compare-dock-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 900px) {
+      .compare-dock-empty-slot {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 767px) {
+      body.has-compare-dock #storefront-app {
+        padding-bottom: 58px;
+      }
+
+      .compare-dock {
+        padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .compare-dock-chip-name {
+        display: none;
+      }
+
+      .compare-dock-chip {
+        padding: 2px 4px 2px 2px;
+        gap: 4px;
+      }
+
+      .compare-dock-chip img {
+        width: 28px;
+        height: 32px;
+      }
+
+      .compare-dock-summary-mobile {
+        display: inline-block;
+      }
+
+      .compare-dock-actions .btn {
+        min-height: 36px;
+        padding: 6px 12px;
+        font-size: 12.5px;
+      }
+    }
+
+    .modal-card.modal-compare {
+      max-width: 1060px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .compare-modal-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .compare-diff-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .compare-notice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .compare-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 580px;
+      table-layout: fixed;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-hairline);
+      border-right: 1px solid var(--border-hairline);
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: var(--text-primary);
+    }
+
+    .compare-table th:last-child,
+    .compare-table td:last-child {
+      border-right: none;
+    }
+
+    .compare-table tr:last-child th,
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .compare-attr-col {
+      width: 150px;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #fafaf9;
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      border-right: 1px solid var(--border-strong);
+    }
+
+    .compare-table tr.is-diff td {
+      background: #fffbeb;
+    }
+
+    .compare-table tr.is-diff th.compare-attr-col {
+      background: #fef3c7;
+      color: #78350f;
+    }
+
+    .compare-prod-head {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .compare-prod-remove-top {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--text-primary);
+      font-size: 17px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compare-prod-remove-top:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .compare-prod-img-box {
+      width: 100%;
+      aspect-ratio: 39 / 43;
+      max-height: 175px;
+      background: #f5f5f5;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .compare-prod-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .compare-prod-title-btn {
+      border: none;
+      background: transparent;
+      padding: 0;
+      text-align: left;
+      font-weight: 700;
+      font-size: 14.5px;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .compare-prod-title-btn:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .compare-best-price {
+      display: inline-block;
+      margin-top: 3px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .compare-size-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .compare-size-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ffffff;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .compare-color-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+
+    .compare-color-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+    }
+
+    .compare-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(17, 17, 17, 0.25);
+      flex-shrink: 0;
+    }
+
+    .compare-placeholder-col {
+      background: #fafaf9;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+
+    @media (max-width: 640px) {
+      .modal-card.modal-compare {
+        padding: 14px;
+      }
+
+      .compare-attr-col {
+        width: 112px;
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      .compare-table th,
+      .compare-table td {
+        padding: 10px;
+        font-size: 12.5px;
+      }
     }
 
     /* Modals */
@@ -1533,6 +2470,55 @@
     .status-Shipped, .status-Out { color: #6d28d9; }
     .status-Delivered, .status-Paid, .status-approved { color: #15803d; }
     .status-Cancelled, .status-Returned, .status-Refunded, .status-rejected { color: #b91c1c; }
+
+    /* Inventory Threshold Alerts & Notifications */
+    .inv-alert-banner {
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .inv-alert-banner.is-clear {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .inv-notif-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .inv-notif-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-hairline);
+      font-size: 13px;
+    }
+
+    .inv-notif-item:last-child {
+      border-bottom: none;
+    }
+
+    .inv-notif-item.is-unread {
+      background: #fffbeb;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+      border: 1px solid #fde68a;
+    }
+
+    .inv-status-ok { color: var(--success); font-weight: 600; }
+    .inv-status-low { color: var(--warning); font-weight: 700; }
+    .inv-status-out { color: var(--danger); font-weight: 700; }
 
     /* Multi-image uploader queue */
     .upload-dropzone {
@@ -2932,7 +3918,7 @@
       <button type="button" class="admin-nav-btn" data-admin-tab="categories">4. Categories</button>
       <button type="button" class="admin-nav-btn" data-admin-tab="orders">5. Orders <span id="admin-pending-badge" class="mono" style="font-size:11px;background:#b91c1c;color:#fff;padding:1px 6px;border-radius:999px;">0</span></button>
       <button type="button" class="admin-nav-btn" data-admin-tab="customers">6. Customers</button>
-      <button type="button" class="admin-nav-btn" data-admin-tab="inventory">7. Inventory</button>
+      <button type="button" class="admin-nav-btn" data-admin-tab="inventory">7. Inventory <span id="admin-inv-alert-badge" class="mono hidden" style="font-size:11px;background:#b91c1c;color:#fff;padding:1px 6px;border-radius:999px;">0</span></button>
       <button type="button" class="admin-nav-btn" data-admin-tab="coupons">8. Coupons</button>
       <button type="button" class="admin-nav-btn" data-admin-tab="reviews">9. Reviews</button>
       <button type="button" class="admin-nav-btn" data-admin-tab="banners">10. Banners</button>
@@ -2956,7 +3942,7 @@
           <h2 id="admin-view-title" style="margin:0;font-size:18px;font-weight:700;">Overview</h2>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div id="admin-live-alert" class="hidden" style="font-size:12px;font-weight:600;color:#b91c1c;background:#fee2e2;padding:5px 10px;border-radius:6px;"></div>
+          <button type="button" id="admin-live-alert" class="hidden" style="font-size:12px;font-weight:600;color:#b91c1c;background:#fee2e2;border:1px solid #fecaca;padding:5px 10px;border-radius:6px;"></button>
           <button type="button" id="admin-firebase-sync-btn" class="btn btn-outline btn-sm hidden">Connect Firebase Write Session</button>
           <button type="button" id="admin-top-back-btn" class="btn btn-outline btn-sm">Storefront</button>
         </div>
@@ -2973,6 +3959,51 @@
         <button type="button" id="admin-modal-close" class="icon-btn" aria-label="Close">&times;</button>
       </div>
       <div id="admin-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ===================== FULL-SCREEN PDP IMAGE GALLERY MODAL ===================== -->
+  <div id="pdp-gallery-modal" class="pdp-lightbox hidden" role="dialog" aria-modal="true" aria-labelledby="pdp-lightbox-title">
+    <div class="pdp-lightbox-topbar">
+      <div class="pdp-lightbox-meta">
+        <span id="pdp-lightbox-title" class="pdp-lightbox-title"></span>
+        <span id="pdp-lightbox-counter" class="pdp-lightbox-counter mono">1 / 1</span>
+      </div>
+      <div class="pdp-lightbox-actions">
+        <button type="button" id="pdp-lightbox-zoom" class="pdp-lightbox-btn" aria-label="Toggle zoom">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button type="button" id="pdp-lightbox-close" class="pdp-lightbox-btn" aria-label="Close gallery">&times;</button>
+      </div>
+    </div>
+    <div id="pdp-lightbox-stage" class="pdp-lightbox-stage">
+      <div id="pdp-lightbox-track" class="pdp-lightbox-track"></div>
+      <button type="button" id="pdp-lightbox-prev" class="pdp-lightbox-nav prev" aria-label="Previous image">&#8249;</button>
+      <button type="button" id="pdp-lightbox-next" class="pdp-lightbox-nav next" aria-label="Next image">&#8250;</button>
+    </div>
+    <div id="pdp-lightbox-thumbs" class="pdp-lightbox-thumbs" role="tablist" aria-label="Product gallery thumbnails"></div>
+  </div>
+
+  <!-- ===================== PRODUCT COMPARE DOCK & MODAL ===================== -->
+  <div id="compare-dock-bar" class="compare-dock hidden" role="region" aria-label="Product comparison tray"></div>
+
+  <div id="compare-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="compare-modal-title">
+    <div class="modal-card modal-compare">
+      <div class="modal-header" style="flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <strong id="compare-modal-title" style="font-size:17px;">Product Comparison</strong>
+          <span id="compare-modal-count" class="mono" style="font-size:12px;color:var(--text-muted);">0 / 3</span>
+        </div>
+        <div class="compare-modal-controls">
+          <label class="compare-diff-toggle">
+            <input type="checkbox" id="compare-diff-toggle" />
+            <span id="compare-diff-label">Highlight differences</span>
+          </label>
+          <button type="button" id="compare-modal-clear" class="btn btn-outline btn-sm">Clear All</button>
+          <button type="button" id="compare-modal-close" class="icon-btn" aria-label="Close comparison">&times;</button>
+        </div>
+      </div>
+      <div id="compare-modal-body"></div>
     </div>
   </div>
   <!-- ===================== VANILLA JS ES6+ APPLICATION ===================== -->
@@ -3098,9 +4129,57 @@
     const OFFICIAL_WHATSAPP = '+8801604703820';
     const OFFICIAL_FACEBOOK = 'https://www.facebook.com/profile.php?id=61575518426681';
     const OFFICIAL_TIKTOK = 'https://www.tiktok.com/@msafashion20?_r=1&_t=ZS-9BWmGDupjKo';
+    const OFFICIAL_INSTAGRAM = 'https://www.instagram.com/';
     const BOOTSTRAP_ADMIN_EMAIL = 'sohel901190@gmail.com';
     // Optional Cloud Function base URL when deployed to Firebase Blaze:
     const CLOUD_FUNCTIONS_BASE = localStorage.getItem('msf_cf_base') || '';
+
+    const DEFAULT_SOCIAL_POSTS = [
+      {
+        id: 'ig-mens-tailoring',
+        platform: 'instagram',
+        handle: '@msfashion.bd',
+        typeLabel: 'Lookbook',
+        typeLabelBn: 'লুকবুক',
+        imageUrl: '/src/assets/images/social_mens_tailoring_1795164549784.jpg',
+        caption: 'Tailored obsidian linen shirt paired with sand chinos — breathable all-day fit.',
+        captionBn: 'কালো লিনেন ক্যাজুয়াল শার্ট ও স্যান্ড চিনোস — সারাদিনের আরামদায়ক আভিজাত্য।',
+        postUrl: ''
+      },
+      {
+        id: 'tt-womens-crimson',
+        platform: 'tiktok',
+        handle: '@msafashion20',
+        typeLabel: 'Reel',
+        typeLabelBn: 'রিলস',
+        imageUrl: '/src/assets/images/social_womens_crimson_1795164551952.jpg',
+        caption: 'Crimson embroidered kurti styling transition — new festive arrivals now live.',
+        captionBn: 'ক্রিমসন এমব্রয়ডারি কুর্তি স্টাইলিং রিলস — নতুন ফেস্টিভ কালেকশন এখন স্টকে।',
+        postUrl: ''
+      },
+      {
+        id: 'tt-streetwear-hoodie',
+        platform: 'tiktok',
+        handle: '@msafashion20',
+        typeLabel: 'Reel',
+        typeLabelBn: 'রিলস',
+        imageUrl: '/src/assets/images/social_streetwear_hoodie_1795164550918.jpg',
+        caption: 'Heavyweight charcoal fleece hoodie fit check — streetwear drop in Dhaka.',
+        captionBn: 'হেভিওয়েট চারকোল ফ্লিস হুডি ফিট চেক — নতুন স্ট্রিটওয়্যার কালেকশন।',
+        postUrl: ''
+      },
+      {
+        id: 'ig-polo-essentials',
+        platform: 'instagram',
+        handle: '@msfashion.bd',
+        typeLabel: 'Style Edit',
+        typeLabelBn: 'কালেকশন',
+        imageUrl: '/src/assets/images/social_polo_essentials_1795164551052.jpg',
+        caption: 'Piqué knit polo trio in ivory, obsidian, and olive — crafted for everyday wear.',
+        captionBn: 'আইভরি, কালো ও অলিভ নিট পোলো ট্রায়ো — প্রতিদিনের প্রিমিয়াম স্টাইল।',
+        postUrl: ''
+      }
+    ];
 
     const DEFAULT_SETTINGS = {
       brandName: 'MS FASHION',
@@ -3115,6 +4194,15 @@
       tiktokUrl: OFFICIAL_TIKTOK,
       instagramUrl: '',
       youtubeUrl: '',
+      socialPosts: [],
+      stockAlertConfig: {
+        enabled: true,
+        defaultThreshold: 5,
+        notifyUi: true,
+        notifyEmail: true,
+        alertEmail: BOOTSTRAP_ADMIN_EMAIL,
+        skuThresholds: {}
+      },
       footerAbout: 'MS FASHION is a modern fashion label in Bangladesh delivering quality menswear, womenswear, and everyday essentials nationwide.',
       footerAboutBn: 'MS FASHION বাংলাদেশের আধুনিক ও প্রিমিয়াম পোশাক ব্র্যান্ড। সেরা মানের কাপড়, ট্রেন্ডি ডিজাইন এবং দ্রুত সারাদেশে ডেলিভারি।',
       currencySymbol: '৳',
@@ -3150,6 +4238,7 @@
         random: true,
         youMayLike: true,
         reviews: true,
+        socialFeed: true,
         newsletter: true,
         social: true,
         whatsapp: true
@@ -3213,6 +4302,8 @@
         sec_random: 'নির্বাচিত কালেকশন',
         sec_also_like: 'আপনার আরও পছন্দ হতে পারে',
         sec_reviews: 'গ্রাহকদের রিভিউ',
+        sec_social_feed: 'ইনস্টাগ্রাম ও টিকটক ফিড',
+        sec_social_feed_sub: 'নতুন ফ্যাশন রিলস, লুকবুক ও প্রতিদিনের স্টাইল আপডেট',
         sec_newsletter: 'নিউজলেটার',
         sec_social: 'সোশ্যাল মিডিয়ায় MS FASHION',
         sec_whatsapp: 'সরাসরি হোয়াটসঅ্যাপে যোগাযোগ করুন',
@@ -3248,7 +4339,17 @@
         empty_products: 'এই সেকশনে এখনো কোনো পণ্য যোগ করা হয়নি।',
         load_more: 'আরও পণ্য লোড করুন',
         track_title: 'অর্ডার ট্র্যাক করুন',
-        track_btn: 'স্ট্যাটাস দেখুন'
+        track_btn: 'স্ট্যাটাস দেখুন',
+        compare_btn: 'তুলনা করুন',
+        comparing_btn: 'তুলনায় আছে',
+        compare_now: 'তুলনা দেখুন',
+        compare_title: 'পণ্য তুলনা',
+        compare_clear: 'সব মুছুন',
+        compare_diff_only: 'পার্থক্য হাইলাইট করুন',
+        compare_max_toast: 'সর্বোচ্চ ৩টি পণ্য একসাথে তুলনা করা যাবে। নতুন পণ্য যোগ করতে একটি সরান।',
+        compare_added_toast: 'তুলনার তালিকায় যোগ হয়েছে',
+        compare_removed_toast: 'তুলনার তালিকা থেকে সরানো হয়েছে',
+        compare_need_two: 'পাশাপাশি তুলনা করতে কমপক্ষে ২টি পণ্য নির্বাচন করুন (সর্বোচ্চ ৩টি)।'
       },
       en: {
         nav_home: 'Home',
@@ -3277,6 +4378,8 @@
         sec_random: 'Curated Picks',
         sec_also_like: 'You May Also Like',
         sec_reviews: 'Customer Reviews',
+        sec_social_feed: 'Latest on Instagram & TikTok',
+        sec_social_feed_sub: 'Style reels, curated lookbooks, and behind-the-scenes studio drops',
         sec_newsletter: 'Newsletter',
         sec_social: 'Follow MS FASHION',
         sec_whatsapp: 'Order & Support on WhatsApp',
@@ -3312,7 +4415,17 @@
         empty_products: 'No products available in this section yet.',
         load_more: 'Load More Products',
         track_title: 'Track Your Order',
-        track_btn: 'Check Status'
+        track_btn: 'Check Status',
+        compare_btn: 'Compare',
+        comparing_btn: 'Comparing',
+        compare_now: 'Compare Now',
+        compare_title: 'Compare Products',
+        compare_clear: 'Clear All',
+        compare_diff_only: 'Highlight differences',
+        compare_max_toast: 'You can compare up to 3 products at once. Remove one to add another.',
+        compare_added_toast: 'Added to comparison list',
+        compare_removed_toast: 'Removed from comparison list',
+        compare_need_two: 'Select at least 2 products to compare side by side (up to 3).'
       }
     };
 
@@ -3330,6 +4443,8 @@
       reviews: [],
       cart: JSON.parse(localStorage.getItem('msf_cart') || '[]'),
       wishlist: JSON.parse(localStorage.getItem('msf_wishlist') || '[]'),
+      compareIds: JSON.parse(localStorage.getItem('msf_compare') || '[]').slice(0, 3),
+      compareHighlightDiff: false,
       recentlyViewed: JSON.parse(localStorage.getItem('msf_recent') || '[]'),
       guestOrders: JSON.parse(localStorage.getItem('msf_guest_orders') || '[]'),
       appliedCoupon: null,
@@ -3347,11 +4462,14 @@
       adminBanners: [],
       adminInventoryLogs: [],
       adminNotifications: [],
+      lastStockEmailReport: null,
+      stockAlertSentKeys: {},
       unsubscribes: [],
       activeTrackingUnsub: null,
       lastTrackedOrderId: '',
       lastTrackedExplicit: false,
       currentHeroIndex: 0,
+      socialFeedFilter: 'all',
       catalogFilters: {
         search: '',
         category: '',
@@ -3574,6 +4692,9 @@
     // 5. IMAGE COMPRESSION & UNLIMITED BATCH UPLOAD QUEUE (FIREBASE STORAGE)
     // =========================================================================
     async function compressImageFile(file, maxWidth = 1400, quality = 0.84) {
+      if (!file) {
+        throw new Error('Missing file for compression');
+      }
       const mime = String(file?.type || '');
       const hasImageExt = /\.(jpe?g|png|webp|gif|avif|bmp|heic|heif)$/i.test(file?.name || '');
       if (!mime.startsWith('image/') && !hasImageExt) {
@@ -3588,35 +4709,56 @@
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            let { width, height } = img;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, width);
-            canvas.height = Math.max(1, height);
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(
-              (blob) => {
-                if (blob && (blob.size < normalizedFile.size || normalizedFile.size > 9 * 1024 * 1024)) {
-                  resolve(new File([blob], normalizedFile.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }));
-                } else {
+          try {
+            const img = new Image();
+            img.onload = () => {
+              try {
+                let width = img.naturalWidth || img.width;
+                let height = img.naturalHeight || img.height;
+                if (!width || !height) {
                   resolve(normalizedFile);
+                  return;
                 }
-              },
-              'image/webp',
-              quality
-            );
-          };
-          img.onerror = () => resolve(normalizedFile);
-          img.src = ev.target.result;
+                if (width > maxWidth) {
+                  height = Math.round((height * maxWidth) / width);
+                  width = maxWidth;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, width);
+                canvas.height = Math.max(1, height);
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  resolve(normalizedFile);
+                  return;
+                }
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(
+                  (blob) => {
+                    if (blob && (blob.size < normalizedFile.size || normalizedFile.size > 9 * 1024 * 1024)) {
+                      resolve(new File([blob], (normalizedFile.name || 'image').replace(/\.[^.]+$/, '') + '.webp', { type: 'image/webp' }));
+                    } else {
+                      resolve(normalizedFile);
+                    }
+                  },
+                  'image/webp',
+                  quality
+                );
+              } catch {
+                resolve(normalizedFile);
+              }
+            };
+            img.onerror = () => resolve(normalizedFile);
+            img.src = ev.target?.result || '';
+          } catch {
+            resolve(normalizedFile);
+          }
         };
         reader.onerror = () => resolve(normalizedFile);
-        reader.readAsDataURL(normalizedFile);
+        try {
+          reader.readAsDataURL(normalizedFile);
+        } catch {
+          resolve(normalizedFile);
+        }
       });
     }
 
@@ -3626,34 +4768,49 @@
         reader.onload = (ev) => {
           const img = new Image();
           img.onload = () => {
-            const tryEncode = (wLimit, q) => {
-              let { width, height } = img;
-              if (width > wLimit) {
-                height = Math.round((height * wLimit) / width);
-                width = wLimit;
-              }
-              const canvas = document.createElement('canvas');
-              canvas.width = Math.max(1, width);
-              canvas.height = Math.max(1, height);
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              let dataUrl = canvas.toDataURL('image/webp', q);
-              if (!dataUrl.startsWith('data:image/webp')) {
-                dataUrl = canvas.toDataURL('image/jpeg', q);
-              }
-              return dataUrl;
-            };
+            try {
+              const tryEncode = (wLimit, q) => {
+                let width = img.naturalWidth || img.width;
+                let height = img.naturalHeight || img.height;
+                if (!width || !height) {
+                  throw new Error(`Invalid image dimensions: ${file?.name || 'image'}`);
+                }
+                if (width > wLimit) {
+                  height = Math.round((height * wLimit) / width);
+                  width = wLimit;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, width);
+                canvas.height = Math.max(1, height);
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  throw new Error('Canvas 2D context unavailable');
+                }
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                let dataUrl = canvas.toDataURL('image/webp', q);
+                if (!dataUrl.startsWith('data:image/webp')) {
+                  dataUrl = canvas.toDataURL('image/jpeg', q);
+                }
+                return dataUrl;
+              };
 
-            let out = tryEncode(maxWidth, quality);
-            if (out.length > 140000) out = tryEncode(640, 0.66);
-            if (out.length > 140000) out = tryEncode(480, 0.56);
-            resolve(out);
+              let out = tryEncode(maxWidth, quality);
+              if (out.length > 140000) out = tryEncode(640, 0.66);
+              if (out.length > 140000) out = tryEncode(480, 0.56);
+              resolve(out);
+            } catch (err) {
+              reject(err instanceof Error ? err : new Error(`Unable to encode image: ${file?.name || 'image'}`));
+            }
           };
-          img.onerror = () => reject(new Error(`Unable to read image: ${file.name}`));
-          img.src = ev.target.result;
+          img.onerror = () => reject(new Error(`Unable to read image: ${file?.name || 'image'}`));
+          img.src = ev.target?.result || '';
         };
-        reader.onerror = () => reject(new Error(`Failed to load file: ${file.name}`));
-        reader.readAsDataURL(file);
+        reader.onerror = () => reject(new Error(`Failed to load file: ${file?.name || 'image'}`));
+        try {
+          reader.readAsDataURL(file);
+        } catch (err) {
+          reject(err instanceof Error ? err : new Error(`Failed to read file: ${file?.name || 'image'}`));
+        }
       });
     }
 
@@ -3662,21 +4819,34 @@
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
-          let { width, height } = img;
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
+          try {
+            let width = img.naturalWidth || img.width;
+            let height = img.naturalHeight || img.height;
+            if (!width || !height) {
+              resolve(dataUrl);
+              return;
+            }
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, width);
+            canvas.height = Math.max(1, height);
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(dataUrl);
+              return;
+            }
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            let out = canvas.toDataURL('image/webp', quality);
+            if (!out.startsWith('data:image/webp')) {
+              out = canvas.toDataURL('image/jpeg', quality);
+            }
+            resolve(out.length < dataUrl.length ? out : dataUrl);
+          } catch {
+            resolve(dataUrl);
           }
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, width);
-          canvas.height = Math.max(1, height);
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          let out = canvas.toDataURL('image/webp', quality);
-          if (!out.startsWith('data:image/webp')) {
-            out = canvas.toDataURL('image/jpeg', quality);
-          }
-          resolve(out.length < dataUrl.length ? out : dataUrl);
         };
         img.onerror = () => resolve(dataUrl);
         img.src = dataUrl;
@@ -3684,34 +4854,63 @@
     }
 
     async function uploadFileToStorage(file, folderPath, onProgress, timeoutMs = 8000) {
-      storage.maxUploadRetryTime = Math.max(3000, timeoutMs - 1000);
-      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${(file.name || 'image.webp').replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      // Keep Firebase Storage's global maxUploadRetryTime healthy (>= 60s; default is 600s)
+      // instead of shrinking it per call, because smaller files (<= 256 KB) use _oneShotUpload /
+      // multipartUpload which passes service.maxUploadRetryTime directly to backoff start() timeout.
+      const MIN_SAFE_STORAGE_RETRY_MS = 60000;
+      if (!Number.isFinite(storage.maxUploadRetryTime) || storage.maxUploadRetryTime < MIN_SAFE_STORAGE_RETRY_MS) {
+        storage.maxUploadRetryTime = Math.max(MIN_SAFE_STORAGE_RETRY_MS, Number(timeoutMs) || 0);
+      }
+      const safeName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}_${(file?.name || 'image.webp').replace(/[^a-zA-Z0-9._-]/g, '_')}`;
       const path = `${folderPath}/${safeName}`;
       const ref = storageRef(storage, path);
-      const contentType = String(file.type || '').startsWith('image/') ? file.type : 'image/jpeg';
+      const contentType = String(file?.type || '').startsWith('image/') ? file.type : 'image/jpeg';
 
-      return Promise.race([
-        new Promise((resolve, reject) => {
-          const task = uploadBytesResumable(ref, file, { contentType });
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        let task = null;
+        const timerId = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          try { task?.cancel(); } catch {}
+          reject(new Error('Storage timeout'));
+        }, timeoutMs);
+
+        const finishResolve = (val) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timerId);
+          resolve(val);
+        };
+        const finishReject = (err) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timerId);
+          reject(err);
+        };
+
+        try {
+          task = uploadBytesResumable(ref, file, { contentType });
           task.on(
             'state_changed',
             (snap) => {
               const rawPct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 50;
-              if (onProgress) onProgress(Math.max(40, Math.min(95, rawPct)));
+              if (onProgress && !settled) onProgress(Math.max(40, Math.min(95, rawPct)));
             },
-            (err) => reject(err),
+            (err) => finishReject(err),
             async () => {
               try {
                 const url = await getDownloadURL(task.snapshot.ref);
-                resolve({ url, storagePath: path });
+                finishResolve({ url, storagePath: path });
               } catch (e) {
-                reject(e);
+                finishReject(e);
               }
             }
           );
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Storage timeout')), timeoutMs))
-      ]);
+        } catch (startErr) {
+          finishReject(startErr);
+        }
+      });
     }
 
     async function uploadSingleFile(file, folderPath, onProgress) {
@@ -3719,7 +4918,17 @@
       if (typeof auth.authStateReady === 'function') {
         await auth.authStateReady().catch(() => {});
       }
-      const compressed = await compressImageFile(file);
+
+      // Wrap compression promise in try-catch so compression errors never crash the upload queue,
+      // always resolving cleanly back to the original file.
+      let compressed = file;
+      try {
+        const compressedResult = await compressImageFile(file);
+        if (compressedResult) compressed = compressedResult;
+      } catch (compressErr) {
+        console.warn(`Image compression failed for "${file?.name || 'file'}", using original file:`, compressErr);
+        compressed = file;
+      }
       if (onProgress) onProgress(35);
 
       if (isFirebaseAdminUser() && auth.currentUser) {
@@ -3733,7 +4942,18 @@
         }
       }
 
-      const dataUrl = await compressImageToDataUrl(compressed);
+      let dataUrl = '';
+      try {
+        dataUrl = await compressImageToDataUrl(compressed);
+      } catch (inlineErr) {
+        if (compressed !== file) {
+          console.warn(`Inline fallback failed for compressed file "${file?.name || 'file'}", retrying original file:`, inlineErr);
+          dataUrl = await compressImageToDataUrl(file);
+          compressed = file;
+        } else {
+          throw inlineErr;
+        }
+      }
       if (onProgress) onProgress(100);
       return { url: dataUrl, storagePath: '', compressedFile: compressed };
     }
@@ -3883,6 +5103,7 @@
         }
       }
       renderMobileDrawerCategories();
+      renderCompareDock();
     }
 
     async function loadApprovedReviews() {
@@ -4026,6 +5247,7 @@
       const discPct = hasDiscount ? Math.round(((reg - sale) / reg) * 100) : Number(p.discountPercent || 0);
       const imgUrl = getProductMainImage(p);
       const isWished = state.wishlist.includes(p.id);
+      const isCompared = state.compareIds.includes(p.id);
       const stockNum = Number(p.stock || 0);
 
       return `
@@ -4046,6 +5268,10 @@
             <div class="product-card-actions">
               <button type="button" class="btn btn-primary btn-sm btn-block" data-quick-add="${esc(p.id)}" ${stockNum <= 0 ? 'disabled' : ''}>
                 ${stockNum <= 0 ? t('out_of_stock') : t('add_to_cart')}
+              </button>
+              <button type="button" class="product-compare-btn ${isCompared ? 'active' : ''}" data-toggle-compare="${esc(p.id)}" aria-pressed="${isCompared ? 'true' : 'false'}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${isCompared ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'}</svg>
+                <span>${isCompared ? t('comparing_btn') : t('compare_btn')}</span>
               </button>
             </div>
           </div>
@@ -4073,8 +5299,106 @@
       `;
     }
 
+    function getActiveSocialPosts() {
+      const configured = Array.isArray(state.settings.socialPosts) && state.settings.socialPosts.length
+        ? state.settings.socialPosts
+        : DEFAULT_SOCIAL_POSTS;
+      return configured
+        .filter((item) => item && item.imageUrl)
+        .map((item, idx) => {
+          const platform = String(item.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
+          const defaultProfileUrl = platform === 'tiktok'
+            ? (state.settings.tiktokUrl || OFFICIAL_TIKTOK)
+            : (state.settings.instagramUrl || OFFICIAL_INSTAGRAM);
+          const safeUrl = /^https?:\/\//i.test(String(item.postUrl || '').trim())
+            ? String(item.postUrl).trim()
+            : defaultProfileUrl;
+          return {
+            id: item.id || `social_${idx}`,
+            platform,
+            handle: item.handle || (platform === 'tiktok' ? '@msafashion20' : '@msfashion.bd'),
+            typeLabel: item.typeLabel || (platform === 'tiktok' ? 'Reel' : 'Post'),
+            typeLabelBn: item.typeLabelBn || (platform === 'tiktok' ? 'রিলস' : 'পোস্ট'),
+            imageUrl: item.imageUrl,
+            caption: item.caption || '',
+            captionBn: item.captionBn || item.caption || '',
+            href: safeUrl
+          };
+        });
+    }
+
+    function renderSocialFeedCardsHTML(filter = state.socialFeedFilter || 'all') {
+      const posts = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter);
+      if (!posts.length) {
+        return `<div class="empty-state">${state.lang === 'bn' ? 'এই প্ল্যাটফর্মে এখনো কোনো পোস্ট যোগ করা হয়নি।' : 'No posts added for this platform yet.'}</div>`;
+      }
+      const igIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
+      const ttIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>`;
+
+      return posts.map((post) => {
+        const isTikTok = post.platform === 'tiktok';
+        const platformLabel = isTikTok ? 'TikTok' : 'Instagram';
+        const caption = state.lang === 'bn' ? (post.captionBn || post.caption) : (post.caption || post.captionBn);
+        const typeLabel = state.lang === 'bn' ? (post.typeLabelBn || post.typeLabel) : (post.typeLabel || post.typeLabelBn);
+        const ctaText = isTikTok
+          ? (state.lang === 'bn' ? 'TikTok-এ দেখুন ↗' : 'Watch on TikTok ↗')
+          : (state.lang === 'bn' ? 'Instagram-এ দেখুন ↗' : 'View on Instagram ↗');
+        return `
+          <a class="social-post-card" href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(`${platformLabel}: ${caption}`)}">
+            <div class="social-post-media">
+              <img src="${esc(post.imageUrl)}" alt="${esc(caption || `${platformLabel} lookbook`)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+              ${isTikTok ? `<span class="social-reel-play" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>` : ''}
+            </div>
+            <div class="social-post-meta">
+              ${isTikTok ? ttIcon : igIcon}
+              <span>${platformLabel}</span>
+              <span aria-hidden="true">·</span>
+              <span>${esc(post.handle)}</span>
+              <span aria-hidden="true">·</span>
+              <span>${esc(typeLabel)}</span>
+            </div>
+            <p class="social-post-caption">${esc(caption)}</p>
+            <span class="social-post-cta">${ctaText}</span>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function renderSocialFeedSectionHTML() {
+      const filter = state.socialFeedFilter || 'all';
+      const igHref = state.settings.instagramUrl || OFFICIAL_INSTAGRAM;
+      const ttHref = state.settings.tiktokUrl || OFFICIAL_TIKTOK;
+      return `
+        <section id="social-feed" class="section-block social-feed-section" aria-labelledby="social-feed-heading">
+          <div class="container">
+            <div class="social-feed-header">
+              <div>
+                <p class="social-feed-kicker">Instagram · TikTok · @msafashion20</p>
+                <h2 id="social-feed-heading" class="section-title">${t('sec_social_feed')}</h2>
+                <p class="section-sub">${t('sec_social_feed_sub')}</p>
+              </div>
+              <div class="social-feed-controls">
+                <div class="social-feed-tabs" role="tablist" aria-label="Social platform filter">
+                  <button type="button" class="social-feed-tab ${filter === 'all' ? 'active' : ''}" data-social-filter="all" aria-pressed="${filter === 'all' ? 'true' : 'false'}">${state.lang === 'bn' ? 'সবগুলো' : 'All'}</button>
+                  <button type="button" class="social-feed-tab ${filter === 'instagram' ? 'active' : ''}" data-social-filter="instagram" aria-pressed="${filter === 'instagram' ? 'true' : 'false'}">Instagram</button>
+                  <button type="button" class="social-feed-tab ${filter === 'tiktok' ? 'active' : ''}" data-social-filter="tiktok" aria-pressed="${filter === 'tiktok' ? 'true' : 'false'}">TikTok</button>
+                </div>
+                <div class="social-feed-links">
+                  <a href="${esc(igHref)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Instagram ↗</a>
+                  <a href="${esc(ttHref)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">TikTok ↗</a>
+                </div>
+              </div>
+            </div>
+            <div id="social-feed-grid" class="social-feed-grid">
+              ${renderSocialFeedCardsHTML(filter)}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
     // =========================================================================
-    // 9. HOMEPAGE RENDERER (ALL 19 SECTIONS)
+    // 9. HOMEPAGE RENDERER (ALL SECTIONS)
     // =========================================================================
     function renderHome() {
       const host = document.getElementById('view-home');
@@ -4195,6 +5519,8 @@
         </section>
       ` : '';
 
+      const socialFeedHtml = sec.socialFeed !== false ? renderSocialFeedSectionHTML() : '';
+
       const newsletterHtml = sec.newsletter !== false ? `
         <section class="section-block" style="background:var(--bg-surface);">
           <div class="container" style="max-width:680px;text-align:center;">
@@ -4220,6 +5546,7 @@
                   <div style="display:flex;flex-wrap:wrap;gap:10px;">
                     <a href="${esc(state.settings.facebookUrl || OFFICIAL_FACEBOOK)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Facebook Page</a>
                     <a href="${esc(state.settings.tiktokUrl || OFFICIAL_TIKTOK)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">TikTok</a>
+                    ${state.settings.instagramUrl ? `<a href="${esc(state.settings.instagramUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Instagram</a>` : ''}
                   </div>
                 </div>
               ` : ''}
@@ -4235,7 +5562,7 @@
         </section>
       ` : '';
 
-      host.innerHTML = heroHtml + catHtml + productSectionsHtml + reviewsHtml + newsletterHtml + socialWhatsappHtml;
+      host.innerHTML = heroHtml + catHtml + productSectionsHtml + reviewsHtml + socialFeedHtml + newsletterHtml + socialWhatsappHtml;
     }
 
     // =========================================================================
@@ -4312,12 +5639,17 @@
               <h1 class="section-title">${esc(title)}</h1>
               <p class="section-sub tabular-nums">${items.length} ${state.lang === 'bn' ? 'টি পণ্য পাওয়া গেছে' : 'products found'}</p>
             </div>
-            <select id="catalog-sort-select" class="form-control" style="width:auto;min-width:170px;">
-              <option value="newest" ${f.sort === 'newest' ? 'selected' : ''}>${state.lang === 'bn' ? 'নতুন আগে' : 'Newest First'}</option>
-              <option value="price_asc" ${f.sort === 'price_asc' ? 'selected' : ''}>${state.lang === 'bn' ? 'দাম: কম থেকে বেশি' : 'Price: Low to High'}</option>
-              <option value="price_desc" ${f.sort === 'price_desc' ? 'selected' : ''}>${state.lang === 'bn' ? 'দাম: বেশি থেকে কম' : 'Price: High to Low'}</option>
-              <option value="popular" ${f.sort === 'popular' ? 'selected' : ''}>${state.lang === 'bn' ? 'জনপ্রিয়তা' : 'Popularity'}</option>
-            </select>
+            <div class="catalog-header-controls">
+              <button type="button" id="catalog-compare-trigger-btn" class="btn btn-outline btn-sm ${state.compareIds.length ? '' : 'hidden'}">
+                ${t('compare_btn')} (<span class="tabular-nums">${state.compareIds.length}</span>/3)
+              </button>
+              <select id="catalog-sort-select" class="form-control" style="width:auto;min-width:170px;">
+                <option value="newest" ${f.sort === 'newest' ? 'selected' : ''}>${state.lang === 'bn' ? 'নতুন আগে' : 'Newest First'}</option>
+                <option value="price_asc" ${f.sort === 'price_asc' ? 'selected' : ''}>${state.lang === 'bn' ? 'দাম: কম থেকে বেশি' : 'Price: Low to High'}</option>
+                <option value="price_desc" ${f.sort === 'price_desc' ? 'selected' : ''}>${state.lang === 'bn' ? 'দাম: বেশি থেকে কম' : 'Price: High to Low'}</option>
+                <option value="popular" ${f.sort === 'popular' ? 'selected' : ''}>${state.lang === 'bn' ? 'জনপ্রিয়তা' : 'Popularity'}</option>
+              </select>
+            </div>
           </div>
 
           <div class="catalog-layout">
@@ -4377,6 +5709,7 @@
         </div>
       `;
 
+      document.getElementById('catalog-compare-trigger-btn')?.addEventListener('click', openCompareModal);
       document.getElementById('catalog-sort-select')?.addEventListener('change', (e) => {
         state.catalogFilters.sort = e.target.value;
         renderCatalog();
@@ -4425,9 +5758,400 @@
     }
 
     // =========================================================================
-    // 11. PRODUCT DETAILS PAGE (39:43 GALLERY, ZOOM, VARIANTS, REVIEWS)
+    // 11. PRODUCT DETAILS PAGE (39:43 GALLERY, FULLSCREEN LIGHTBOX, VARIANTS)
     // =========================================================================
     let activePdpState = { productId: null, size: '', color: '', qty: 1, imgIdx: 0 };
+
+    const pdpLightboxState = {
+      isOpen: false,
+      images: [],
+      title: '',
+      index: 0,
+      zoomed: false,
+      panX: 0,
+      panY: 0,
+      prevBodyOverflow: '',
+      lastFocusedEl: null,
+      initialized: false,
+      wheelLockUntil: 0
+    };
+
+    function getPdpLightboxElements() {
+      return {
+        modal: document.getElementById('pdp-gallery-modal'),
+        titleEl: document.getElementById('pdp-lightbox-title'),
+        counterEl: document.getElementById('pdp-lightbox-counter'),
+        zoomBtn: document.getElementById('pdp-lightbox-zoom'),
+        closeBtn: document.getElementById('pdp-lightbox-close'),
+        stage: document.getElementById('pdp-lightbox-stage'),
+        track: document.getElementById('pdp-lightbox-track'),
+        prevBtn: document.getElementById('pdp-lightbox-prev'),
+        nextBtn: document.getElementById('pdp-lightbox-next'),
+        thumbsEl: document.getElementById('pdp-lightbox-thumbs')
+      };
+    }
+
+    function applyPdpLightboxZoom() {
+      const { stage, zoomBtn, track } = getPdpLightboxElements();
+      if (!stage || !track) return;
+      stage.classList.toggle('is-zoomed', pdpLightboxState.zoomed);
+      if (zoomBtn) {
+        zoomBtn.classList.toggle('active', pdpLightboxState.zoomed);
+        zoomBtn.setAttribute(
+          'aria-label',
+          pdpLightboxState.zoomed
+            ? (state.lang === 'bn' ? 'জুম রিসেট করুন' : 'Reset zoom')
+            : (state.lang === 'bn' ? 'জুম করুন' : 'Zoom in')
+        );
+      }
+      const slides = track.querySelectorAll('.pdp-lightbox-slide');
+      slides.forEach((slide, idx) => {
+        const img = slide.querySelector('img');
+        if (!img) return;
+        if (idx === pdpLightboxState.index && pdpLightboxState.zoomed) {
+          img.style.transform = `translate3d(${pdpLightboxState.panX}px, ${pdpLightboxState.panY}px, 0) scale(2)`;
+        } else {
+          img.style.transform = '';
+        }
+      });
+    }
+
+    function setPdpLightboxIndex(nextIdx, options = {}) {
+      const total = pdpLightboxState.images.length;
+      if (!total) return;
+      const wrap = Boolean(options.wrap);
+      let resolvedIdx = Number(nextIdx) || 0;
+      if (wrap) {
+        resolvedIdx = ((resolvedIdx % total) + total) % total;
+      } else {
+        resolvedIdx = Math.max(0, Math.min(total - 1, resolvedIdx));
+      }
+
+      pdpLightboxState.index = resolvedIdx;
+      pdpLightboxState.zoomed = false;
+      pdpLightboxState.panX = 0;
+      pdpLightboxState.panY = 0;
+
+      const { track, counterEl, thumbsEl } = getPdpLightboxElements();
+      if (track) {
+        track.classList.remove('is-dragging');
+        track.style.transform = `translate3d(-${resolvedIdx * 100}%, 0, 0)`;
+        track.querySelectorAll('.pdp-lightbox-slide').forEach((slide, idx) => {
+          slide.classList.toggle('active', idx === resolvedIdx);
+        });
+      }
+      if (counterEl) {
+        counterEl.textContent = `${resolvedIdx + 1} / ${total}`;
+      }
+      if (thumbsEl) {
+        thumbsEl.querySelectorAll('.pdp-lightbox-thumb').forEach((btn, idx) => {
+          const isActive = idx === resolvedIdx;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          if (isActive) {
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        });
+      }
+      applyPdpLightboxZoom();
+
+      // Sync active slide back to the underlying PDP view immediately
+      activePdpState.imgIdx = resolvedIdx;
+      const pdpMainImg = document.querySelector('#pdp-main-media img');
+      const pdpCounter = document.getElementById('pdp-main-counter');
+      const targetImgUrl = pdpLightboxState.images[resolvedIdx]?.url;
+      if (pdpMainImg && targetImgUrl) {
+        pdpMainImg.src = targetImgUrl;
+      }
+      if (pdpCounter) {
+        pdpCounter.textContent = `${resolvedIdx + 1} / ${total}`;
+      }
+      document.querySelectorAll('#view-pdp [data-pdp-thumb]').forEach((thumbBtn) => {
+        const idx = Number(thumbBtn.getAttribute('data-pdp-thumb'));
+        thumbBtn.classList.toggle('active', idx === resolvedIdx);
+      });
+    }
+
+    function closePdpGalleryModal() {
+      const { modal } = getPdpLightboxElements();
+      if (!modal || !pdpLightboxState.isOpen) return;
+      pdpLightboxState.isOpen = false;
+      pdpLightboxState.zoomed = false;
+      pdpLightboxState.panX = 0;
+      pdpLightboxState.panY = 0;
+      modal.classList.add('hidden');
+      document.body.style.overflow = pdpLightboxState.prevBodyOverflow || '';
+      if (pdpLightboxState.lastFocusedEl && typeof pdpLightboxState.lastFocusedEl.focus === 'function') {
+        try { pdpLightboxState.lastFocusedEl.focus({ preventScroll: true }); } catch {}
+      }
+      pdpLightboxState.lastFocusedEl = null;
+    }
+
+    function initPdpGalleryModalEvents() {
+      if (pdpLightboxState.initialized) return;
+      const { modal, zoomBtn, closeBtn, stage, track, prevBtn, nextBtn, thumbsEl } = getPdpLightboxElements();
+      if (!modal || !stage || !track) return;
+      pdpLightboxState.initialized = true;
+
+      closeBtn?.addEventListener('click', closePdpGalleryModal);
+      prevBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setPdpLightboxIndex(pdpLightboxState.index - 1, { wrap: true });
+      });
+      nextBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setPdpLightboxIndex(pdpLightboxState.index + 1, { wrap: true });
+      });
+      zoomBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pdpLightboxState.zoomed = !pdpLightboxState.zoomed;
+        pdpLightboxState.panX = 0;
+        pdpLightboxState.panY = 0;
+        applyPdpLightboxZoom();
+      });
+
+      thumbsEl?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-lightbox-thumb]');
+        if (!btn) return;
+        setPdpLightboxIndex(Number(btn.getAttribute('data-lightbox-thumb')));
+      });
+
+      // Touch swipe & zoomed pan support
+      let touchActive = false;
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let touchMode = ''; // 'swipe' | 'pan' | 'scroll'
+      let panOriginX = 0;
+      let panOriginY = 0;
+      let touchMoved = false;
+
+      stage.addEventListener('touchstart', (e) => {
+        if (!pdpLightboxState.isOpen || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        touchActive = true;
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+        touchStartTime = Date.now();
+        touchMoved = false;
+        touchMode = pdpLightboxState.zoomed ? 'pan' : '';
+        panOriginX = pdpLightboxState.panX;
+        panOriginY = pdpLightboxState.panY;
+        if (!pdpLightboxState.zoomed) {
+          track.classList.add('is-dragging');
+        }
+      }, { passive: true });
+
+      stage.addEventListener('touchmove', (e) => {
+        if (!touchActive || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        const dx = t.clientX - touchStartX;
+        const dy = t.clientY - touchStartY;
+        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+          touchMoved = true;
+        }
+        if (touchMode === 'pan') {
+          e.preventDefault();
+          const maxPanX = Math.round(stage.clientWidth * 0.45);
+          const maxPanY = Math.round(stage.clientHeight * 0.45);
+          pdpLightboxState.panX = Math.max(-maxPanX, Math.min(maxPanX, panOriginX + dx));
+          pdpLightboxState.panY = Math.max(-maxPanY, Math.min(maxPanY, panOriginY + dy));
+          applyPdpLightboxZoom();
+          return;
+        }
+        if (!touchMode && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+          touchMode = Math.abs(dx) >= Math.abs(dy) ? 'swipe' : 'scroll';
+        }
+        if (touchMode === 'swipe') {
+          e.preventDefault();
+          const atFirst = pdpLightboxState.index === 0 && dx > 0;
+          const atLast = pdpLightboxState.index >= pdpLightboxState.images.length - 1 && dx < 0;
+          const resistedDx = (atFirst || atLast) ? dx * 0.28 : dx;
+          track.style.transform = `translate3d(calc(-${pdpLightboxState.index * 100}% + ${resistedDx}px), 0, 0)`;
+        }
+      }, { passive: false });
+
+      const finishTouch = (e) => {
+        if (!touchActive) return;
+        touchActive = false;
+        track.classList.remove('is-dragging');
+        if (touchMode === 'swipe') {
+          const changed = e.changedTouches?.[0];
+          const dx = changed ? changed.clientX - touchStartX : 0;
+          const dt = Date.now() - touchStartTime;
+          const threshold = Math.min(60, Math.round(stage.clientWidth * 0.16));
+          const isFlick = Math.abs(dx) > 20 && dt < 260;
+          if ((dx < -threshold || (isFlick && dx < 0)) && pdpLightboxState.index < pdpLightboxState.images.length - 1) {
+            setPdpLightboxIndex(pdpLightboxState.index + 1);
+          } else if ((dx > threshold || (isFlick && dx > 0)) && pdpLightboxState.index > 0) {
+            setPdpLightboxIndex(pdpLightboxState.index - 1);
+          } else {
+            setPdpLightboxIndex(pdpLightboxState.index);
+          }
+        }
+        touchMode = '';
+      };
+      stage.addEventListener('touchend', finishTouch, { passive: true });
+      stage.addEventListener('touchcancel', finishTouch, { passive: true });
+
+      // Desktop mouse/pointer drag swipe + click zoom/close
+      let pointerDown = false;
+      let pointerStartX = 0;
+      let pointerStartY = 0;
+      let pointerMoved = false;
+      let pointerStartTime = 0;
+      let pointerPanOriginX = 0;
+      let pointerPanOriginY = 0;
+
+      stage.addEventListener('pointerdown', (e) => {
+        if (!pdpLightboxState.isOpen || e.pointerType === 'touch' || e.button !== 0) return;
+        if (e.target.closest('.pdp-lightbox-nav')) return;
+        pointerDown = true;
+        pointerStartX = e.clientX;
+        pointerStartY = e.clientY;
+        pointerMoved = false;
+        pointerStartTime = Date.now();
+        pointerPanOriginX = pdpLightboxState.panX;
+        pointerPanOriginY = pdpLightboxState.panY;
+        if (!pdpLightboxState.zoomed) {
+          track.classList.add('is-dragging');
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!pointerDown) return;
+        const dx = e.clientX - pointerStartX;
+        const dy = e.clientY - pointerStartY;
+        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) pointerMoved = true;
+        if (!pointerMoved) return;
+        if (pdpLightboxState.zoomed) {
+          const maxPanX = Math.round(stage.clientWidth * 0.45);
+          const maxPanY = Math.round(stage.clientHeight * 0.45);
+          pdpLightboxState.panX = Math.max(-maxPanX, Math.min(maxPanX, pointerPanOriginX + dx));
+          pdpLightboxState.panY = Math.max(-maxPanY, Math.min(maxPanY, pointerPanOriginY + dy));
+          applyPdpLightboxZoom();
+        } else {
+          const atFirst = pdpLightboxState.index === 0 && dx > 0;
+          const atLast = pdpLightboxState.index >= pdpLightboxState.images.length - 1 && dx < 0;
+          const resistedDx = (atFirst || atLast) ? dx * 0.28 : dx;
+          track.style.transform = `translate3d(calc(-${pdpLightboxState.index * 100}% + ${resistedDx}px), 0, 0)`;
+        }
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!pointerDown) return;
+        pointerDown = false;
+        track.classList.remove('is-dragging');
+        const dx = e.clientX - pointerStartX;
+        const dt = Date.now() - pointerStartTime;
+        if (pointerMoved && !pdpLightboxState.zoomed) {
+          const threshold = Math.min(65, Math.round(stage.clientWidth * 0.15));
+          const isFlick = Math.abs(dx) > 22 && dt < 260;
+          if ((dx < -threshold || (isFlick && dx < 0)) && pdpLightboxState.index < pdpLightboxState.images.length - 1) {
+            setPdpLightboxIndex(pdpLightboxState.index + 1);
+          } else if ((dx > threshold || (isFlick && dx > 0)) && pdpLightboxState.index > 0) {
+            setPdpLightboxIndex(pdpLightboxState.index - 1);
+          } else {
+            setPdpLightboxIndex(pdpLightboxState.index);
+          }
+        }
+      });
+
+      // Click on image toggles zoom; click on dark stage background closes gallery
+      stage.addEventListener('click', (e) => {
+        if (pointerMoved || touchMoved) {
+          pointerMoved = false;
+          touchMoved = false;
+          return;
+        }
+        if (e.target.closest('.pdp-lightbox-nav')) return;
+        if (e.target.tagName === 'IMG') {
+          pdpLightboxState.zoomed = !pdpLightboxState.zoomed;
+          pdpLightboxState.panX = 0;
+          pdpLightboxState.panY = 0;
+          applyPdpLightboxZoom();
+        } else {
+          closePdpGalleryModal();
+        }
+      });
+
+      // Trackpad horizontal wheel swipe support
+      stage.addEventListener('wheel', (e) => {
+        if (!pdpLightboxState.isOpen || pdpLightboxState.zoomed || pdpLightboxState.images.length <= 1) return;
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 28) {
+          e.preventDefault();
+          const now = Date.now();
+          if (now < pdpLightboxState.wheelLockUntil) return;
+          pdpLightboxState.wheelLockUntil = now + 320;
+          if (e.deltaX > 0) {
+            setPdpLightboxIndex(pdpLightboxState.index + 1);
+          } else {
+            setPdpLightboxIndex(pdpLightboxState.index - 1);
+          }
+        }
+      }, { passive: false });
+
+      // Global keyboard controls while gallery modal is open
+      document.addEventListener('keydown', (e) => {
+        if (!pdpLightboxState.isOpen) return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closePdpGalleryModal();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setPdpLightboxIndex(pdpLightboxState.index - 1, { wrap: true });
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          setPdpLightboxIndex(pdpLightboxState.index + 1, { wrap: true });
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          setPdpLightboxIndex(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          setPdpLightboxIndex(pdpLightboxState.images.length - 1);
+        }
+      });
+    }
+
+    function openPdpGalleryModal(images, startIdx = 0, productTitle = '') {
+      initPdpGalleryModalEvents();
+      const { modal, titleEl, track, prevBtn, nextBtn, thumbsEl } = getPdpLightboxElements();
+      if (!modal || !track || !Array.isArray(images) || !images.length) return;
+
+      pdpLightboxState.images = images;
+      pdpLightboxState.title = productTitle || 'MS FASHION';
+      pdpLightboxState.lastFocusedEl = document.activeElement;
+      if (!pdpLightboxState.isOpen) {
+        pdpLightboxState.prevBodyOverflow = document.body.style.overflow;
+      }
+
+      if (titleEl) titleEl.textContent = pdpLightboxState.title;
+
+      track.innerHTML = images.map((im, i) => `
+        <div class="pdp-lightbox-slide" data-lightbox-slide="${i}">
+          <img src="${esc(im.url)}" alt="${esc(pdpLightboxState.title)} - ${i + 1}" referrerpolicy="no-referrer" draggable="false" onerror="this.src='${OFFICIAL_LOGO}'" />
+        </div>
+      `).join('');
+
+      const multi = images.length > 1;
+      prevBtn?.classList.toggle('hidden', !multi);
+      nextBtn?.classList.toggle('hidden', !multi);
+
+      if (thumbsEl) {
+        thumbsEl.classList.toggle('hidden', !multi);
+        thumbsEl.innerHTML = multi ? images.map((im, i) => `
+          <button type="button" class="pdp-lightbox-thumb" data-lightbox-thumb="${i}" role="tab" aria-label="View image ${i + 1}">
+            <img src="${esc(im.url)}" alt="${esc(pdpLightboxState.title)} thumbnail ${i + 1}" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+          </button>
+        `).join('') : '';
+      }
+
+      pdpLightboxState.isOpen = true;
+      document.body.style.overflow = 'hidden';
+      modal.classList.remove('hidden');
+      setPdpLightboxIndex(startIdx);
+      getPdpLightboxElements().closeBtn?.focus({ preventScroll: true });
+    }
 
     async function renderPDP(productId) {
       const host = document.getElementById('view-pdp');
@@ -4500,13 +6224,23 @@
 
           <div class="pdp-layout">
             <div class="pdp-gallery">
-              <div id="pdp-main-media" class="pdp-main-media" title="Click to zoom">
-                <img src="${esc(activeImg.url)}" alt="${esc(title)}" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+              <div id="pdp-main-media" class="pdp-main-media" role="button" tabindex="0" aria-label="${state.lang === 'bn' ? 'পণ্যের ছবি বড় বা জুম করে দেখুন' : 'Inspect product image or open full-screen gallery'}" title="${state.lang === 'bn' ? 'পূর্ণ স্ক্রিন গ্যালারি বা জুম' : 'Click image for full-screen gallery, or toggle Zoom'}">
+                <img src="${esc(activeImg.url)}" alt="${esc(title)}" referrerpolicy="no-referrer" draggable="false" onerror="this.src='${OFFICIAL_LOGO}'" />
+                <div class="pdp-media-controls">
+                  <button type="button" id="pdp-zoom-toggle" class="pdp-media-ctrl" aria-pressed="false" aria-label="${state.lang === 'bn' ? 'জুম মোড চালু করুন' : 'Toggle zoom mode'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                    <span id="pdp-zoom-label">${state.lang === 'bn' ? 'জুম' : 'Zoom'}</span>
+                  </button>
+                  <button type="button" id="pdp-expand-btn" class="pdp-media-ctrl" aria-label="${state.lang === 'bn' ? 'পূর্ণ স্ক্রিনে সব ছবি দেখুন' : 'Open full-screen image gallery'}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    ${imgs.length > 1 ? `<span id="pdp-main-counter">${activePdpState.imgIdx + 1} / ${imgs.length}</span>` : `<span>${state.lang === 'bn' ? 'পূর্ণ স্ক্রিন' : 'Full Screen'}</span>`}
+                  </button>
+                </div>
               </div>
               ${imgs.length > 1 ? `
                 <div class="pdp-thumbs">
                   ${imgs.map((im, i) => `
-                    <button type="button" class="pdp-thumb ${i === activePdpState.imgIdx ? 'active' : ''}" data-pdp-thumb="${i}">
+                    <button type="button" class="pdp-thumb ${i === activePdpState.imgIdx ? 'active' : ''}" data-pdp-thumb="${i}" aria-label="${esc(title)} ${i + 1}">
                       <img src="${esc(im.url)}" alt="${esc(title)} ${i + 1}" referrerpolicy="no-referrer" />
                     </button>
                   `).join('')}
@@ -4645,13 +6379,138 @@
         autoSelectLatest: true
       });
 
-      document.getElementById('pdp-main-media')?.addEventListener('click', (e) => {
-        e.currentTarget.classList.toggle('zoomed');
+      const pdpMainMedia = document.getElementById('pdp-main-media');
+      const pdpMainImg = pdpMainMedia?.querySelector('img');
+      const pdpZoomBtn = document.getElementById('pdp-zoom-toggle');
+      const pdpZoomLabel = document.getElementById('pdp-zoom-label');
+      const pdpExpandBtn = document.getElementById('pdp-expand-btn');
+
+      let zoomOriginX = 50;
+      let zoomOriginY = 50;
+      let zoomTouchStartX = 0;
+      let zoomTouchStartY = 0;
+      let zoomTouchOriginX = 50;
+      let zoomTouchOriginY = 50;
+      let zoomTouchMoved = false;
+
+      const setPdpZoomMode = (enabled, originEvent = null) => {
+        if (!pdpMainMedia || !pdpMainImg) return;
+        const next = Boolean(enabled);
+        pdpMainMedia.classList.toggle('zoomed', next);
+        if (pdpZoomBtn) {
+          pdpZoomBtn.classList.toggle('active', next);
+          pdpZoomBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
+        }
+        if (pdpZoomLabel) {
+          pdpZoomLabel.textContent = next
+            ? (state.lang === 'bn' ? 'জুম বন্ধ' : 'Exit Zoom')
+            : (state.lang === 'bn' ? 'জুম' : 'Zoom');
+        }
+        if (next) {
+          if (originEvent && typeof originEvent.clientX === 'number') {
+            const rect = pdpMainMedia.getBoundingClientRect();
+            zoomOriginX = Math.max(0, Math.min(100, ((originEvent.clientX - rect.left) / Math.max(1, rect.width)) * 100));
+            zoomOriginY = Math.max(0, Math.min(100, ((originEvent.clientY - rect.top) / Math.max(1, rect.height)) * 100));
+          } else {
+            zoomOriginX = 50;
+            zoomOriginY = 50;
+          }
+          pdpMainImg.style.transformOrigin = `${zoomOriginX.toFixed(1)}% ${zoomOriginY.toFixed(1)}%`;
+        } else {
+          zoomOriginX = 50;
+          zoomOriginY = 50;
+          pdpMainImg.style.transformOrigin = '50% 50%';
+        }
+      };
+
+      pdpZoomBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setPdpZoomMode(!pdpMainMedia?.classList.contains('zoomed'));
       });
+
+      pdpExpandBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setPdpZoomMode(false);
+        openPdpGalleryModal(imgs, activePdpState.imgIdx, title);
+      });
+
+      pdpMainMedia?.addEventListener('mousemove', (e) => {
+        if (!pdpMainMedia.classList.contains('zoomed') || !pdpMainImg) return;
+        const rect = pdpMainMedia.getBoundingClientRect();
+        zoomOriginX = Math.max(0, Math.min(100, ((e.clientX - rect.left) / Math.max(1, rect.width)) * 100));
+        zoomOriginY = Math.max(0, Math.min(100, ((e.clientY - rect.top) / Math.max(1, rect.height)) * 100));
+        pdpMainImg.style.transformOrigin = `${zoomOriginX.toFixed(1)}% ${zoomOriginY.toFixed(1)}%`;
+      });
+
+      pdpMainMedia?.addEventListener('touchstart', (e) => {
+        if (!pdpMainMedia.classList.contains('zoomed') || e.touches.length !== 1) return;
+        if (e.target.closest('.pdp-media-ctrl')) return;
+        const t = e.touches[0];
+        zoomTouchStartX = t.clientX;
+        zoomTouchStartY = t.clientY;
+        zoomTouchOriginX = zoomOriginX;
+        zoomTouchOriginY = zoomOriginY;
+        zoomTouchMoved = false;
+      }, { passive: true });
+
+      pdpMainMedia?.addEventListener('touchmove', (e) => {
+        if (!pdpMainMedia.classList.contains('zoomed') || e.touches.length !== 1 || !pdpMainImg) return;
+        if (e.target.closest('.pdp-media-ctrl')) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        const rect = pdpMainMedia.getBoundingClientRect();
+        const dx = t.clientX - zoomTouchStartX;
+        const dy = t.clientY - zoomTouchStartY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) zoomTouchMoved = true;
+        zoomOriginX = Math.max(0, Math.min(100, zoomTouchOriginX - (dx / Math.max(1, rect.width)) * 100));
+        zoomOriginY = Math.max(0, Math.min(100, zoomTouchOriginY - (dy / Math.max(1, rect.height)) * 100));
+        pdpMainImg.style.transformOrigin = `${zoomOriginX.toFixed(1)}% ${zoomOriginY.toFixed(1)}%`;
+      }, { passive: false });
+
+      pdpMainMedia?.addEventListener('click', (e) => {
+        if (e.target.closest('.pdp-media-ctrl')) return;
+        if (zoomTouchMoved) {
+          zoomTouchMoved = false;
+          return;
+        }
+        if (pdpMainMedia.classList.contains('zoomed')) {
+          setPdpZoomMode(false);
+          return;
+        }
+        openPdpGalleryModal(imgs, activePdpState.imgIdx, title);
+      });
+
+      pdpMainMedia?.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && pdpMainMedia.classList.contains('zoomed')) {
+          e.preventDefault();
+          setPdpZoomMode(false);
+          return;
+        }
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === pdpMainMedia) {
+          e.preventDefault();
+          if (pdpMainMedia.classList.contains('zoomed')) {
+            setPdpZoomMode(false);
+          } else {
+            openPdpGalleryModal(imgs, activePdpState.imgIdx, title);
+          }
+        }
+      });
+
       host.querySelectorAll('[data-pdp-thumb]').forEach((btn) => {
         btn.addEventListener('click', () => {
-          activePdpState.imgIdx = Number(btn.getAttribute('data-pdp-thumb'));
-          renderPDP(prod.id);
+          const nextIdx = Number(btn.getAttribute('data-pdp-thumb'));
+          if (!imgs[nextIdx]) return;
+          activePdpState.imgIdx = nextIdx;
+          if (pdpMainMedia?.classList.contains('zoomed')) {
+            setPdpZoomMode(false);
+          }
+          const mainImgEl = document.querySelector('#pdp-main-media img');
+          const counterEl = document.getElementById('pdp-main-counter');
+          if (mainImgEl) mainImgEl.src = imgs[nextIdx].url;
+          if (counterEl) counterEl.textContent = `${nextIdx + 1} / ${imgs.length}`;
+          host.querySelectorAll('[data-pdp-thumb]').forEach((b, idx) => {
+            b.classList.toggle('active', idx === nextIdx);
+          });
         });
       });
       host.querySelectorAll('[data-pdp-size]').forEach((btn) => {
@@ -4833,6 +6692,454 @@
         showToast(state.lang === 'bn' ? 'উইশলিস্টে যোগ হয়েছে' : 'Added to wishlist', 'success');
       }
       persistWishlist();
+    }
+
+    const MAX_COMPARE_ITEMS = 3;
+
+    function resolveColorSwatch(colorName) {
+      const raw = String(colorName || '').trim().toLowerCase();
+      if (!raw) return null;
+      if (/^#[0-9a-f]{3,8}$/i.test(raw)) return raw;
+      const palette = [
+        ['off white', '#f5f5f0'], ['ivory', '#fffff0'], ['cream', '#f3ead8'],
+        ['white', '#ffffff'], ['black', '#111111'], ['charcoal', '#27272a'],
+        ['navy', '#1e3a8a'], ['royal', '#1d4ed8'], ['sky', '#38bdf8'], ['blue', '#2563eb'], ['denim', '#3b5998'],
+        ['crimson', '#9f1239'], ['maroon', '#7f1d1d'], ['burgundy', '#6b1d2f'], ['wine', '#722f37'], ['red', '#dc2626'],
+        ['olive', '#4d7c0f'], ['emerald', '#047857'], ['mint', '#6ee7b7'], ['green', '#15803d'], ['teal', '#0f766e'],
+        ['beige', '#d6c7b2'], ['khaki', '#c3b091'], ['sand', '#dcc8a8'], ['tan', '#b08968'], ['brown', '#6b4423'], ['coffee', '#4a3426'],
+        ['grey', '#71717a'], ['gray', '#71717a'], ['silver', '#cbd5e1'], ['ash', '#9ca3af'],
+        ['pink', '#ec4899'], ['rose', '#e11d48'], ['peach', '#fda4af'], ['coral', '#fb7185'],
+        ['purple', '#7e22ce'], ['lavender', '#c4b5fd'], ['violet', '#6d28d9'],
+        ['yellow', '#eab308'], ['mustard', '#ca8a04'], ['gold', '#d97706'], ['orange', '#ea580c']
+      ];
+      for (const [token, hex] of palette) {
+        if (raw === token || raw.includes(token)) return hex;
+      }
+      return '#e4e4e7';
+    }
+
+    function persistCompareIds() {
+      state.compareIds = [...new Set(state.compareIds)].slice(0, MAX_COMPARE_ITEMS);
+      localStorage.setItem('msf_compare', JSON.stringify(state.compareIds));
+    }
+
+    function getCompareProducts() {
+      if (state.products.length > 0) {
+        const validIds = state.compareIds.filter((id) => state.products.some((p) => p.id === id));
+        if (validIds.length !== state.compareIds.length) {
+          state.compareIds = validIds;
+          persistCompareIds();
+        }
+      }
+      return state.compareIds
+        .map((id) => state.products.find((p) => p.id === id))
+        .filter(Boolean);
+    }
+
+    function syncCompareCardButtons() {
+      document.querySelectorAll('[data-toggle-compare]').forEach((btn) => {
+        const pid = btn.getAttribute('data-toggle-compare');
+        const active = state.compareIds.includes(pid);
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        btn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${active ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'}</svg>
+          <span>${active ? t('comparing_btn') : t('compare_btn')}</span>
+        `;
+      });
+
+      const catTrigger = document.getElementById('catalog-compare-trigger-btn');
+      if (catTrigger) {
+        catTrigger.classList.toggle('hidden', state.compareIds.length === 0);
+        catTrigger.innerHTML = `${t('compare_btn')} (<span class="tabular-nums">${state.compareIds.length}</span>/${MAX_COMPARE_ITEMS})`;
+      }
+    }
+
+    function shouldShowCompareDock() {
+      const adminVisible = !document.getElementById('admin-app')?.classList.contains('hidden');
+      if (adminVisible) return false;
+      const hash = window.location.hash || '#home';
+      if (hash === '#checkout' || hash === '#track' || hash === '#account') return false;
+      return getCompareProducts().length > 0;
+    }
+
+    function renderCompareDock() {
+      const dock = document.getElementById('compare-dock-bar');
+      if (!dock) return;
+      const items = getCompareProducts();
+      const visible = shouldShowCompareDock();
+      document.body.classList.toggle('has-compare-dock', visible);
+      dock.classList.toggle('hidden', !visible);
+      if (!visible) {
+        dock.innerHTML = '';
+        return;
+      }
+
+      const emptyCount = Math.max(0, MAX_COMPARE_ITEMS - items.length);
+      const chipsHtml = items.map((p) => {
+        const title = state.lang === 'bn' ? (p.nameBn || p.name) : p.name;
+        const imgUrl = getProductMainImage(p);
+        return `
+          <div class="compare-dock-chip">
+            <img src="${esc(imgUrl)}" alt="${esc(title)}" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+            <span class="compare-dock-chip-name">${esc(title)}</span>
+            <button type="button" class="compare-dock-remove" data-compare-remove="${esc(p.id)}" aria-label="${esc(`Remove ${title}`)}">&times;</button>
+          </div>
+        `;
+      }).join('');
+
+      const emptySlotsHtml = Array.from({ length: emptyCount }, (_, idx) => `
+        <div class="compare-dock-empty-slot">${state.lang === 'bn' ? `পণ্য ${items.length + idx + 1} নির্বাচন করুন` : `Add item ${items.length + idx + 1}`}</div>
+      `).join('');
+
+      dock.innerHTML = `
+        <div class="container compare-dock-inner">
+          <div class="compare-dock-slots">
+            ${chipsHtml}
+            ${emptySlotsHtml}
+            <span class="compare-dock-summary-mobile tabular-nums">${items.length}/${MAX_COMPARE_ITEMS}</span>
+          </div>
+          <div class="compare-dock-actions">
+            <button type="button" id="compare-dock-clear" class="btn btn-outline btn-sm">${t('compare_clear')}</button>
+            <button type="button" id="compare-dock-open" class="btn btn-primary btn-sm">${t('compare_now')} (<span class="tabular-nums">${items.length}</span>/${MAX_COMPARE_ITEMS})</button>
+          </div>
+        </div>
+      `;
+
+      dock.querySelectorAll('[data-compare-remove]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          toggleCompare(btn.getAttribute('data-compare-remove'));
+        });
+      });
+      document.getElementById('compare-dock-clear')?.addEventListener('click', clearCompare);
+      document.getElementById('compare-dock-open')?.addEventListener('click', openCompareModal);
+    }
+
+    function getProductAttributeHighlights(p) {
+      const labels = [];
+      if (p.isNewArrival) labels.push(state.lang === 'bn' ? 'নিউ অ্যারাইভাল' : 'New Arrival');
+      if (p.isBestSeller) labels.push(state.lang === 'bn' ? 'বেস্ট সেলার' : 'Best Seller');
+      if (p.isFeatured) labels.push(state.lang === 'bn' ? 'ফিচার্ড' : 'Featured');
+      if (p.isTrending) labels.push(state.lang === 'bn' ? 'ট্রেন্ডিং' : 'Trending');
+      if (p.isSpecialCollection) labels.push(state.lang === 'bn' ? 'স্পেশাল কালেকশন' : 'Special Collection');
+      if (p.isFlashSale) labels.push(state.lang === 'bn' ? 'ফ্ল্যাশ সেল' : 'Flash Sale');
+      return labels;
+    }
+
+    function renderCompareModalBody() {
+      const modal = document.getElementById('compare-modal');
+      const body = document.getElementById('compare-modal-body');
+      const titleEl = document.getElementById('compare-modal-title');
+      const countEl = document.getElementById('compare-modal-count');
+      const clearBtn = document.getElementById('compare-modal-clear');
+      const diffLabel = document.getElementById('compare-diff-label');
+      const diffCheck = document.getElementById('compare-diff-toggle');
+      if (!modal || !body) return;
+
+      const items = getCompareProducts();
+      if (titleEl) titleEl.textContent = t('compare_title');
+      if (countEl) countEl.textContent = `${items.length} / ${MAX_COMPARE_ITEMS}`;
+      if (clearBtn) clearBtn.textContent = t('compare_clear');
+      if (diffLabel) diffLabel.textContent = t('compare_diff_only');
+      if (diffCheck) diffCheck.checked = Boolean(state.compareHighlightDiff);
+
+      if (!items.length) {
+        body.innerHTML = `<div class="empty-state">${t('compare_need_two')}</div>`;
+        return;
+      }
+
+      const prices = items.map((p) => getProductPrice(p));
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const hasDistinctLowest = items.length >= 2 && minPrice < maxPrice;
+
+      const emptyCols = Math.max(0, MAX_COMPARE_ITEMS - items.length);
+      const hasDiff = (values) => {
+        if (!state.compareHighlightDiff || items.length < 2) return false;
+        const norm = values.map((v) => String(v || '').trim().toLowerCase());
+        return new Set(norm).size > 1;
+      };
+
+      const renderRow = (label, rawDiffKeys, cellsHtml, emptyPlaceholder = '') => {
+        const diffCls = hasDiff(rawDiffKeys) ? 'is-diff' : '';
+        const empties = Array.from({ length: emptyCols }, () => `<td class="compare-placeholder-col">${emptyPlaceholder}</td>`).join('');
+        return `
+          <tr class="${diffCls}">
+            <th scope="row" class="compare-attr-col">${esc(label)}</th>
+            ${cellsHtml.join('')}
+            ${empties}
+          </tr>
+        `;
+      };
+
+      const headerCells = items.map((p) => {
+        const title = state.lang === 'bn' ? (p.nameBn || p.name) : p.name;
+        const imgUrl = getProductMainImage(p);
+        return `
+          <td>
+            <div class="compare-prod-head">
+              <button type="button" class="compare-prod-remove-top" data-compare-remove="${esc(p.id)}" aria-label="${esc(`Remove ${title}`)}">&times;</button>
+              <div class="compare-prod-img-box" data-compare-open-pdp="${esc(p.id)}">
+                <img src="${esc(imgUrl)}" alt="${esc(title)}" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+              </div>
+              <div style="font-size:11.5px;color:var(--text-muted);">${esc(p.categoryName || 'MS FASHION')}</div>
+              <button type="button" class="compare-prod-title-btn" data-compare-open-pdp="${esc(p.id)}">${esc(title)}</button>
+            </div>
+          </td>
+        `;
+      });
+
+      const emptyHeadCells = Array.from({ length: emptyCols }, (_, i) => `
+        <td class="compare-placeholder-col">
+          <div style="padding:18px 8px;">
+            <div style="font-weight:600;margin-bottom:6px;">${state.lang === 'bn' ? `স্লট ${items.length + i + 1}` : `Slot ${items.length + i + 1}`}</div>
+            <div>${state.lang === 'bn' ? 'তালিকা থেকে আরও একটি পণ্য যোগ করুন' : 'Select another product from the catalog'}</div>
+          </div>
+        </td>
+      `).join('');
+
+      const priceCells = items.map((p) => {
+        const reg = Number(p.regularPrice || 0);
+        const sale = Number(p.salePrice || 0);
+        const hasDiscount = sale > 0 && sale < reg;
+        const current = hasDiscount ? sale : reg;
+        const discPct = hasDiscount ? Math.round(((reg - sale) / reg) * 100) : Number(p.discountPercent || 0);
+        const isLowest = hasDistinctLowest && current === minPrice;
+        return `
+          <td>
+            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+              <span class="price-current tabular-nums">${formatPrice(current)}</span>
+              ${hasDiscount ? `<span class="price-regular tabular-nums">${formatPrice(reg)}</span><span class="price-discount">-${discPct}%</span>` : ''}
+            </div>
+            ${isLowest ? `<span class="compare-best-price">${state.lang === 'bn' ? '✓ সর্বনিম্ন মূল্য' : '✓ Lowest Price'}</span>` : ''}
+          </td>
+        `;
+      });
+
+      const stockCells = items.map((p) => {
+        const stockNum = Number(p.stock || 0);
+        return `
+          <td>
+            <span style="font-weight:600;color:${stockNum > 0 ? 'var(--success)' : 'var(--danger)'};" class="tabular-nums">
+              ${stockNum > 0 ? `${t('in_stock')} (${stockNum})` : t('out_of_stock')}
+            </span>
+          </td>
+        `;
+      });
+
+      const sizeCells = items.map((p) => {
+        const sizes = Array.isArray(p.sizes) ? p.sizes.filter(Boolean) : [];
+        if (!sizes.length) return `<td><span style="color:var(--text-muted);">${state.lang === 'bn' ? 'স্ট্যান্ডার্ড / উল্লেখ নেই' : 'Standard / N/A'}</span></td>`;
+        return `
+          <td>
+            <div class="compare-size-list">
+              ${sizes.map((s) => `<span class="compare-size-tag">${esc(s)}</span>`).join('')}
+            </div>
+          </td>
+        `;
+      });
+
+      const colorCells = items.map((p) => {
+        const colors = Array.isArray(p.colors) ? p.colors.filter(Boolean) : [];
+        if (!colors.length) return `<td><span style="color:var(--text-muted);">${state.lang === 'bn' ? 'নির্দিষ্ট নয়' : 'Not specified'}</span></td>`;
+        return `
+          <td>
+            <div class="compare-color-list">
+              ${colors.map((c) => {
+                const hex = resolveColorSwatch(c);
+                return `<span class="compare-color-item"><span class="compare-swatch" style="background:${esc(hex || '#e4e4e7')};" aria-hidden="true"></span><span>${esc(c)}</span></span>`;
+              }).join('')}
+            </div>
+          </td>
+        `;
+      });
+
+      const categoryCells = items.map((p) => {
+        const catStr = [p.categoryName || 'MS FASHION', p.subcategory].filter(Boolean).join(' · ');
+        return `<td>${esc(catStr)}</td>`;
+      });
+
+      const brandCells = items.map((p) => `<td>${esc(p.brand || 'MS FASHION')}</td>`);
+      const skuCells = items.map((p) => `<td><span class="mono">${esc(p.sku || '—')}</span></td>`);
+
+      const highlightCells = items.map((p) => {
+        const attrs = getProductAttributeHighlights(p);
+        return `<td>${attrs.length ? esc(attrs.join(' · ')) : `<span style="color:var(--text-muted);">${state.lang === 'bn' ? 'নিয়মিত কালেকশন' : 'Standard Collection'}</span>`}</td>`;
+      });
+
+      const ratingCells = items.map((p) => {
+        const avg = Number(p.ratingAvg || 0);
+        const cnt = Number(p.reviewCount || 0);
+        if (cnt <= 0 && avg <= 0) {
+          return `<td><span style="color:var(--text-muted);">${state.lang === 'bn' ? 'কোনো রিভিউ নেই' : 'No reviews yet'}</span></td>`;
+        }
+        return `<td><span class="tabular-nums" style="font-weight:600;color:#b45309;">★ ${avg.toFixed(1)} / 5</span> <span class="tabular-nums" style="color:var(--text-muted);">(${cnt})</span></td>`;
+      });
+
+      const tagCells = items.map((p) => {
+        const merged = [...new Set([...(Array.isArray(p.tags) ? p.tags : []), ...(Array.isArray(p.keywords) ? p.keywords : [])].map((x) => String(x || '').trim()).filter(Boolean))];
+        return `<td>${merged.length ? esc(merged.slice(0, 6).join(' · ')) : '<span style="color:var(--text-muted);">—</span>'}</td>`;
+      });
+
+      const descCells = items.map((p) => {
+        const raw = state.lang === 'bn'
+          ? (p.shortDescriptionBn || p.shortDescription || p.fullDescriptionBn || p.fullDescription || '')
+          : (p.shortDescription || p.fullDescription || '');
+        const clean = String(raw).trim();
+        const snippet = clean.length > 140 ? `${clean.slice(0, 137)}...` : clean;
+        return `<td>${snippet ? esc(snippet) : '<span style="color:var(--text-muted);">—</span>'}</td>`;
+      });
+
+      const actionCells = items.map((p) => {
+        const stockNum = Number(p.stock || 0);
+        const needsChoice = (p.sizes && p.sizes.length > 1) || (p.colors && p.colors.length > 1);
+        const ctaLabel = stockNum <= 0
+          ? t('out_of_stock')
+          : (needsChoice ? (state.lang === 'bn' ? 'সাইজ/রঙ বাছাই' : 'Select Options') : t('add_to_cart'));
+        return `
+          <td>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button type="button" class="btn btn-primary btn-sm btn-block" data-compare-add-cart="${esc(p.id)}" ${stockNum <= 0 ? 'disabled' : ''}>${ctaLabel}</button>
+              <button type="button" class="btn btn-outline btn-sm btn-block" data-compare-open-pdp="${esc(p.id)}">${state.lang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}</button>
+            </div>
+          </td>
+        `;
+      });
+
+      body.innerHTML = `
+        ${items.length < 2 ? `
+          <div class="compare-notice">
+            <span>${t('compare_need_two')}</span>
+            <button type="button" id="compare-browse-more" class="btn btn-outline btn-sm">${state.lang === 'bn' ? 'আরও পণ্য দেখুন' : 'Browse Products'}</button>
+          </div>
+        ` : ''}
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th scope="col" class="compare-attr-col">${state.lang === 'bn' ? 'পণ্য' : 'Product'}</th>
+                ${headerCells.join('')}
+                ${emptyHeadCells}
+              </tr>
+            </thead>
+            <tbody>
+              ${renderRow(state.lang === 'bn' ? 'দাম' : 'Price', items.map((p) => getProductPrice(p)), priceCells)}
+              ${renderRow(state.lang === 'bn' ? 'স্টক অবস্থা' : 'Availability', items.map((p) => Number(p.stock || 0) > 0 ? 'in' : 'out'), stockCells)}
+              ${renderRow(state.lang === 'bn' ? 'সাইজ' : 'Sizes', items.map((p) => (p.sizes || []).join(',')), sizeCells)}
+              ${renderRow(state.lang === 'bn' ? 'রঙ' : 'Colors', items.map((p) => (p.colors || []).join(',')), colorCells)}
+              ${renderRow(state.lang === 'bn' ? 'ক্যাটাগরি' : 'Category', items.map((p) => `${p.categoryName || ''}|${p.subcategory || ''}`), categoryCells)}
+              ${renderRow(state.lang === 'bn' ? 'ব্র্যান্ড' : 'Brand', items.map((p) => p.brand || 'MS FASHION'), brandCells)}
+              ${renderRow('SKU', items.map((p) => p.sku || ''), skuCells)}
+              ${renderRow(state.lang === 'bn' ? 'কালেকশন ও হাইলাইটস' : 'Highlights', items.map((p) => getProductAttributeHighlights(p).join(',')), highlightCells)}
+              ${renderRow(state.lang === 'bn' ? 'গ্রাহক রেটিং' : 'Rating', items.map((p) => `${p.ratingAvg || 0}:${p.reviewCount || 0}`), ratingCells)}
+              ${renderRow(state.lang === 'bn' ? 'ট্যাগ ও স্টাইল' : 'Attributes / Tags', items.map((p) => [...(p.tags || []), ...(p.keywords || [])].join(',')), tagCells)}
+              ${renderRow(state.lang === 'bn' ? 'বিবরণ' : 'Description', items.map((p) => state.lang === 'bn' ? (p.shortDescriptionBn || p.shortDescription || '') : (p.shortDescription || '')), descCells)}
+              <tr>
+                <th scope="row" class="compare-attr-col">${state.lang === 'bn' ? 'অ্যাকশন' : 'Action'}</th>
+                ${actionCells.join('')}
+                ${Array.from({ length: emptyCols }, () => '<td class="compare-placeholder-col">—</td>').join('')}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      document.getElementById('compare-browse-more')?.addEventListener('click', () => {
+        closeCompareModal();
+        if (!window.location.hash || window.location.hash === '#home' || window.location.hash.startsWith('#product/')) {
+          navigateTo('#shop');
+        }
+      });
+
+      body.querySelectorAll('[data-compare-remove]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          toggleCompare(btn.getAttribute('data-compare-remove'));
+        });
+      });
+
+      body.querySelectorAll('[data-compare-open-pdp]').forEach((el) => {
+        el.addEventListener('click', () => {
+          const pid = el.getAttribute('data-compare-open-pdp');
+          closeCompareModal();
+          navigateTo(`#product/${encodeURIComponent(pid)}`);
+        });
+      });
+
+      body.querySelectorAll('[data-compare-add-cart]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const pid = btn.getAttribute('data-compare-add-cart');
+          const prod = state.products.find((p) => p.id === pid);
+          if (!prod) return;
+          if ((prod.sizes && prod.sizes.length > 1) || (prod.colors && prod.colors.length > 1)) {
+            closeCompareModal();
+            navigateTo(`#product/${encodeURIComponent(pid)}`);
+            showToast(state.lang === 'bn' ? 'সাইজ ও রঙ নির্বাচন করুন' : 'Please select size/color');
+          } else {
+            addToCart(prod, prod.sizes?.[0] || '', prod.colors?.[0] || '', 1);
+            closeCompareModal();
+            openCartDrawer();
+          }
+        });
+      });
+    }
+
+    let comparePrevOverflow = '';
+    let compareLastFocus = null;
+
+    function openCompareModal() {
+      const modal = document.getElementById('compare-modal');
+      if (!modal) return;
+      if (modal.classList.contains('hidden')) {
+        comparePrevOverflow = document.body.style.overflow;
+        compareLastFocus = document.activeElement;
+      }
+      renderCompareModalBody();
+      document.body.style.overflow = 'hidden';
+      modal.classList.remove('hidden');
+      document.getElementById('compare-modal-close')?.focus({ preventScroll: true });
+    }
+
+    function closeCompareModal() {
+      const modal = document.getElementById('compare-modal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      modal.classList.add('hidden');
+      document.body.style.overflow = comparePrevOverflow;
+      comparePrevOverflow = '';
+      if (compareLastFocus && typeof compareLastFocus.focus === 'function') {
+        compareLastFocus.focus({ preventScroll: true });
+      }
+      compareLastFocus = null;
+    }
+
+    function toggleCompare(productId) {
+      if (!productId) return;
+      if (state.compareIds.includes(productId)) {
+        state.compareIds = state.compareIds.filter((id) => id !== productId);
+        showToast(t('compare_removed_toast'));
+      } else {
+        if (state.compareIds.length >= MAX_COMPARE_ITEMS) {
+          showToast(t('compare_max_toast'), 'error');
+          return;
+        }
+        state.compareIds.push(productId);
+        showToast(`${t('compare_added_toast')} (${state.compareIds.length}/${MAX_COMPARE_ITEMS})`, 'success');
+      }
+      persistCompareIds();
+      syncCompareCardButtons();
+      renderCompareDock();
+      const modal = document.getElementById('compare-modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        if (state.compareIds.length === 0) closeCompareModal();
+        else renderCompareModalBody();
+      }
+    }
+
+    function clearCompare() {
+      state.compareIds = [];
+      persistCompareIds();
+      syncCompareCardButtons();
+      renderCompareDock();
+      closeCompareModal();
     }
 
     function calculateCartTotals(district = 'Dhaka') {
@@ -5994,6 +8301,7 @@
     }
 
     async function handleRoute() {
+      closePdpGalleryModal();
       cleanupOrderTracker();
       const hash = window.location.hash || '#home';
       document.querySelectorAll('.desktop-nav .nav-link').forEach((a) => {
@@ -6050,12 +8358,19 @@
         showOnlyView('view-home');
         renderHome();
       }
+      renderCompareDock();
     }
 
     window.addEventListener('hashchange', handleRoute);
 
     // Global delegated clicks on storefront
     document.getElementById('storefront-main').addEventListener('click', (e) => {
+      const compareBtn = e.target.closest('[data-toggle-compare]');
+      if (compareBtn) {
+        e.stopPropagation();
+        toggleCompare(compareBtn.getAttribute('data-toggle-compare'));
+        return;
+      }
       const wishBtn = e.target.closest('[data-toggle-wish]');
       if (wishBtn) {
         e.stopPropagation();
@@ -6088,6 +8403,21 @@
       if (heroDot) {
         state.currentHeroIndex = Number(heroDot.getAttribute('data-hero-dot'));
         renderHome();
+        return;
+      }
+      const socialTab = e.target.closest('[data-social-filter]');
+      if (socialTab) {
+        const nextFilter = socialTab.getAttribute('data-social-filter') || 'all';
+        state.socialFeedFilter = nextFilter;
+        const gridEl = document.getElementById('social-feed-grid');
+        if (gridEl) {
+          gridEl.innerHTML = renderSocialFeedCardsHTML(nextFilter);
+          document.querySelectorAll('#social-feed [data-social-filter]').forEach((btn) => {
+            const active = btn.getAttribute('data-social-filter') === nextFilter;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+          });
+        }
       }
     });
 
@@ -6155,6 +8485,21 @@
     document.getElementById('account-btn').addEventListener('click', () => navigateTo('#account'));
     document.getElementById('auth-modal-close').addEventListener('click', () => {
       document.getElementById('auth-modal').classList.add('hidden');
+    });
+    document.getElementById('compare-modal-close')?.addEventListener('click', closeCompareModal);
+    document.getElementById('compare-modal-clear')?.addEventListener('click', clearCompare);
+    document.getElementById('compare-diff-toggle')?.addEventListener('change', (e) => {
+      state.compareHighlightDiff = Boolean(e.target.checked);
+      renderCompareModalBody();
+    });
+    document.getElementById('compare-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'compare-modal') closeCompareModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      const cmpModal = document.getElementById('compare-modal');
+      if (e.key === 'Escape' && cmpModal && !cmpModal.classList.contains('hidden')) {
+        closeCompareModal();
+      }
     });
 
     // Search Bar & Live Suggestions
@@ -6386,8 +8731,10 @@
     // 16. FULL ADMIN DASHBOARD (18 SECTIONS, REAL-TIME ORDERS, UNLIMITED UPLOADS)
     // =========================================================================
     function openAdminDashboard() {
+      closeCompareModal();
       document.getElementById('storefront-app').classList.add('hidden');
       document.getElementById('admin-app').classList.remove('hidden');
+      renderCompareDock();
       updateAdminFirebaseSyncBanner();
       startAdminRealtimeListeners();
       renderAdminTab(state.adminTab || 'overview');
@@ -6433,6 +8780,234 @@
       }
     });
 
+    function getStockAlertConfig() {
+      const raw = state.settings?.stockAlertConfig || {};
+      const def = DEFAULT_SETTINGS.stockAlertConfig;
+      const thr = Number(raw.defaultThreshold);
+      return {
+        enabled: raw.enabled !== false,
+        defaultThreshold: Number.isFinite(thr) && thr >= 0 ? Math.floor(thr) : def.defaultThreshold,
+        notifyUi: raw.notifyUi !== false,
+        notifyEmail: raw.notifyEmail !== false,
+        alertEmail: String(raw.alertEmail || def.alertEmail || BOOTSTRAP_ADMIN_EMAIL).trim().slice(0, 160),
+        skuThresholds: raw.skuThresholds && typeof raw.skuThresholds === 'object' ? raw.skuThresholds : {}
+      };
+    }
+
+    function getEffectiveStockThreshold(product) {
+      const cfg = getStockAlertConfig();
+      const custom = cfg.skuThresholds?.[product?.id];
+      if (custom !== undefined && custom !== null && custom !== '') {
+        const n = Number(custom);
+        if (Number.isFinite(n) && n >= 0) return Math.floor(n);
+      }
+      return cfg.defaultThreshold;
+    }
+
+    function isLowStockProduct(product) {
+      const cfg = getStockAlertConfig();
+      if (!cfg.enabled) return false;
+      const thr = getEffectiveStockThreshold(product);
+      return thr > 0 && Number(product?.stock || 0) < thr;
+    }
+
+    function getBelowThresholdProducts(prods = state.adminProducts) {
+      const list = Array.isArray(prods) ? prods : [];
+      const cfg = getStockAlertConfig();
+      return list
+        .map((p) => {
+          const stock = Number(p.stock || 0);
+          const threshold = getEffectiveStockThreshold(p);
+          const customRaw = cfg.skuThresholds?.[p.id];
+          const hasCustom = customRaw !== undefined && customRaw !== null && customRaw !== '';
+          return {
+            product: p,
+            stock,
+            threshold,
+            hasCustom,
+            isOutOfStock: stock <= 0,
+            isBelow: cfg.enabled && threshold > 0 && stock < threshold
+          };
+        })
+        .filter((entry) => entry.isBelow)
+        .sort((a, b) => a.stock - b.stock);
+    }
+
+    function updateAdminStockAlertIndicators() {
+      const prods = state.adminProducts.length ? state.adminProducts : state.products;
+      const below = getBelowThresholdProducts(prods);
+      const badgeEl = document.getElementById('admin-inv-alert-badge');
+      if (badgeEl) {
+        badgeEl.textContent = String(below.length);
+        badgeEl.classList.toggle('hidden', below.length === 0);
+      }
+      const alertEl = document.getElementById('admin-live-alert');
+      if (alertEl) {
+        const cfg = getStockAlertConfig();
+        if (below.length > 0 && cfg.notifyUi) {
+          const first = below[0];
+          alertEl.dataset.alertTarget = 'inventory';
+          alertEl.textContent = below.length === 1
+            ? `Low Stock: ${first.product.sku} (${first.stock} < min ${first.threshold})`
+            : `${below.length} SKUs Below Min Stock`;
+          alertEl.classList.remove('hidden');
+        } else if (alertEl.dataset.alertTarget === 'inventory') {
+          alertEl.textContent = '';
+          alertEl.classList.add('hidden');
+          delete alertEl.dataset.alertTarget;
+        }
+      }
+    }
+
+    async function dispatchStockAlertEmail(belowEntries, { testMode = false } = {}) {
+      const cfg = getStockAlertConfig();
+      if (!cfg.alertEmail) return null;
+      const items = belowEntries.map((entry) => ({
+        productId: entry.product.id,
+        sku: entry.product.sku || entry.product.id,
+        productName: entry.product.name || 'Product',
+        stock: entry.stock,
+        threshold: entry.threshold
+      }));
+      if (!items.length) return null;
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (auth.currentUser) {
+          try {
+            const idToken = await auth.currentUser.getIdToken();
+            if (idToken) headers.Authorization = `Bearer ${idToken}`;
+          } catch {}
+        }
+        const res = await fetch('/api/admin/stock-alert-email', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            sessionToken: state.adminSessionToken || '',
+            toEmail: cfg.alertEmail,
+            items
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || 'Email alert dispatch failed');
+        }
+        state.lastStockEmailReport = {
+          ...data,
+          count: items.length,
+          testMode,
+          timestamp: new Date().toISOString()
+        };
+        if (data.mode === 'resend' || data.mode === 'webhook') {
+          showToast(`Stock alert email sent to ${cfg.alertEmail}`, 'success');
+        } else {
+          showToast(`Email alert queued for ${cfg.alertEmail} (${items.length} SKU${items.length > 1 ? 's' : ''})`, 'success');
+        }
+        if (state.adminTab === 'inventory') renderAdminTab('inventory');
+        return state.lastStockEmailReport;
+      } catch (err) {
+        const fallbackSubject = `[MS FASHION] Low Stock Alert (${items.length} SKU${items.length > 1 ? 's' : ''})`;
+        const fallbackBody = items.map((it) => `SKU: ${it.sku} | ${it.productName} | Stock: ${it.stock} (Min: ${it.threshold})`).join('\n');
+        state.lastStockEmailReport = {
+          ok: false,
+          mode: 'client_mailto',
+          error: err.message,
+          toEmail: cfg.alertEmail,
+          subject: fallbackSubject,
+          mailtoUrl: `mailto:${encodeURIComponent(cfg.alertEmail)}?subject=${encodeURIComponent(fallbackSubject)}&body=${encodeURIComponent(fallbackBody)}`,
+          count: items.length,
+          timestamp: new Date().toISOString()
+        };
+        if (state.adminTab === 'inventory') renderAdminTab('inventory');
+        return state.lastStockEmailReport;
+      }
+    }
+
+    async function evaluateStockAlerts(prods = state.adminProducts, { forceNotify = false, triggerEmail = true, onlyProductIds = null } = {}) {
+      const cfg = getStockAlertConfig();
+      if (!cfg.enabled && !forceNotify) {
+        updateAdminStockAlertIndicators();
+        return [];
+      }
+
+      const sourceList = Array.isArray(onlyProductIds)
+        ? (prods || []).filter((p) => onlyProductIds.includes(p.id))
+        : (prods || []);
+      const belowEntries = getBelowThresholdProducts(sourceList);
+      updateAdminStockAlertIndicators();
+
+      if (!belowEntries.length) return [];
+
+      const triggered = belowEntries.filter((entry) => {
+        const key = `${entry.product.id}:${entry.stock}:${entry.threshold}`;
+        if (forceNotify) return true;
+        return !state.stockAlertSentKeys[key];
+      });
+
+      if (!triggered.length) return [];
+
+      triggered.forEach((entry) => {
+        const key = `${entry.product.id}:${entry.stock}:${entry.threshold}`;
+        state.stockAlertSentKeys[key] = true;
+      });
+
+      if (cfg.notifyUi) {
+        const first = triggered[0];
+        showToast(
+          triggered.length === 1
+            ? `Low Stock Alert: ${first.product.sku} (${first.stock} left, min ${first.threshold})`
+            : `Low Stock Alert: ${triggered.length} SKUs dropped below minimum stock`,
+          'error'
+        );
+
+        if (isFirebaseAdminUser()) {
+          try {
+            const batch = writeBatch(db);
+            let writeCount = 0;
+            triggered.forEach((entry, idx) => {
+              const alreadyUnread = state.adminNotifications.some(
+                (n) => !n.read && n.productId === entry.product.id && String(n.message || '').includes(`Stock: ${entry.stock}`)
+              );
+              if (alreadyUnread && !forceNotify) return;
+              const safePid = String(entry.product.id || 'sku').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 50);
+              const notifId = `stock_${safePid}_${Date.now()}_${idx}`.slice(0, 120);
+              const title = entry.isOutOfStock
+                ? `Out of Stock: ${entry.product.sku || entry.product.name}`
+                : `Low Stock Alert: ${entry.product.sku || entry.product.name}`;
+              const message = `${entry.product.name} (SKU: ${entry.product.sku || '-'}) — Stock: ${entry.stock} (Min Threshold: ${entry.threshold})`;
+              batch.set(doc(db, 'notifications', notifId), {
+                id: notifId,
+                userId: 'admin',
+                type: 'low_stock',
+                productId: entry.product.id,
+                sku: String(entry.product.sku || '').slice(0, 80),
+                title: title.slice(0, 160),
+                message: message.slice(0, 500),
+                read: false,
+                createdAt: serverTimestamp()
+              });
+              writeCount++;
+            });
+            if (writeCount > 0) {
+              await batch.commit();
+            }
+          } catch (err) {
+            if (isFirestorePermissionError(err)) {
+              handleFirestoreError(err, OperationType.CREATE, 'notifications');
+            } else {
+              console.warn('Stock UI notification write skipped:', err.message);
+            }
+          }
+        }
+      }
+
+      if (cfg.notifyEmail && triggerEmail) {
+        await dispatchStockAlertEmail(triggered);
+      }
+
+      return triggered;
+    }
+
     function startAdminRealtimeListeners() {
       state.unsubscribes.forEach((u) => u());
       state.unsubscribes = [];
@@ -6450,6 +9025,7 @@
             if (!initialOrderLoad && state.adminOrders.length > prevCount) {
               const latest = state.adminOrders[0];
               const alertEl = document.getElementById('admin-live-alert');
+              delete alertEl.dataset.alertTarget;
               alertEl.textContent = `New Order: ${latest.orderId} (${formatPrice(latest.finalTotal)})`;
               alertEl.classList.remove('hidden');
               showToast(`New Order Received: ${latest.orderId}`, 'success');
@@ -6465,18 +9041,68 @@
       } catch (e) {
         console.warn('Orders listener skipped:', e);
       }
+
+      // Real-time Admin Notifications listener (Stock Alerts & Orders)
+      try {
+        const unsubNotifs = onSnapshot(
+          query(collection(db, 'notifications'), where('userId', '==', 'admin'), limit(100)),
+          (snap) => {
+            const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            list.sort((a, b) => {
+              const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt || 0).getTime();
+              const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt || 0).getTime();
+              return tb - ta;
+            });
+            state.adminNotifications = list;
+            updateAdminStockAlertIndicators();
+            if (state.adminTab === 'inventory') renderAdminTab('inventory');
+          },
+          (err) => console.warn('Admin notifications listener:', err.message)
+        );
+        state.unsubscribes.push(unsubNotifs);
+      } catch (e) {
+        console.warn('Notifications listener skipped:', e);
+      }
+
+      // Real-time Products listener for threshold alerts
+      try {
+        let initialProdSnap = true;
+        const prodQuery = isFirebaseAdminUser()
+          ? query(collection(db, 'products'), limit(300))
+          : query(collection(db, 'products'), where('active', '==', true), where('published', '==', true), limit(300));
+        const unsubProducts = onSnapshot(
+          prodQuery,
+          (snap) => {
+            state.adminProducts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            if (initialProdSnap) {
+              initialProdSnap = false;
+              updateAdminStockAlertIndicators();
+            } else {
+              evaluateStockAlerts(state.adminProducts, { triggerEmail: true });
+            }
+            if (state.adminTab === 'inventory' || state.adminTab === 'overview') {
+              renderAdminTab(state.adminTab);
+            }
+          },
+          (err) => console.warn('Admin products listener:', err.message)
+        );
+        state.unsubscribes.push(unsubProducts);
+      } catch (e) {
+        console.warn('Admin products listener skipped:', e);
+      }
     }
 
     async function loadAdminCollections() {
       try {
-        const [pSnap, cSnap, bSnap, cpSnap, rSnap, uSnap, logSnap] = await Promise.allSettled([
+        const [pSnap, cSnap, bSnap, cpSnap, rSnap, uSnap, logSnap, notifSnap] = await Promise.allSettled([
           getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc'))),
           getDocs(query(collection(db, 'categories'), orderBy('order', 'asc'))),
           getDocs(query(collection(db, 'banners'), orderBy('order', 'asc'))),
           getDocs(collection(db, 'coupons')),
           getDocs(query(collection(db, 'reviews'), orderBy('createdAt', 'desc'))),
           getDocs(collection(db, 'users')),
-          getDocs(query(collection(db, 'inventoryLogs'), orderBy('createdAt', 'desc'), limit(100)))
+          getDocs(query(collection(db, 'inventoryLogs'), orderBy('createdAt', 'desc'), limit(100))),
+          getDocs(query(collection(db, 'notifications'), where('userId', '==', 'admin'), limit(100)))
         ]);
         if (pSnap.status === 'fulfilled') state.adminProducts = pSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }));
         if (cSnap.status === 'fulfilled') state.adminCategories = cSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -6485,6 +9111,16 @@
         if (rSnap.status === 'fulfilled') state.adminReviews = rSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }));
         if (uSnap.status === 'fulfilled') state.adminCustomers = uSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }));
         if (logSnap.status === 'fulfilled') state.adminInventoryLogs = logSnap.value.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (notifSnap.status === 'fulfilled') {
+          state.adminNotifications = notifSnap.value.docs
+            .map((d) => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => {
+              const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt || 0).getTime();
+              const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt || 0).getTime();
+              return tb - ta;
+            });
+        }
+        updateAdminStockAlertIndicators();
       } catch (err) {
         console.warn('Admin collections load:', err);
       }
@@ -6505,6 +9141,14 @@
     document.getElementById('admin-top-back-btn').addEventListener('click', exitToStorefront);
     document.getElementById('admin-modal-close').addEventListener('click', () => {
       document.getElementById('admin-modal').classList.add('hidden');
+    });
+    document.getElementById('admin-live-alert').addEventListener('click', async () => {
+      const target = document.getElementById('admin-live-alert').dataset.alertTarget || 'orders';
+      state.adminTab = target;
+      document.querySelectorAll('[data-admin-tab]').forEach((b) => b.classList.toggle('active', b.getAttribute('data-admin-tab') === target));
+      document.getElementById('admin-view-title').textContent = target === 'inventory' ? 'Inventory' : 'Orders';
+      await loadAdminCollections();
+      renderAdminTab(target);
     });
 
     document.getElementById('admin-logout-btn').addEventListener('click', async () => {
@@ -6598,7 +9242,7 @@
         const cancelledCount = orders.filter((o) => o.orderStatus === 'Cancelled').length;
         const activeProds = prods.filter((p) => p.active && p.published).length;
         const outStock = prods.filter((p) => Number(p.stock || 0) <= 0).length;
-        const lowStock = prods.filter((p) => Number(p.stock || 0) > 0 && Number(p.stock || 0) <= 5);
+        const lowStockEntries = getBelowThresholdProducts(prods);
 
         host.innerHTML = `
           <div class="kpi-grid">
@@ -6622,13 +9266,13 @@
               ${renderSalesSvgChart(orders)}
             </div>
             <div class="panel-box">
-              <h3 style="margin:0 0 8px;font-size:16px;">Low Stock Alerts (${lowStock.length})</h3>
-              ${lowStock.length ? lowStock.slice(0, 8).map((p) => `
-                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-hairline);font-size:13px;">
-                  <span>${esc(p.name)}</span>
-                  <strong style="color:var(--danger);">${p.stock} left</strong>
+              <h3 style="margin:0 0 8px;font-size:16px;">Low Stock Alerts (${lowStockEntries.length} &lt; threshold)</h3>
+              ${lowStockEntries.length ? lowStockEntries.slice(0, 8).map((entry) => `
+                <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-hairline);font-size:13px;">
+                  <span>${esc(entry.product.name)} <span class="mono" style="color:var(--text-muted);font-size:11.5px;">(${esc(entry.product.sku)})</span></span>
+                  <strong style="color:var(--danger);" class="tabular-nums">${entry.stock} left / min ${entry.threshold}</strong>
                 </div>
-              `).join('') : '<div style="font-size:13px;color:var(--text-muted);">No low stock alerts.</div>'}
+              `).join('') : '<div style="font-size:13px;color:var(--text-muted);">No SKUs below configured minimum stock threshold.</div>'}
             </div>
           </div>
 
@@ -6927,7 +9571,7 @@
                 } catch (err) {
                   entry.status = 'error';
                   failed++;
-                  showToast(`Upload failed (${entry.file.name}): ${err.message}`, 'error');
+                  showToast(`Upload failed (${entry.file?.name || 'image'}): ${err?.message || 'Upload error'}`, 'error');
                 }
                 const doneCount = succeeded + failed;
                 if (ovBar && ovText) {
@@ -7247,6 +9891,7 @@
             editorProductImages = [];
             await loadAdminCollections();
             await loadProducts(true);
+            await evaluateStockAlerts([productDoc], { onlyProductIds: [pid], forceNotify: Number(productDoc.stock || 0) < getEffectiveStockThreshold(productDoc) });
             state.adminTab = 'products';
             renderAdminTab('products');
           } catch (err) {
@@ -7469,23 +10114,151 @@
         `;
       } else if (tab === 'inventory') {
         const prods = state.adminProducts;
+        const cfg = getStockAlertConfig();
+        const belowEntries = getBelowThresholdProducts(prods);
+        const outOfStockCount = belowEntries.filter((e) => e.isOutOfStock).length;
+        const stockNotifs = (state.adminNotifications || []).filter(
+          (n) => n.type === 'low_stock' || String(n.id || '').startsWith('stock_') || String(n.title || '').toLowerCase().includes('stock')
+        );
+        const unreadStockNotifs = stockNotifs.filter((n) => !n.read);
+        const emailReport = state.lastStockEmailReport;
+
         host.innerHTML = `
+          <div class="inv-alert-banner ${belowEntries.length ? '' : 'is-clear'}" role="status">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div>
+                <strong>${belowEntries.length
+                  ? `${belowEntries.length} Product SKU${belowEntries.length === 1 ? '' : 's'} Below Minimum Stock Threshold`
+                  : 'All SKUs Meet Minimum Stock Threshold'}</strong>
+                <div style="font-size:12.5px;margin-top:2px;">
+                  Default minimum threshold: <strong class="tabular-nums">${cfg.defaultThreshold}</strong> units (alerts trigger when stock &lt; threshold)${outOfStockCount ? ` · <strong class="tabular-nums">${outOfStockCount} out of stock</strong>` : ''}.
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" id="inv-scan-alerts-btn" class="btn btn-primary btn-sm">Scan Stock &amp; Trigger Alerts</button>
+                <button type="button" id="inv-test-alert-btn" class="btn btn-outline btn-sm">Send Test Alert</button>
+              </div>
+            </div>
+          </div>
+
+          ${emailReport ? `
+            <div class="panel-box" style="margin-bottom:16px;background:#f8fafc;border-color:#cbd5e1;font-size:13px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <strong>Email Alert Dispatch (${esc(emailReport.toEmail || cfg.alertEmail)}):</strong>
+                  ${emailReport.mode === 'resend' || emailReport.mode === 'webhook'
+                    ? `Sent automatically via ${esc(emailReport.mode)} for ${emailReport.count} SKU(s).`
+                    : `Logged on server (${emailReport.count} SKU${emailReport.count === 1 ? '' : 's'}). Configure <code>RESEND_API_KEY</code> in environment for direct delivery, or send immediately via your email client.`}
+                </div>
+                ${emailReport.mailtoUrl ? `<a href="${esc(emailReport.mailtoUrl)}" class="btn btn-outline btn-sm">Open Email Client</a>` : ''}
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="checkout-grid" style="margin-bottom:16px;">
+            <form id="inv-alert-config-form" class="panel-box" style="display:flex;flex-direction:column;gap:12px;">
+              <h3 style="margin:0;font-size:16px;">Threshold Alert Configuration</h3>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;">
+                <input type="checkbox" id="inv-cfg-enabled" ${cfg.enabled ? 'checked' : ''} />
+                <span>Enable Threshold-Based Stock Alerts</span>
+              </label>
+              <div class="form-grid-2">
+                <div>
+                  <label for="inv-cfg-threshold" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;">Default Minimum Stock Value *</label>
+                  <input type="number" id="inv-cfg-threshold" class="form-control" min="1" max="10000" required value="${esc(cfg.defaultThreshold)}" />
+                </div>
+                <div>
+                  <label for="inv-cfg-email" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;">Alert Recipient Email *</label>
+                  <input type="email" id="inv-cfg-email" class="form-control" maxlength="160" required value="${esc(cfg.alertEmail)}" placeholder="admin@example.com" />
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;">
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="inv-cfg-ui" ${cfg.notifyUi ? 'checked' : ''} />
+                  <span>Trigger Admin UI Notification</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="inv-cfg-email-on" ${cfg.notifyEmail ? 'checked' : ''} />
+                  <span>Trigger Email Notification</span>
+                </label>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Alert Settings</button>
+              </div>
+            </form>
+
+            <div class="panel-box">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;">
+                <h3 style="margin:0;font-size:16px;">UI Stock Alert Notifications (${unreadStockNotifs.length} unread)</h3>
+                ${unreadStockNotifs.length ? `<button type="button" id="inv-mark-all-read" class="btn btn-outline btn-sm">Mark All Read</button>` : ''}
+              </div>
+              <div class="inv-notif-list">
+                ${stockNotifs.length ? stockNotifs.slice(0, 15).map((n) => `
+                  <div class="inv-notif-item ${n.read ? '' : 'is-unread'}">
+                    <div style="min-width:0;">
+                      <div style="font-weight:${n.read ? '600' : '700'};color:var(--text-primary);">
+                        ${esc(n.title)} ${n.read ? '' : '<span style="color:var(--danger);font-size:11px;margin-left:6px;">Unread</span>'}
+                      </div>
+                      <div style="font-size:12.5px;color:var(--text-secondary);margin-top:2px;">${esc(n.message)}</div>
+                    </div>
+                    ${!n.read ? `<button type="button" class="btn btn-outline btn-sm" style="flex-shrink:0;" data-notif-read="${esc(n.id)}">Mark Read</button>` : ''}
+                  </div>
+                `).join('') : '<div style="font-size:13px;color:var(--text-muted);">No stock alert notifications recorded yet.</div>'}
+              </div>
+            </div>
+          </div>
+
+          ${belowEntries.length ? `
+            <div class="panel-box" style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                <h3 style="margin:0;font-size:16px;">Active Below-Threshold SKUs (${belowEntries.length})</h3>
+                <button type="button" id="inv-email-digest-btn" class="btn btn-outline btn-sm">Send Email Alert Now</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>SKU</th><th>Product</th><th>Stock</th><th>Min Threshold</th><th>Status</th><th>Quick Restock</th></tr></thead>
+                  <tbody>
+                    ${belowEntries.map((entry) => `
+                      <tr>
+                        <td class="mono">${esc(entry.product.sku)}</td>
+                        <td>${esc(entry.product.name)}</td>
+                        <td class="tabular-nums"><strong>${entry.stock}</strong></td>
+                        <td class="tabular-nums">${entry.threshold}${entry.hasCustom ? ' (SKU)' : ''}</td>
+                        <td><span class="${entry.isOutOfStock ? 'inv-status-out' : 'inv-status-low'}">${entry.isOutOfStock ? 'Out of Stock' : 'Below Minimum'}</span></td>
+                        <td><button type="button" class="btn btn-outline btn-sm" data-inv-quick-restock="${esc(entry.product.id)}">+10 Restock</button></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ` : ''}
+
           <div class="panel-box" style="margin-bottom:16px;">
-            <h3 style="margin:0 0 12px;font-size:16px;">Product Stock &amp; Quick Adjustment</h3>
+            <h3 style="margin:0 0 12px;font-size:16px;">Product Stock, SKU Thresholds &amp; Quick Adjustment</h3>
             <div class="table-wrap">
               <table class="data-table">
-                <thead><tr><th>SKU</th><th>Product</th><th>Current Stock</th><th>Adjust (+/-)</th><th>Reason</th><th>Save</th></tr></thead>
+                <thead><tr><th>SKU</th><th>Product</th><th>Current Stock</th><th>Min Threshold</th><th>Alert Status</th><th>Adjust (+/-)</th><th>Reason</th><th>Save</th></tr></thead>
                 <tbody>
-                  ${prods.map((p) => `
-                    <tr>
-                      <td class="mono">${esc(p.sku)}</td>
-                      <td>${esc(p.name)}</td>
-                      <td class="tabular-nums"><strong>${p.stock}</strong></td>
-                      <td><input type="number" class="form-control" style="width:90px;" id="inv-adj-${esc(p.id)}" value="0" /></td>
-                      <td><input type="text" class="form-control" style="width:160px;" id="inv-rsn-${esc(p.id)}" placeholder="Restock / Audit" /></td>
-                      <td><button type="button" class="btn btn-outline btn-sm" data-inv-save="${esc(p.id)}">Apply</button></td>
-                    </tr>
-                  `).join('')}
+                  ${prods.map((p) => {
+                    const effThr = getEffectiveStockThreshold(p);
+                    const customThr = cfg.skuThresholds?.[p.id];
+                    const stockVal = Number(p.stock || 0);
+                    const statusCls = stockVal <= 0 ? 'inv-status-out' : (cfg.enabled && effThr > 0 && stockVal < effThr ? 'inv-status-low' : 'inv-status-ok');
+                    const statusText = stockVal <= 0 ? 'Out of Stock' : (cfg.enabled && effThr > 0 && stockVal < effThr ? 'Below Min' : 'OK');
+                    return `
+                      <tr>
+                        <td class="mono">${esc(p.sku)}</td>
+                        <td>${esc(p.name)}</td>
+                        <td class="tabular-nums"><strong>${stockVal}</strong></td>
+                        <td><input type="number" class="form-control tabular-nums" style="width:92px;" min="0" id="inv-thr-${esc(p.id)}" placeholder="${esc(cfg.defaultThreshold)}" value="${customThr !== undefined && customThr !== '' ? esc(customThr) : ''}" title="Leave blank to use default (${cfg.defaultThreshold})" /></td>
+                        <td><span class="${statusCls}">${statusText}</span></td>
+                        <td><input type="number" class="form-control" style="width:90px;" id="inv-adj-${esc(p.id)}" value="0" /></td>
+                        <td><input type="text" class="form-control" style="width:160px;" id="inv-rsn-${esc(p.id)}" placeholder="Restock / Audit" /></td>
+                        <td><button type="button" class="btn btn-outline btn-sm" data-inv-save="${esc(p.id)}">Apply</button></td>
+                      </tr>
+                    `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
@@ -7510,6 +10283,91 @@
             </div>
           </div>
         `;
+
+        document.getElementById('inv-alert-config-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const currentCfg = getStockAlertConfig();
+          const nextThreshold = Math.max(1, Math.floor(Number(document.getElementById('inv-cfg-threshold').value || 5)));
+          const nextEmail = document.getElementById('inv-cfg-email').value.trim().slice(0, 160);
+          const nextCfg = {
+            ...currentCfg,
+            enabled: document.getElementById('inv-cfg-enabled').checked,
+            defaultThreshold: nextThreshold,
+            alertEmail: nextEmail,
+            notifyUi: document.getElementById('inv-cfg-ui').checked,
+            notifyEmail: document.getElementById('inv-cfg-email-on').checked
+          };
+          await savePublicSettings({ stockAlertConfig: nextCfg });
+          state.stockAlertSentKeys = {};
+          await evaluateStockAlerts(state.adminProducts, { forceNotify: false, triggerEmail: true });
+          renderAdminTab('inventory');
+        });
+
+        document.getElementById('inv-scan-alerts-btn')?.addEventListener('click', async () => {
+          const found = await evaluateStockAlerts(state.adminProducts, { forceNotify: true, triggerEmail: true });
+          if (!found.length) {
+            showToast('All SKUs currently meet the configured minimum stock threshold.', 'success');
+          }
+          renderAdminTab('inventory');
+        });
+
+        document.getElementById('inv-test-alert-btn')?.addEventListener('click', async () => {
+          const sample = state.adminProducts[0] || { id: 'test_sku', sku: 'MSF-TEST-001', name: 'Sample Apparel SKU', stock: 2 };
+          const cfgNow = getStockAlertConfig();
+          const testEntry = [{
+            product: sample,
+            stock: Number(sample.stock || 2),
+            threshold: getEffectiveStockThreshold(sample),
+            isOutOfStock: Number(sample.stock || 2) <= 0
+          }];
+          if (cfgNow.notifyUi) {
+            showToast(`Test UI Stock Alert: ${sample.sku || sample.name} (min ${testEntry[0].threshold})`, 'error');
+            if (isFirebaseAdminUser()) {
+              try {
+                const nid = `stock_test_${Date.now()}`;
+                await setDoc(doc(db, 'notifications', nid), {
+                  id: nid,
+                  userId: 'admin',
+                  type: 'low_stock',
+                  productId: sample.id || 'test_sku',
+                  sku: String(sample.sku || 'TEST').slice(0, 80),
+                  title: `Test Stock Alert: ${sample.sku || sample.name}`.slice(0, 160),
+                  message: `Test threshold notification — Stock: ${testEntry[0].stock} (Min Threshold: ${testEntry[0].threshold})`.slice(0, 500),
+                  read: false,
+                  createdAt: serverTimestamp()
+                });
+              } catch {}
+            }
+          }
+          if (cfgNow.notifyEmail) {
+            await dispatchStockAlertEmail(testEntry, { testMode: true });
+          }
+          await loadAdminCollections();
+          renderAdminTab('inventory');
+        });
+
+        document.getElementById('inv-email-digest-btn')?.addEventListener('click', async () => {
+          const currentBelow = getBelowThresholdProducts(state.adminProducts);
+          if (!currentBelow.length) return;
+          await dispatchStockAlertEmail(currentBelow);
+        });
+
+        document.getElementById('inv-mark-all-read')?.addEventListener('click', async () => {
+          if (!unreadStockNotifs.length) return;
+          try {
+            await ensureFirebaseAdminSession();
+            const batch = writeBatch(db);
+            unreadStockNotifs.forEach((n) => {
+              batch.update(doc(db, 'notifications', n.id), { read: true });
+            });
+            await batch.commit();
+            showToast('All stock notifications marked read', 'success');
+            await loadAdminCollections();
+            renderAdminTab('inventory');
+          } catch (err) {
+            showToast(formatFirebaseAdminError(err), 'error');
+          }
+        });
       } else if (tab === 'coupons') {
         host.innerHTML = `
           <form id="adm-coupon-form" class="panel-box" style="margin-bottom:18px;display:flex;flex-direction:column;gap:12px;">
@@ -7753,23 +10611,28 @@
         `;
         document.getElementById('adm-settings-logo-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          let logoUrl = document.getElementById('st-logo').value.trim();
-          const file = document.getElementById('st-logo-file').files?.[0];
-          if (file) {
-            const up = await uploadSingleFile(file, 'branding');
-            logoUrl = up.url;
+          try {
+            let logoUrl = document.getElementById('st-logo').value.trim();
+            const file = document.getElementById('st-logo-file').files?.[0];
+            if (file) {
+              await ensureFirebaseAdminSession();
+              const up = await uploadSingleFile(file, 'branding');
+              logoUrl = up.url;
+            }
+            await savePublicSettings({
+              brandName: document.getElementById('st-brand').value.trim(),
+              logoUrl,
+              faviconUrl: document.getElementById('st-fav').value.trim() || logoUrl,
+              primaryColor: document.getElementById('st-primary').value,
+              accentColor: document.getElementById('st-accent').value,
+              announcementTextBn: document.getElementById('st-ann-bn').value.trim(),
+              announcementText: document.getElementById('st-ann-en').value.trim(),
+              footerAboutBn: document.getElementById('st-foot-bn').value.trim(),
+              footerAbout: document.getElementById('st-foot-en').value.trim()
+            });
+          } catch (err) {
+            showToast(formatFirebaseAdminError(err, 'Logo upload failed'), 'error');
           }
-          await savePublicSettings({
-            brandName: document.getElementById('st-brand').value.trim(),
-            logoUrl,
-            faviconUrl: document.getElementById('st-fav').value.trim() || logoUrl,
-            primaryColor: document.getElementById('st-primary').value,
-            accentColor: document.getElementById('st-accent').value,
-            announcementTextBn: document.getElementById('st-ann-bn').value.trim(),
-            announcementText: document.getElementById('st-ann-en').value.trim(),
-            footerAboutBn: document.getElementById('st-foot-bn').value.trim(),
-            footerAbout: document.getElementById('st-foot-en').value.trim()
-          });
         });
       } else if (tab === 'settings') {
         const hs = s.homepageSections || DEFAULT_SETTINGS.homepageSections;
@@ -7868,25 +10731,115 @@
           });
         });
       } else if (tab === 'social') {
+        const activeFeedPosts = (Array.isArray(s.socialPosts) && s.socialPosts.length) ? s.socialPosts : DEFAULT_SOCIAL_POSTS;
         host.innerHTML = `
-          <form id="adm-settings-soc-form" class="panel-box" style="max-width:600px;display:flex;flex-direction:column;gap:12px;">
-            <h3 style="margin:0;">Social Media &amp; WhatsApp Settings</h3>
-            <div><label style="font-size:12px;font-weight:600;">WhatsApp Number (with country code)</label><input type="text" id="sc-wa" class="form-control" value="${esc(s.whatsappNumber)}" required /></div>
-            <div><label style="font-size:12px;font-weight:600;">Facebook URL</label><input type="url" id="sc-fb" class="form-control" value="${esc(s.facebookUrl)}" /></div>
-            <div><label style="font-size:12px;font-weight:600;">TikTok URL</label><input type="url" id="sc-tt" class="form-control" value="${esc(s.tiktokUrl)}" /></div>
-            <div><label style="font-size:12px;font-weight:600;">Instagram URL</label><input type="url" id="sc-ig" class="form-control" value="${esc(s.instagramUrl || '')}" /></div>
-            <div><label style="font-size:12px;font-weight:600;">YouTube URL</label><input type="url" id="sc-yt" class="form-control" value="${esc(s.youtubeUrl || '')}" /></div>
+          <form id="adm-settings-soc-form" class="panel-box" style="max-width:740px;display:flex;flex-direction:column;gap:14px;">
+            <h3 style="margin:0;">Social Media, WhatsApp &amp; Homepage Social Feed</h3>
+            <div class="form-grid-2">
+              <div><label style="font-size:12px;font-weight:600;">WhatsApp Number (with country code)</label><input type="text" id="sc-wa" class="form-control" value="${esc(s.whatsappNumber)}" required /></div>
+              <div><label style="font-size:12px;font-weight:600;">Facebook URL</label><input type="url" id="sc-fb" class="form-control" value="${esc(s.facebookUrl)}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">TikTok URL</label><input type="url" id="sc-tt" class="form-control" value="${esc(s.tiktokUrl)}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">Instagram URL</label><input type="url" id="sc-ig" class="form-control" value="${esc(s.instagramUrl || '')}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">YouTube URL</label><input type="url" id="sc-yt" class="form-control" value="${esc(s.youtubeUrl || '')}" /></div>
+            </div>
+            <div style="border-top:1px solid var(--border-hairline);padding-top:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                <strong style="font-size:14px;">Instagram &amp; TikTok Homepage Feed Posts</strong>
+                <button type="button" id="sc-add-post-btn" class="btn btn-outline btn-sm">+ Add Social Post</button>
+              </div>
+              <div id="sc-posts-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
             <button type="submit" class="btn btn-primary">Save Social Settings</button>
           </form>
         `;
+        let editablePosts = structuredClone(activeFeedPosts).slice(0, 24);
+        const renderSocialPostRows = () => {
+          const listEl = document.getElementById('sc-posts-list');
+          if (!listEl) return;
+          listEl.innerHTML = editablePosts.map((p, idx) => `
+            <div style="padding:12px;border:1px solid var(--border-hairline);border-radius:8px;background:var(--bg-surface);display:flex;flex-direction:column;gap:8px;" data-sc-row="${idx}">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <strong style="font-size:12px;">Post #${idx + 1}</strong>
+                <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger);" data-sc-remove="${idx}">Remove</button>
+              </div>
+              <div class="form-grid-2">
+                <select class="form-control" data-sc-field="platform" data-sc-idx="${idx}">
+                  <option value="instagram" ${p.platform === 'instagram' ? 'selected' : ''}>Instagram</option>
+                  <option value="tiktok" ${p.platform === 'tiktok' ? 'selected' : ''}>TikTok</option>
+                </select>
+                <input type="text" class="form-control" data-sc-field="handle" data-sc-idx="${idx}" placeholder="@handle" value="${esc(p.handle || '')}" />
+                <input type="text" class="form-control" data-sc-field="imageUrl" data-sc-idx="${idx}" placeholder="Image URL" value="${esc(p.imageUrl || '')}" />
+                <input type="url" class="form-control" data-sc-field="postUrl" data-sc-idx="${idx}" placeholder="Post / Reel URL (optional)" value="${esc(p.postUrl || '')}" />
+                <input type="text" class="form-control" data-sc-field="caption" data-sc-idx="${idx}" placeholder="Caption (English)" value="${esc(p.caption || '')}" />
+                <input type="text" class="form-control" data-sc-field="captionBn" data-sc-idx="${idx}" placeholder="Caption (Bengali)" value="${esc(p.captionBn || '')}" />
+              </div>
+            </div>
+          `).join('');
+        };
+        renderSocialPostRows();
+
+        document.getElementById('sc-posts-list').addEventListener('input', (e) => {
+          const inp = e.target.closest('[data-sc-field]');
+          if (!inp) return;
+          const idx = Number(inp.getAttribute('data-sc-idx'));
+          const field = inp.getAttribute('data-sc-field');
+          if (editablePosts[idx]) editablePosts[idx][field] = inp.value;
+        });
+        document.getElementById('sc-posts-list').addEventListener('change', (e) => {
+          const inp = e.target.closest('[data-sc-field]');
+          if (!inp) return;
+          const idx = Number(inp.getAttribute('data-sc-idx'));
+          const field = inp.getAttribute('data-sc-field');
+          if (editablePosts[idx]) editablePosts[idx][field] = inp.value;
+        });
+        document.getElementById('sc-posts-list').addEventListener('click', (e) => {
+          const rmBtn = e.target.closest('[data-sc-remove]');
+          if (!rmBtn) return;
+          editablePosts.splice(Number(rmBtn.getAttribute('data-sc-remove')), 1);
+          renderSocialPostRows();
+        });
+        document.getElementById('sc-add-post-btn').addEventListener('click', () => {
+          if (editablePosts.length >= 24) {
+            showToast('Maximum 24 social posts allowed.', 'error');
+            return;
+          }
+          editablePosts.push({
+            id: `post_${Date.now()}`,
+            platform: 'instagram',
+            handle: '@msfashion.bd',
+            typeLabel: 'Post',
+            typeLabelBn: 'পোস্ট',
+            imageUrl: DEFAULT_SOCIAL_POSTS[0].imageUrl,
+            caption: '',
+            captionBn: '',
+            postUrl: ''
+          });
+          renderSocialPostRows();
+        });
+
         document.getElementById('adm-settings-soc-form').addEventListener('submit', async (e) => {
           e.preventDefault();
+          const cleanedPosts = editablePosts
+            .filter((p) => String(p.imageUrl || '').trim())
+            .slice(0, 24)
+            .map((p, idx) => ({
+              id: String(p.id || `post_${idx}`).slice(0, 80),
+              platform: p.platform === 'tiktok' ? 'tiktok' : 'instagram',
+              handle: String(p.handle || (p.platform === 'tiktok' ? '@msafashion20' : '@msfashion.bd')).trim().slice(0, 80),
+              typeLabel: String(p.typeLabel || (p.platform === 'tiktok' ? 'Reel' : 'Post')).trim().slice(0, 40),
+              typeLabelBn: String(p.typeLabelBn || (p.platform === 'tiktok' ? 'রিলস' : 'পোস্ট')).trim().slice(0, 40),
+              imageUrl: String(p.imageUrl || '').trim().slice(0, 1000),
+              caption: String(p.caption || '').trim().slice(0, 300),
+              captionBn: String(p.captionBn || '').trim().slice(0, 300),
+              postUrl: String(p.postUrl || '').trim().slice(0, 1000)
+            }));
           await savePublicSettings({
             whatsappNumber: document.getElementById('sc-wa').value.trim(),
             facebookUrl: document.getElementById('sc-fb').value.trim(),
             tiktokUrl: document.getElementById('sc-tt').value.trim(),
             instagramUrl: document.getElementById('sc-ig').value.trim(),
-            youtubeUrl: document.getElementById('sc-yt').value.trim()
+            youtubeUrl: document.getElementById('sc-yt').value.trim(),
+            socialPosts: cleanedPosts
           });
         });
       }
@@ -8651,22 +11604,89 @@
       if (invSave) {
         const pid = invSave.getAttribute('data-inv-save');
         const prod = state.adminProducts.find((p) => p.id === pid);
-        const delta = Number(document.getElementById(`inv-adj-${pid}`).value || 0);
-        const reason = (document.getElementById(`inv-rsn-${pid}`).value.trim() || 'Manual Adjustment').slice(0, 200);
-        if (!prod || !delta) return;
+        const delta = Number(document.getElementById(`inv-adj-${pid}`)?.value || 0);
+        const reason = (document.getElementById(`inv-rsn-${pid}`)?.value.trim() || 'Manual Adjustment').slice(0, 200);
+        const thrInputVal = String(document.getElementById(`inv-thr-${pid}`)?.value ?? '').trim();
+        if (!prod) return;
+
+        const cfg = getStockAlertConfig();
+        const prevCustom = cfg.skuThresholds?.[pid];
+        const nextCustom = thrInputVal === '' ? undefined : Math.max(0, Math.floor(Number(thrInputVal)));
+        const thrChanged = (nextCustom === undefined && prevCustom !== undefined) || (nextCustom !== undefined && Number(prevCustom) !== nextCustom);
+
+        if (!delta && !thrChanged) return;
+
+        try {
+          await ensureFirebaseAdminSession();
+          let updatedProd = prod;
+
+          if (thrChanged) {
+            const nextSkuMap = { ...(cfg.skuThresholds || {}) };
+            if (nextCustom === undefined) delete nextSkuMap[pid];
+            else nextSkuMap[pid] = nextCustom;
+            await savePublicSettings({
+              stockAlertConfig: { ...cfg, skuThresholds: nextSkuMap }
+            });
+          }
+
+          if (delta) {
+            const prev = Number(prod.stock || 0);
+            const next = Math.max(0, prev + delta);
+            const batch = writeBatch(db);
+            batch.update(doc(db, 'products', pid), { stock: next, updatedAt: serverTimestamp() });
+            const lid = `adj_${pid}_${Date.now()}`.slice(0, 120);
+            batch.set(doc(db, 'inventoryLogs', lid), {
+              id: lid, productId: pid, productName: prod.name, sku: prod.sku,
+              change: delta, previousStock: prev, newStock: next, reason, createdAt: serverTimestamp()
+            });
+            await batch.commit();
+            updatedProd = { ...prod, stock: next };
+          }
+
+          showToast('Inventory updated', 'success');
+          await loadAdminCollections();
+          const effThr = getEffectiveStockThreshold(updatedProd);
+          if (Number(updatedProd.stock || 0) < effThr) {
+            await evaluateStockAlerts([updatedProd], { onlyProductIds: [pid], forceNotify: true });
+          } else {
+            updateAdminStockAlertIndicators();
+          }
+          renderAdminTab('inventory');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
+        return;
+      }
+
+      const quickRestock = e.target.closest('[data-inv-quick-restock]');
+      if (quickRestock) {
+        const pid = quickRestock.getAttribute('data-inv-quick-restock');
+        const prod = state.adminProducts.find((p) => p.id === pid);
+        if (!prod) return;
         try {
           await ensureFirebaseAdminSession();
           const prev = Number(prod.stock || 0);
-          const next = Math.max(0, prev + delta);
+          const next = prev + 10;
           const batch = writeBatch(db);
           batch.update(doc(db, 'products', pid), { stock: next, updatedAt: serverTimestamp() });
-          const lid = `adj_${pid}_${Date.now()}`.slice(0, 120);
+          const lid = `restock_${pid}_${Date.now()}`.slice(0, 120);
           batch.set(doc(db, 'inventoryLogs', lid), {
             id: lid, productId: pid, productName: prod.name, sku: prod.sku,
-            change: delta, previousStock: prev, newStock: next, reason, createdAt: serverTimestamp()
+            change: 10, previousStock: prev, newStock: next, reason: 'Quick Restock (+10)', createdAt: serverTimestamp()
           });
           await batch.commit();
-          showToast('Stock updated', 'success');
+          showToast(`Restocked ${prod.sku} (+10)`, 'success');
+          await loadAdminCollections();
+          updateAdminStockAlertIndicators();
+          renderAdminTab('inventory');
+        } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
+        return;
+      }
+
+      const markReadBtn = e.target.closest('[data-notif-read]');
+      if (markReadBtn) {
+        const nid = markReadBtn.getAttribute('data-notif-read');
+        try {
+          await ensureFirebaseAdminSession();
+          await updateDoc(doc(db, 'notifications', nid), { read: true });
           await loadAdminCollections();
           renderAdminTab('inventory');
         } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
@@ -8744,8 +11764,8 @@
           [...state.adminProducts].sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0)).forEach((p) => rows.push([p.sku, p.name, p.soldCount || 0, getProductPrice(p), p.stock]));
           downloadCsv('ms-fashion-bestsellers.csv', rows);
         } else if (type === 'lowstock') {
-          const rows = [['SKU', 'Product', 'Stock']];
-          state.adminProducts.filter((p) => Number(p.stock || 0) <= 5).forEach((p) => rows.push([p.sku, p.name, p.stock]));
+          const rows = [['SKU', 'Product', 'Stock', 'MinThreshold']];
+          getBelowThresholdProducts(state.adminProducts).forEach((entry) => rows.push([entry.product.sku, entry.product.name, entry.stock, entry.threshold]));
           downloadCsv('ms-fashion-lowstock.csv', rows);
         } else if (type === 'customers') {
           const rows = [['Name', 'Email', 'Phone', 'District', 'Address']];

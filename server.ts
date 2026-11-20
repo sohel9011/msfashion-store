@@ -9,11 +9,53 @@ dotenv.config();
 
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_AUTH_FILE = path.resolve(process.cwd(), '.admin-auth.json');
+const ALERT_OUTBOX_FILE = path.resolve(process.cwd(), '.stock-alert-outbox.json');
+const FIREBASE_CONFIG_FILE = path.resolve(process.cwd(), 'firebase-applet-config.json');
+const BOOTSTRAP_ADMIN_EMAIL = 'sohel901190@gmail.com';
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || crypto.createHash('sha256').update(process.env.APP_URL || 'ms-fashion-secret-key').digest('hex');
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 const attemptStore = new Map<string, { count: number; lockedUntil: number }>();
+
+function getFirebaseApiKey(): string {
+  try {
+    if (fs.existsSync(FIREBASE_CONFIG_FILE)) {
+      const cfg = JSON.parse(fs.readFileSync(FIREBASE_CONFIG_FILE, 'utf8'));
+      return String(cfg?.apiKey || '');
+    }
+  } catch {
+    // ignore
+  }
+  return '';
+}
+
+async function verifyAdminRequest(req: express.Request): Promise<boolean> {
+  const token = String(req.body?.sessionToken || req.headers['x-admin-session'] || '');
+  const decoded = verifySessionToken(token);
+  if (decoded && decoded.role === 'admin') return true;
+
+  const authHeader = String(req.headers.authorization || '');
+  const idToken = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : String(req.body?.firebaseIdToken || '').trim();
+  const apiKey = getFirebaseApiKey();
+  if (!idToken || !apiKey) return false;
+
+  try {
+    const resp = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+    if (!resp.ok) return false;
+    const data = (await resp.json()) as { users?: Array<{ email?: string; emailVerified?: boolean }> };
+    const u = data?.users?.[0];
+    return Boolean(u && String(u.email || '').toLowerCase() === BOOTSTRAP_ADMIN_EMAIL && u.emailVerified);
+  } catch {
+    return false;
+  }
+}
 
 function hashPassword(password: string, salt?: string): string {
   const usedSalt = salt || crypto.randomBytes(16).toString('hex');
@@ -137,6 +179,162 @@ async function startServer() {
     const newHash = hashPassword(newPassword);
     fs.writeFileSync(ADMIN_AUTH_FILE, JSON.stringify({ passwordHash: newHash, updatedAt: new Date().toISOString() }, null, 2));
     return res.json({ ok: true });
+  });
+
+  app.post('/api/admin/stock-alert-email', async (req, res) => {
+    const isAuthorized = await verifyAdminRequest(req);
+    if (!isAuthorized) {
+      return res.status(403).json({ error: 'Unauthorized admin session' });
+    }
+
+    const toEmail = String(req.body?.toEmail || BOOTSTRAP_ADMIN_EMAIL).trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) {
+      return res.status(400).json({ error: 'Valid recipient email address is required' });
+    }
+
+    interface StockAlertItem {
+      productId: string;
+      sku: string;
+      productName: string;
+      stock: number;
+      threshold: number;
+    }
+
+    const rawItems: unknown[] = Array.isArray(req.body?.items) ? req.body.items : [];
+    const items: StockAlertItem[] = rawItems
+      .filter((it: unknown): it is Record<string, unknown> => Boolean(it && typeof it === 'object'))
+      .slice(0, 100)
+      .map((it: Record<string, unknown>): StockAlertItem => ({
+        productId: String(it.productId || '').slice(0, 128),
+        sku: String(it.sku || 'N/A').slice(0, 80),
+        productName: String(it.productName || 'Product').slice(0, 200),
+        stock: Math.max(0, Number(it.stock || 0)),
+        threshold: Math.max(0, Number(it.threshold || 5)),
+      }));
+
+    if (!items.length) {
+      return res.status(400).json({ error: 'At least one low-stock item is required' });
+    }
+
+    const subject = items.length === 1
+      ? `[MS FASHION] Low Stock Alert: ${items[0].sku} (${items[0].stock} left)`
+      : `[MS FASHION] Low Stock Alert: ${items.length} SKUs Below Threshold`;
+
+    const lines = items.map(
+      (it: StockAlertItem, i: number) => `${i + 1}. SKU: ${it.sku} | ${it.productName} | Current Stock: ${it.stock} (Min Threshold: ${it.threshold})`
+    );
+    const textBody = [
+      'MS FASHION Inventory Threshold Alert',
+      `Generated: ${new Date().toISOString()}`,
+      '',
+      'The following SKUs have dropped below their configured minimum stock threshold:',
+      ...lines,
+      '',
+      'Please review and restock in the Admin Inventory dashboard.',
+    ].join('\n');
+
+    const escapeHtml = (s: string) => s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+    const htmlRows = items
+      .map((it: StockAlertItem) => `<tr><td style="padding:8px;border:1px solid #e4e4e7;font-family:monospace;">${escapeHtml(it.sku)}</td><td style="padding:8px;border:1px solid #e4e4e7;">${escapeHtml(it.productName)}</td><td style="padding:8px;border:1px solid #e4e4e7;font-weight:700;color:#b91c1c;">${it.stock}</td><td style="padding:8px;border:1px solid #e4e4e7;">${it.threshold}</td></tr>`)
+      .join('');
+    const htmlBody = `
+      <div style="font-family:sans-serif;color:#111111;max-width:640px;">
+        <h2 style="margin:0 0 8px;">MS FASHION Low Stock Alert</h2>
+        <p style="margin:0 0 14px;color:#52525b;">The following product SKUs have dropped below their configured minimum stock value:</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead>
+            <tr style="background:#f7f7f6;">
+              <th style="padding:8px;border:1px solid #e4e4e7;text-align:left;">SKU</th>
+              <th style="padding:8px;border:1px solid #e4e4e7;text-align:left;">Product</th>
+              <th style="padding:8px;border:1px solid #e4e4e7;text-align:left;">Stock</th>
+              <th style="padding:8px;border:1px solid #e4e4e7;text-align:left;">Min Threshold</th>
+            </tr>
+          </thead>
+          <tbody>${htmlRows}</tbody>
+        </table>
+      </div>
+    `;
+
+    const resendKey = String(process.env.RESEND_API_KEY || '').trim();
+    if (resendKey) {
+      try {
+        const resendResp = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: process.env.ALERT_FROM_EMAIL || 'MS FASHION Alerts <onboarding@resend.dev>',
+            to: [toEmail],
+            subject,
+            text: textBody,
+            html: htmlBody,
+          }),
+        });
+        const resendData = (await resendResp.json().catch(() => ({}))) as { id?: string; message?: string };
+        if (resendResp.ok) {
+          return res.json({ ok: true, mode: 'resend', id: resendData.id || '', toEmail, subject });
+        }
+        return res.status(502).json({ error: resendData.message || 'Email provider rejected request' });
+      } catch (err) {
+        return res.status(502).json({ error: err instanceof Error ? err.message : 'Email delivery failed' });
+      }
+    }
+
+    const webhookUrl = String(process.env.ALERT_WEBHOOK_URL || '').trim();
+    if (webhookUrl) {
+      try {
+        const whResp = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toEmail, subject, text: textBody, html: htmlBody, items }),
+        });
+        if (whResp.ok) {
+          return res.json({ ok: true, mode: 'webhook', toEmail, subject });
+        }
+      } catch {
+        // fall through to outbox + mailto fallback
+      }
+    }
+
+    let existingOutbox: unknown[] = [];
+    try {
+      if (fs.existsSync(ALERT_OUTBOX_FILE)) {
+        const parsed = JSON.parse(fs.readFileSync(ALERT_OUTBOX_FILE, 'utf8'));
+        if (Array.isArray(parsed)) existingOutbox = parsed;
+      }
+    } catch {
+      existingOutbox = [];
+    }
+    const entry = {
+      id: `email_${Date.now()}`,
+      toEmail,
+      subject,
+      text: textBody,
+      items,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      fs.writeFileSync(ALERT_OUTBOX_FILE, JSON.stringify([entry, ...existingOutbox].slice(0, 50), null, 2));
+    } catch {
+      // ignore disk write issues in read-only environments
+    }
+
+    const mailtoUrl = `mailto:${encodeURIComponent(toEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
+    return res.json({
+      ok: true,
+      mode: 'mailto_fallback',
+      toEmail,
+      subject,
+      mailtoUrl,
+      sentAt: entry.createdAt,
+    });
   });
 
   const isProd = process.env.NODE_ENV === 'production';
