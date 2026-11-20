@@ -102,7 +102,7 @@ service cloud.firestore {
         (!('description' in data) || isOptionalString(data.description, 500)) &&
         (!('descriptionBn' in data) || isOptionalString(data.descriptionBn, 500)) &&
         (!('parentId' in data) || isOptionalString(data.parentId, 128)) &&
-        (!('imageUrl' in data) || isOptionalString(data.imageUrl, 1000)) &&
+        (!('imageUrl' in data) || isOptionalString(data.imageUrl, 250000)) &&
         (!('storagePath' in data) || isOptionalString(data.storagePath, 500)) &&
         data.order is number &&
         data.enabled is bool &&
@@ -297,7 +297,7 @@ service cloud.firestore {
         (!('buttonText' in data) || isOptionalString(data.buttonText, 60)) &&
         (!('buttonTextBn' in data) || isOptionalString(data.buttonTextBn, 60)) &&
         (!('buttonUrl' in data) || isOptionalString(data.buttonUrl, 300)) &&
-        isNonEmptyString(data.imageUrl, 1000) &&
+        isNonEmptyString(data.imageUrl, 250000) &&
         (!('storagePath' in data) || isOptionalString(data.storagePath, 500)) &&
         data.order is number &&
         data.enabled is bool &&
@@ -317,7 +317,8 @@ service cloud.firestore {
           'paymentMethods', 'homepageSections', 'socialPosts', 'stockAlertConfig', 'updatedAt'
         ]) &&
         isNonEmptyString(data.brandName, 100) &&
-        isOptionalString(data.logoUrl, 1000) &&
+        isOptionalString(data.logoUrl, 250000) &&
+        (!('faviconUrl' in data) || isOptionalString(data.faviconUrl, 250000)) &&
         isOptionalString(data.whatsappNumber, 30) &&
         (!('socialPosts' in data) || isMapList(data.socialPosts, 0, 24)) &&
         (!('stockAlertConfig' in data) || (
@@ -348,10 +349,13 @@ service cloud.firestore {
         data.keys().hasOnly(['id', 'productId', 'productName', 'sku', 'change', 'previousStock', 'newStock', 'reason', 'orderId', 'createdAt']) &&
         data.id == logId &&
         isNonEmptyString(data.productId, 128) &&
+        (!('productName' in data) || isOptionalString(data.productName, 200)) &&
+        (!('sku' in data) || isOptionalString(data.sku, 80)) &&
         data.change is number &&
         data.previousStock is number &&
         data.newStock is number && data.newStock >= 0 &&
         isNonEmptyString(data.reason, 200) &&
+        (!('orderId' in data) || isOptionalString(data.orderId, 40)) &&
         data.createdAt == request.time;
     }
 

@@ -337,6 +337,64 @@ async function startServer() {
     });
   });
 
+  app.get('/api/social/oembed', async (req, res) => {
+    const rawUrl = String(req.query.url || '').trim();
+    if (!rawUrl) {
+      return res.status(400).json({ error: 'Missing url query parameter' });
+    }
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(rawUrl);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL' });
+    }
+    if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
+      return res.status(400).json({ error: 'Invalid URL protocol' });
+    }
+    const host = parsedUrl.hostname.toLowerCase();
+    const isTikTok = host === 'tiktok.com' || host.endsWith('.tiktok.com');
+    const isInstagram = host === 'instagram.com' || host.endsWith('.instagram.com');
+    if (!isTikTok && !isInstagram) {
+      return res.status(400).json({ error: 'Only TikTok and Instagram URLs are supported' });
+    }
+
+    const endpoint = isTikTok
+      ? `https://www.tiktok.com/oembed?url=${encodeURIComponent(parsedUrl.toString())}`
+      : `https://www.instagram.com/api/v1/oembed/?url=${encodeURIComponent(parsedUrl.toString())}`;
+
+    try {
+      const upstream = await fetch(endpoint, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; MSFashionStorefront/1.0)',
+          Accept: 'application/json',
+        },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!upstream.ok) {
+        return res.status(502).json({ error: `oEmbed upstream returned ${upstream.status}` });
+      }
+      const data = (await upstream.json()) as Record<string, unknown>;
+      const htmlStr = typeof data.html === 'string' ? data.html : '';
+      const srcMatch = htmlStr.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+      return res.json({
+        ok: true,
+        platform: isTikTok ? 'tiktok' : 'instagram',
+        postUrl: parsedUrl.toString(),
+        title: typeof data.title === 'string' ? data.title : '',
+        authorName: typeof data.author_name === 'string' ? data.author_name : '',
+        authorUrl: typeof data.author_url === 'string' ? data.author_url : '',
+        thumbnailUrl: typeof data.thumbnail_url === 'string' ? data.thumbnail_url : '',
+        embedProductId: typeof data.embed_product_id === 'string' ? data.embed_product_id : '',
+        embedUrl: srcMatch ? srcMatch[1] : '',
+        html: htmlStr,
+      });
+    } catch (err) {
+      return res.status(502).json({
+        error: err instanceof Error ? err.message : 'Failed to fetch social oEmbed',
+      });
+    }
+  });
+
   const isProd = process.env.NODE_ENV === 'production';
   if (!isProd) {
     const vite = await createViteServer({

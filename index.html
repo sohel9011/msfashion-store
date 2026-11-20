@@ -1743,20 +1743,28 @@
 
     .social-feed-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
 
-    @media (max-width: 349px) {
+    @media (min-width: 680px) {
       .social-feed-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .social-feed-grid.social-feed-grid--compact {
+        max-width: 880px;
+        margin-inline: auto;
+      }
+      .social-feed-grid.social-feed-grid--single {
+        grid-template-columns: minmax(0, 440px);
+        justify-content: center;
       }
     }
 
-    @media (min-width: 1024px) {
-      .social-feed-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 20px;
+    @media (min-width: 1080px) {
+      .social-feed-grid:not(.social-feed-grid--compact):not(.social-feed-grid--single) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
       }
     }
 
@@ -1765,29 +1773,34 @@
       flex-direction: column;
       gap: 10px;
       min-width: 0;
-      text-decoration: none;
       color: inherit;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .social-post-card:hover {
-      transform: translateY(-2px);
-    }
-
-    .social-post-card:focus-visible {
-      outline: 2px solid var(--text-primary);
-      outline-offset: 4px;
-      border-radius: 6px;
     }
 
     .social-post-media {
       position: relative;
       width: 100%;
       aspect-ratio: 3 / 4;
-      background: #f3f3f3;
+      background: #fafafa;
       border: 1px solid var(--border-hairline);
       border-radius: var(--radius-md);
       overflow: hidden;
+    }
+
+    .social-post-media--embed {
+      aspect-ratio: 9 / 15;
+      min-height: 480px;
+      max-height: 620px;
+      background: #f5f5f5;
+    }
+
+    .social-embed-frame {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: transparent;
     }
 
     .social-post-media img {
@@ -1799,6 +1812,22 @@
 
     .social-post-card:hover .social-post-media img {
       transform: scale(1.03);
+    }
+
+    .social-media-fallback {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+      text-align: center;
+      color: var(--text-muted);
+      background: linear-gradient(160deg, #fafafa 0%, #f1f1f1 100%);
+      font-size: 12px;
     }
 
     .social-reel-play {
@@ -1845,6 +1874,7 @@
     }
 
     .social-post-cta {
+      align-self: flex-start;
       font-size: 12px;
       font-weight: 600;
       color: var(--accent);
@@ -4011,6 +4041,9 @@
     import { initializeApp, getApps, getApp } from 'firebase/app';
     import {
       getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence,
       onAuthStateChanged,
       GoogleAuthProvider,
       signInWithPopup,
@@ -4078,6 +4111,9 @@
       ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
       : getFirestore(app);
     const auth = getAuth(app);
+    setPersistence(auth, browserLocalPersistence)
+      .catch(() => setPersistence(auth, browserSessionPersistence))
+      .catch(() => {});
     const storage = getStorage(app);
 
     const OperationType = {
@@ -4129,55 +4165,43 @@
     const OFFICIAL_WHATSAPP = '+8801604703820';
     const OFFICIAL_FACEBOOK = 'https://www.facebook.com/profile.php?id=61575518426681';
     const OFFICIAL_TIKTOK = 'https://www.tiktok.com/@msafashion20?_r=1&_t=ZS-9BWmGDupjKo';
-    const OFFICIAL_INSTAGRAM = 'https://www.instagram.com/';
+    const OFFICIAL_INSTAGRAM = 'https://www.instagram.com/reel/Df75TRGP24A/';
     const BOOTSTRAP_ADMIN_EMAIL = 'sohel901190@gmail.com';
     // Optional Cloud Function base URL when deployed to Firebase Blaze:
-    const CLOUD_FUNCTIONS_BASE = localStorage.getItem('msf_cf_base') || '';
+    function getCloudFunctionsBase() {
+      return String(localStorage.getItem('msf_cf_base') || '').trim().replace(/\/+$/, '');
+    }
+    let CLOUD_FUNCTIONS_BASE = getCloudFunctionsBase();
+
+    const LEGACY_PLACEHOLDER_SOCIAL_IDS = new Set([
+      'ig-mens-tailoring',
+      'tt-womens-crimson',
+      'tt-streetwear-hoodie',
+      'ig-polo-essentials'
+    ]);
 
     const DEFAULT_SOCIAL_POSTS = [
       {
-        id: 'ig-mens-tailoring',
-        platform: 'instagram',
-        handle: '@msfashion.bd',
-        typeLabel: 'Lookbook',
-        typeLabelBn: 'লুকবুক',
-        imageUrl: '/src/assets/images/social_mens_tailoring_1795164549784.jpg',
-        caption: 'Tailored obsidian linen shirt paired with sand chinos — breathable all-day fit.',
-        captionBn: 'কালো লিনেন ক্যাজুয়াল শার্ট ও স্যান্ড চিনোস — সারাদিনের আরামদায়ক আভিজাত্য।',
-        postUrl: ''
-      },
-      {
-        id: 'tt-womens-crimson',
+        id: 'tt-latest-msafashion20',
         platform: 'tiktok',
         handle: '@msafashion20',
-        typeLabel: 'Reel',
-        typeLabelBn: 'রিলস',
-        imageUrl: '/src/assets/images/social_womens_crimson_1795164551952.jpg',
-        caption: 'Crimson embroidered kurti styling transition — new festive arrivals now live.',
-        captionBn: 'ক্রিমসন এমব্রয়ডারি কুর্তি স্টাইলিং রিলস — নতুন ফেস্টিভ কালেকশন এখন স্টকে।',
-        postUrl: ''
+        typeLabel: 'Latest Video',
+        typeLabelBn: 'সর্বশেষ ভিডিও',
+        imageUrl: '',
+        caption: 'Latest fashion video directly from @msafashion20 on TikTok.',
+        captionBn: '@msafashion20 TikTok প্রোফাইলের সর্বশেষ ফ্যাশন ভিডিও।',
+        postUrl: 'https://www.tiktok.com/@msafashion20/video/7709976139862641941?is_from_webapp=1&sender_device=pc&web_id=7710174018250786305'
       },
       {
-        id: 'tt-streetwear-hoodie',
-        platform: 'tiktok',
-        handle: '@msafashion20',
-        typeLabel: 'Reel',
-        typeLabelBn: 'রিলস',
-        imageUrl: '/src/assets/images/social_streetwear_hoodie_1795164550918.jpg',
-        caption: 'Heavyweight charcoal fleece hoodie fit check — streetwear drop in Dhaka.',
-        captionBn: 'হেভিওয়েট চারকোল ফ্লিস হুডি ফিট চেক — নতুন স্ট্রিটওয়্যার কালেকশন।',
-        postUrl: ''
-      },
-      {
-        id: 'ig-polo-essentials',
+        id: 'ig-latest-reel',
         platform: 'instagram',
-        handle: '@msfashion.bd',
-        typeLabel: 'Style Edit',
-        typeLabelBn: 'কালেকশন',
-        imageUrl: '/src/assets/images/social_polo_essentials_1795164551052.jpg',
-        caption: 'Piqué knit polo trio in ivory, obsidian, and olive — crafted for everyday wear.',
-        captionBn: 'আইভরি, কালো ও অলিভ নিট পোলো ট্রায়ো — প্রতিদিনের প্রিমিয়াম স্টাইল।',
-        postUrl: ''
+        handle: '@msfas_ion20',
+        typeLabel: 'Latest Reel',
+        typeLabelBn: 'সর্বশেষ রিলস',
+        imageUrl: '',
+        caption: 'Latest fashion reel directly from @msfas_ion20 on Instagram.',
+        captionBn: '@msfas_ion20 Instagram-এর সর্বশেষ ফ্যাশন রিলস।',
+        postUrl: 'https://www.instagram.com/reel/Df75TRGP24A/?utm_source=ig_web_copy_link&hvrq=MzRlODBiNWFlZA==&avpt=MzRlODBiNWFlZA=='
       }
     ];
 
@@ -4464,12 +4488,17 @@
       adminNotifications: [],
       lastStockEmailReport: null,
       stockAlertSentKeys: {},
+      lastUnauthorizedDomain: '',
       unsubscribes: [],
       activeTrackingUnsub: null,
       lastTrackedOrderId: '',
       lastTrackedExplicit: false,
       currentHeroIndex: 0,
       socialFeedFilter: 'all',
+      dynamicSocialPosts: [],
+      socialPostsLoading: false,
+      socialPostsSyncedAt: 0,
+      socialPostsOembedCache: {},
       catalogFilters: {
         search: '',
         category: '',
@@ -4570,6 +4599,79 @@
       );
     }
 
+    function isUnauthorizedDomainError(err) {
+      const code = String(err?.code || '').toLowerCase();
+      const structured = parseStructuredFirestoreError(err);
+      const rawMsg = String(structured?.error || err?.message || '').toLowerCase();
+      return code === 'auth/unauthorized-domain' || rawMsg.includes('unauthorized-domain');
+    }
+
+    function getFirebaseAuthorizedDomainsUrl() {
+      const pid = encodeURIComponent(firebaseConfig.projectId || 'turing-reducer-k5v9p');
+      return `https://console.firebase.google.com/project/${pid}/authentication/settings`;
+    }
+
+    function renderAuthDomainHelper(containerEl, { hostName = window.location.hostname, onRetry = null } = {}) {
+      if (!containerEl) return;
+      const host = String(hostName || window.location.hostname || 'this domain').trim();
+      const consoleUrl = getFirebaseAuthorizedDomainsUrl();
+      const helper = document.createElement('div');
+      helper.style.marginTop = '8px';
+      helper.style.padding = '10px';
+      helper.style.borderRadius = '6px';
+      helper.style.background = '#ffffff';
+      helper.style.border = '1px solid #fca5a5';
+      helper.style.color = '#111111';
+      helper.style.fontSize = '12px';
+      helper.style.lineHeight = '1.5';
+
+      const steps = document.createElement('div');
+      steps.style.marginBottom = '8px';
+      steps.textContent = state.lang === 'bn'
+        ? `সমাধান: নিচের "${host}" ডোমেইন কপি করুন → Firebase Authorized Domains খুলে "Add domain"-এ পেস্ট করুন → তারপর Retry চাপুন।`
+        : `Fix: Copy "${host}" → Open Firebase Authorized Domains → Click "Add domain" & paste → Click Retry.`;
+      helper.appendChild(steps);
+
+      const btnRow = document.createElement('div');
+      btnRow.style.display = 'flex';
+      btnRow.style.gap = '8px';
+      btnRow.style.flexWrap = 'wrap';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'btn btn-outline btn-sm';
+      copyBtn.textContent = `Copy "${host}"`;
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(host);
+          showToast(state.lang === 'bn' ? `"${host}" কপি হয়েছে!` : `Copied "${host}"`, 'success');
+        } catch {
+          showToast(host, 'info');
+        }
+      });
+      btnRow.appendChild(copyBtn);
+
+      const openLink = document.createElement('a');
+      openLink.href = consoleUrl;
+      openLink.target = '_blank';
+      openLink.rel = 'noopener noreferrer';
+      openLink.className = 'btn btn-primary btn-sm';
+      openLink.textContent = state.lang === 'bn' ? 'Firebase Authorized Domains খুলুন ↗' : 'Open Firebase Console ↗';
+      btnRow.appendChild(openLink);
+
+      if (typeof onRetry === 'function') {
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'btn btn-outline btn-sm';
+        retryBtn.textContent = state.lang === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry Sign-In';
+        retryBtn.addEventListener('click', onRetry);
+        btnRow.appendChild(retryBtn);
+      }
+
+      helper.appendChild(btnRow);
+      containerEl.appendChild(helper);
+    }
+
     function formatFirebaseAdminError(err, fallbackMsg = '') {
       const code = String(err?.code || '');
       const structured = parseStructuredFirestoreError(err);
@@ -4578,6 +4680,7 @@
 
       if (code === 'auth/unauthorized-domain' || lower.includes('unauthorized-domain')) {
         const hostName = window.location.hostname || 'this domain';
+        state.lastUnauthorizedDomain = hostName;
         return state.lang === 'bn'
           ? `Firebase Authentication-এ "${hostName}" ডোমেইনটি অনুমোদিত নয় (auth/unauthorized-domain)। Firebase Console → Authentication → Settings → Authorized domains-এ "${hostName}" যোগ করুন।`
           : `Domain "${hostName}" is not authorized in Firebase Authentication (auth/unauthorized-domain). Add "${hostName}" under Firebase Console → Authentication → Settings → Authorized domains.`;
@@ -4589,8 +4692,32 @@
       }
       if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
         return state.lang === 'bn'
-          ? `Google লগইন পপআপ সম্পূর্ণ না করেই বন্ধ হয়েছে। পণ্য পাবলিশ করতে ${BOOTSTRAP_ADMIN_EMAIL} দিয়ে লগইন করুন।`
-          : `Google sign-in popup was closed. Please sign in with ${BOOTSTRAP_ADMIN_EMAIL} to publish.`;
+          ? `Google লগইন পপআপ সম্পূর্ণ না করেই বন্ধ হয়েছে। পুনরায় চেষ্টা করুন।`
+          : `Google sign-in popup was closed before completion. Please try again.`;
+      }
+      if (code === 'auth/operation-not-allowed' || lower.includes('operation-not-allowed')) {
+        return state.lang === 'bn'
+          ? 'এই লগইন পদ্ধতিটি Firebase Console → Authentication → Sign-in method থেকে চালু করা হয়নি।'
+          : 'This sign-in provider is not enabled yet in Firebase Console → Authentication → Sign-in method.';
+      }
+      if (code === 'auth/network-request-failed' || lower.includes('network-request-failed')) {
+        return state.lang === 'bn'
+          ? 'নেটওয়ার্ক সংযোগের কারণে Firebase-এ সংযোগ করা যায়নি। ইন্টারনেট চেক করে আবার চেষ্টা করুন।'
+          : 'Network error connecting to Firebase. Please check your internet connection and retry.';
+      }
+      if (code === 'auth/too-many-requests' || lower.includes('too-many-requests')) {
+        return state.lang === 'bn'
+          ? 'অতিরিক্ত চেষ্টার কারণে সাময়িকভাবে ব্লক হয়েছে। কয়েক মিনিট পর আবার চেষ্টা করুন।'
+          : 'Too many attempts. Please wait a few minutes and try again.';
+      }
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+        return state.lang === 'bn' ? 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' : 'Invalid email or password.';
+      }
+      if (code === 'auth/email-already-in-use') {
+        return state.lang === 'bn' ? 'এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা আছে। Sign In করুন।' : 'An account already exists with this email. Please sign in.';
+      }
+      if (code === 'auth/weak-password') {
+        return state.lang === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' : 'Password must be at least 6 characters.';
       }
       if (code === 'resource-exhausted' || lower.includes('quota exceeded')) {
         return state.lang === 'bn'
@@ -4602,7 +4729,7 @@
         const opPath = structured?.path ? ` [${structured.operationType}: ${structured.path}]` : '';
         return state.lang === 'bn'
           ? `Firestore Permission Error (${curEmail})${opPath}: পণ্য পাবলিশ করতে ভেরিফায়েড অ্যাডমিন জিমেইল (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে লগইন থাকতে হবে এবং সব ফিল্ড সঠিক ফরম্যাট/সীমার মধ্যে থাকতে হবে।`
-          : `Firestore Permission Denied (signed in: ${curEmail})${opPath}. Publishing requires verified ${BOOTSTRAP_ADMIN_EMAIL} and schema-valid product fields.`;
+          : `Firestore Permission Denied (signed in: ${curEmail})${opPath}. Publishing requires verified ${BOOTSTRAP_ADMIN_EMAIL} and schema-valid fields.`;
       }
       return rawMsg || fallbackMsg || 'Firebase write failed.';
     }
@@ -4633,6 +4760,7 @@
       if (auth.currentUser && (await validateAdminIdentity(auth.currentUser))) {
         state.user = auth.currentUser;
         state.adminVerified = true;
+        state.lastUnauthorizedDomain = '';
         updateAdminFirebaseSyncBanner();
         return true;
       }
@@ -4659,13 +4787,17 @@
           }
           state.user = authRes.user;
           state.adminVerified = true;
+          state.lastUnauthorizedDomain = '';
           updateAdminFirebaseSyncBanner();
           if (!document.getElementById('admin-app').classList.contains('hidden')) {
             startAdminRealtimeListeners();
           }
           return true;
         } catch (authErr) {
-          throw new Error(formatFirebaseAdminError(authErr));
+          const formatted = formatFirebaseAdminError(authErr);
+          const wrapped = new Error(formatted);
+          wrapped.code = authErr?.code || '';
+          throw wrapped;
         } finally {
           activeAdminSessionPromise = null;
         }
@@ -4853,6 +4985,26 @@
       });
     }
 
+    async function ensureInlineUrlFits(url, fallbackUrl = '', maxLen = 220000) {
+      let current = String(url || '').trim();
+      if (!current) return String(fallbackUrl || '').slice(0, maxLen);
+      if (current.length <= maxLen) return current;
+      if (current.startsWith('data:image/')) {
+        const passes = [
+          { maxW: 900, q: 0.72 },
+          { maxW: 680, q: 0.62 },
+          { maxW: 480, q: 0.52 },
+          { maxW: 320, q: 0.42 }
+        ];
+        for (const pass of passes) {
+          current = await recompressDataUrl(current, pass.maxW, pass.q);
+          if (current.length <= maxLen) return current;
+        }
+        throw new Error(`Image is too large for inline fallback (${Math.round(current.length / 1024)} KB). Choose a smaller image or check Firebase Storage.`);
+      }
+      return current.slice(0, maxLen);
+    }
+
     async function uploadFileToStorage(file, folderPath, onProgress, timeoutMs = 8000) {
       // Keep Firebase Storage's global maxUploadRetryTime healthy (>= 60s; default is 600s)
       // instead of shrinking it per call, because smaller files (<= 256 KB) use _oneShotUpload /
@@ -4981,6 +5133,7 @@
         console.warn('Settings load fallback:', err);
       }
       applyDynamicBranding();
+      fetchLatestSocialPosts().catch(() => {});
     }
 
     function applyDynamicBranding() {
@@ -5299,32 +5452,256 @@
       `;
     }
 
-    function getActiveSocialPosts() {
-      const configured = Array.isArray(state.settings.socialPosts) && state.settings.socialPosts.length
-        ? state.settings.socialPosts
-        : DEFAULT_SOCIAL_POSTS;
-      return configured
-        .filter((item) => item && item.imageUrl)
-        .map((item, idx) => {
-          const platform = String(item.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
-          const defaultProfileUrl = platform === 'tiktok'
-            ? (state.settings.tiktokUrl || OFFICIAL_TIKTOK)
-            : (state.settings.instagramUrl || OFFICIAL_INSTAGRAM);
-          const safeUrl = /^https?:\/\//i.test(String(item.postUrl || '').trim())
-            ? String(item.postUrl).trim()
-            : defaultProfileUrl;
-          return {
-            id: item.id || `social_${idx}`,
-            platform,
-            handle: item.handle || (platform === 'tiktok' ? '@msafashion20' : '@msfashion.bd'),
-            typeLabel: item.typeLabel || (platform === 'tiktok' ? 'Reel' : 'Post'),
-            typeLabelBn: item.typeLabelBn || (platform === 'tiktok' ? 'রিলস' : 'পোস্ট'),
-            imageUrl: item.imageUrl,
-            caption: item.caption || '',
-            captionBn: item.captionBn || item.caption || '',
-            href: safeUrl
-          };
+    function parseSocialPostEmbed(rawUrl, fallbackPlatform = 'instagram') {
+      const cleanUrl = String(rawUrl || '').trim();
+      if (!/^https?:\/\//i.test(cleanUrl)) {
+        return { platform: fallbackPlatform, embedUrl: '', handle: '', contentId: '' };
+      }
+      if (/tiktok\.com/i.test(cleanUrl)) {
+        const handleMatch = cleanUrl.match(/tiktok\.com\/@([^/?#]+)/i);
+        const videoMatch = cleanUrl.match(/\/(?:video|v)\/(\d{8,24})/i);
+        const videoId = videoMatch ? videoMatch[1] : '';
+        return {
+          platform: 'tiktok',
+          handle: handleMatch ? `@${handleMatch[1]}` : '',
+          contentId: videoId,
+          embedUrl: videoId
+            ? `https://www.tiktok.com/player/v1/${videoId}?embed_from=oembed&music_info=1&description=1&autoplay=0`
+            : ''
+        };
+      }
+      if (/instagram\.com/i.test(cleanUrl)) {
+        const igMatch = cleanUrl.match(/instagram\.com\/(?:[^/?#]+\/)?(reel|reels|p|tv)\/([A-Za-z0-9_-]+)/i);
+        const kindRaw = igMatch ? igMatch[1].toLowerCase() : '';
+        const kind = kindRaw === 'reels' ? 'reel' : kindRaw;
+        const code = igMatch ? igMatch[2] : '';
+        return {
+          platform: 'instagram',
+          handle: '',
+          contentId: code,
+          embedUrl: kind && code ? `https://www.instagram.com/${kind}/${code}/embed/` : ''
+        };
+      }
+      return { platform: fallbackPlatform, embedUrl: '', handle: '', contentId: '' };
+    }
+
+    function collectConfiguredSocialSeeds() {
+      const saved = Array.isArray(state.settings.socialPosts) ? state.settings.socialPosts : [];
+      const isLegacyOnly = saved.length > 0 && saved.every(
+        (item) => item && LEGACY_PLACEHOLDER_SOCIAL_IDS.has(item.id) && !String(item.postUrl || '').trim()
+      );
+      const baseList = (saved.length && !isLegacyOnly) ? [...saved] : [...DEFAULT_SOCIAL_POSTS];
+
+      const seenUrls = new Set(
+        baseList
+          .map((item) => String(item?.postUrl || '').trim().split('?')[0])
+          .filter(Boolean)
+      );
+
+      // Programmatically inspect top-level settings.tiktokUrl and settings.instagramUrl:
+      // if they point directly to a video/reel/post not already listed, include them automatically.
+      const extraCandidates = [
+        { url: state.settings.tiktokUrl, platform: 'tiktok' },
+        { url: state.settings.instagramUrl, platform: 'instagram' }
+      ];
+      for (const cand of extraCandidates) {
+        const raw = String(cand.url || '').trim();
+        if (!raw) continue;
+        const parsed = parseSocialPostEmbed(raw, cand.platform);
+        const baseKey = raw.split('?')[0];
+        if (parsed.embedUrl && !seenUrls.has(baseKey)) {
+          seenUrls.add(baseKey);
+          baseList.unshift({
+            id: `settings_${parsed.platform}_${parsed.contentId || Date.now()}`,
+            platform: parsed.platform,
+            handle: parsed.handle || (parsed.platform === 'tiktok' ? '@msafashion20' : '@msfas_ion20'),
+            typeLabel: parsed.platform === 'tiktok' ? 'Latest Video' : 'Latest Reel',
+            typeLabelBn: parsed.platform === 'tiktok' ? 'সর্বশেষ ভিডিও' : 'সর্বশেষ রিলস',
+            imageUrl: '',
+            caption: '',
+            captionBn: '',
+            postUrl: raw
+          });
+        }
+      }
+      return baseList;
+    }
+
+    async function fetchSocialPostOembedMetadata(postUrl, fallbackPlatform = 'instagram', { forceRefresh = false } = {}) {
+      const cleanUrl = String(postUrl || '').trim();
+      const parsed = parseSocialPostEmbed(cleanUrl, fallbackPlatform);
+      if (!/^https?:\/\//i.test(cleanUrl)) return { ...parsed, oembedFetched: false };
+
+      if (!forceRefresh && state.socialPostsOembedCache[cleanUrl]) {
+        return state.socialPostsOembedCache[cleanUrl];
+      }
+
+      const normalizeEmbedSrc = (rawSrc) => {
+        if (!rawSrc) return '';
+        try {
+          const u = new URL(rawSrc);
+          if (u.hostname.includes('tiktok.com')) {
+            u.searchParams.set('autoplay', '0');
+          }
+          return u.toString();
+        } catch {
+          return rawSrc;
+        }
+      };
+
+      // 1) Try same-origin /api/social/oembed proxy (supports both Instagram & TikTok public oEmbed JSON)
+      try {
+        const apiResp = await fetch(`/api/social/oembed?url=${encodeURIComponent(cleanUrl)}`, {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(6500)
         });
+        const ct = apiResp.headers.get('content-type') || '';
+        if (apiResp.ok && ct.includes('application/json')) {
+          const d = await apiResp.json();
+          if (d && d.ok) {
+            const resolved = {
+              platform: d.platform || parsed.platform,
+              handle: d.authorName ? `@${String(d.authorName).replace(/^@/, '')}` : parsed.handle,
+              authorUrl: String(d.authorUrl || '').trim(),
+              title: String(d.title || '').trim(),
+              thumbnailUrl: String(d.thumbnailUrl || '').trim(),
+              contentId: String(d.embedProductId || parsed.contentId || '').trim(),
+              embedUrl: normalizeEmbedSrc(d.embedUrl) || parsed.embedUrl,
+              oembedFetched: true
+            };
+            state.socialPostsOembedCache[cleanUrl] = resolved;
+            return resolved;
+          }
+        }
+      } catch {
+        // Static hosting (e.g. GitHub Pages) falls through cleanly
+      }
+
+      // 2) Direct CORS-enabled TikTok public oEmbed API (works directly from static hosting too)
+      if (parsed.platform === 'tiktok') {
+        try {
+          const ttResp = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(cleanUrl)}`, {
+            headers: { Accept: 'application/json' },
+            signal: AbortSignal.timeout(6500)
+          });
+          if (ttResp.ok) {
+            const d = await ttResp.json();
+            const srcMatch = typeof d?.html === 'string'
+              ? d.html.match(/<iframe[^>]+src=["']([^"']+)["']/i)
+              : null;
+            const resolved = {
+              platform: 'tiktok',
+              handle: d?.author_name ? `@${String(d.author_name).replace(/^@/, '')}` : parsed.handle,
+              authorUrl: String(d?.author_url || '').trim(),
+              title: String(d?.title || '').trim(),
+              thumbnailUrl: String(d?.thumbnail_url || '').trim(),
+              contentId: String(d?.embed_product_id || parsed.contentId || '').trim(),
+              embedUrl: normalizeEmbedSrc(srcMatch ? srcMatch[1] : '') || parsed.embedUrl,
+              oembedFetched: true
+            };
+            state.socialPostsOembedCache[cleanUrl] = resolved;
+            return resolved;
+          }
+        } catch {
+          // Network/offline fallback below
+        }
+      }
+
+      const fallbackResolved = { ...parsed, authorUrl: '', title: '', thumbnailUrl: '', oembedFetched: false };
+      state.socialPostsOembedCache[cleanUrl] = fallbackResolved;
+      return fallbackResolved;
+    }
+
+    function normalizeSeedToSocialPost(item, idx, liveMeta = null) {
+      const fallbackPlatform = String(item?.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
+      const parsed = liveMeta || parseSocialPostEmbed(item?.postUrl, fallbackPlatform);
+      const platform = parsed.platform || fallbackPlatform;
+      const defaultProfileUrl = platform === 'tiktok'
+        ? (state.settings.tiktokUrl || OFFICIAL_TIKTOK)
+        : (state.settings.instagramUrl || OFFICIAL_INSTAGRAM);
+      const safeUrl = /^https?:\/\//i.test(String(item?.postUrl || '').trim())
+        ? String(item.postUrl).trim()
+        : (parsed.authorUrl || defaultProfileUrl);
+      const liveTitle = String(parsed.title || '').trim();
+      return {
+        id: item?.id || `social_${idx}`,
+        platform,
+        handle: parsed.handle || item?.handle || (platform === 'tiktok' ? '@msafashion20' : '@msfas_ion20'),
+        authorUrl: parsed.authorUrl || '',
+        typeLabel: item?.typeLabel || (platform === 'tiktok' ? 'Latest Video' : 'Latest Reel'),
+        typeLabelBn: item?.typeLabelBn || (platform === 'tiktok' ? 'সর্বশেষ ভিডিও' : 'সর্বশেষ রিলস'),
+        imageUrl: String(parsed.thumbnailUrl || item?.imageUrl || '').trim(),
+        embedUrl: String(parsed.embedUrl || '').trim(),
+        caption: liveTitle || String(item?.caption || '').trim(),
+        captionBn: liveTitle || String(item?.captionBn || item?.caption || '').trim(),
+        href: safeUrl,
+        oembedFetched: Boolean(parsed.oembedFetched)
+      };
+    }
+
+    function refreshSocialFeedDOM() {
+      const gridEl = document.getElementById('social-feed-grid');
+      if (gridEl) {
+        const filter = state.socialFeedFilter || 'all';
+        const filteredCount = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter).length;
+        gridEl.className = getSocialFeedGridClass(filteredCount);
+        gridEl.innerHTML = renderSocialFeedCardsHTML(filter);
+      }
+      const refreshBtn = document.getElementById('social-feed-refresh-btn');
+      if (refreshBtn) {
+        refreshBtn.disabled = Boolean(state.socialPostsLoading);
+        refreshBtn.textContent = state.socialPostsLoading
+          ? (state.lang === 'bn' ? 'আপডেট হচ্ছে...' : 'Syncing...')
+          : (state.lang === 'bn' ? 'রিফ্রেশ' : 'Refresh');
+      }
+    }
+
+    async function fetchLatestSocialPosts({ forceRefresh = false } = {}) {
+      if (state.socialPostsLoading && !forceRefresh) return state.dynamicSocialPosts;
+      state.socialPostsLoading = true;
+      refreshSocialFeedDOM();
+
+      try {
+        const seeds = collectConfiguredSocialSeeds().filter(
+          (item) => item && (String(item.postUrl || '').trim() || String(item.imageUrl || '').trim())
+        );
+
+        const settled = await Promise.allSettled(
+          seeds.map(async (item, idx) => {
+            const fallbackPlatform = String(item.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
+            const liveMeta = String(item.postUrl || '').trim()
+              ? await fetchSocialPostOembedMetadata(item.postUrl, fallbackPlatform, { forceRefresh })
+              : null;
+            return normalizeSeedToSocialPost(item, idx, liveMeta);
+          })
+        );
+
+        const nextPosts = settled
+          .filter((r) => r.status === 'fulfilled' && r.value)
+          .map((r) => r.value);
+
+        state.dynamicSocialPosts = nextPosts;
+        state.socialPostsSyncedAt = Date.now();
+        return nextPosts;
+      } finally {
+        state.socialPostsLoading = false;
+        refreshSocialFeedDOM();
+      }
+    }
+
+    function getActiveSocialPosts() {
+      if (Array.isArray(state.dynamicSocialPosts) && state.dynamicSocialPosts.length) {
+        return state.dynamicSocialPosts;
+      }
+      return collectConfiguredSocialSeeds()
+        .filter((item) => item && (String(item.postUrl || '').trim() || String(item.imageUrl || '').trim()))
+        .map((item, idx) => normalizeSeedToSocialPost(item, idx, null));
+    }
+
+    function getSocialFeedGridClass(count) {
+      if (count <= 1) return 'social-feed-grid social-feed-grid--single';
+      if (count === 2) return 'social-feed-grid social-feed-grid--compact';
+      return 'social-feed-grid';
     }
 
     function renderSocialFeedCardsHTML(filter = state.socialFeedFilter || 'all') {
@@ -5341,13 +5718,41 @@
         const caption = state.lang === 'bn' ? (post.captionBn || post.caption) : (post.caption || post.captionBn);
         const typeLabel = state.lang === 'bn' ? (post.typeLabelBn || post.typeLabel) : (post.typeLabel || post.typeLabelBn);
         const ctaText = isTikTok
-          ? (state.lang === 'bn' ? 'TikTok-এ দেখুন ↗' : 'Watch on TikTok ↗')
-          : (state.lang === 'bn' ? 'Instagram-এ দেখুন ↗' : 'View on Instagram ↗');
-        return `
-          <a class="social-post-card" href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(`${platformLabel}: ${caption}`)}">
-            <div class="social-post-media">
-              <img src="${esc(post.imageUrl)}" alt="${esc(caption || `${platformLabel} lookbook`)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+          ? (state.lang === 'bn' ? 'TikTok-এ সরাসরি দেখুন ↗' : 'Watch on TikTok ↗')
+          : (state.lang === 'bn' ? 'Instagram-এ সরাসরি দেখুন ↗' : 'View on Instagram ↗');
+        const mediaInner = post.embedUrl
+          ? `
+            <div class="social-media-fallback" aria-hidden="true">
+              ${post.imageUrl ? `<img src="${esc(post.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.25;" onerror="this.remove();" />` : ''}
+              ${isTikTok ? ttIcon : igIcon}
+              <span>${esc(platformLabel)} · ${esc(post.handle)}</span>
+            </div>
+            <iframe
+              class="social-embed-frame"
+              src="${esc(post.embedUrl)}"
+              title="${esc(`${platformLabel} ${post.handle} live post`)}"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          `
+          : `
+            <a href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;height:100%;">
+              ${post.imageUrl
+                ? `<img src="${esc(post.imageUrl)}" alt="${esc(caption || `${platformLabel} post`)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />`
+                : ''}
+              <div class="social-media-fallback" style="${post.imageUrl ? 'display:none;' : 'display:flex;'}">
+                ${isTikTok ? ttIcon : igIcon}
+                <span>${esc(platformLabel)} · ${esc(post.handle)}</span>
+              </div>
               ${isTikTok ? `<span class="social-reel-play" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>` : ''}
+            </a>
+          `;
+        return `
+          <article class="social-post-card">
+            <div class="social-post-media ${post.embedUrl ? 'social-post-media--embed' : ''}">
+              ${mediaInner}
             </div>
             <div class="social-post-meta">
               ${isTikTok ? ttIcon : igIcon}
@@ -5357,15 +5762,16 @@
               <span aria-hidden="true">·</span>
               <span>${esc(typeLabel)}</span>
             </div>
-            <p class="social-post-caption">${esc(caption)}</p>
-            <span class="social-post-cta">${ctaText}</span>
-          </a>
+            ${caption ? `<p class="social-post-caption">${esc(caption)}</p>` : ''}
+            <a class="social-post-cta" href="${esc(post.href)}" target="_blank" rel="noopener noreferrer">${ctaText}</a>
+          </article>
         `;
       }).join('');
     }
 
     function renderSocialFeedSectionHTML() {
       const filter = state.socialFeedFilter || 'all';
+      const filteredCount = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter).length;
       const igHref = state.settings.instagramUrl || OFFICIAL_INSTAGRAM;
       const ttHref = state.settings.tiktokUrl || OFFICIAL_TIKTOK;
       return `
@@ -5384,12 +5790,13 @@
                   <button type="button" class="social-feed-tab ${filter === 'tiktok' ? 'active' : ''}" data-social-filter="tiktok" aria-pressed="${filter === 'tiktok' ? 'true' : 'false'}">TikTok</button>
                 </div>
                 <div class="social-feed-links">
+                  <button type="button" id="social-feed-refresh-btn" class="btn btn-outline btn-sm" data-social-refresh="1" ${state.socialPostsLoading ? 'disabled' : ''}>${state.socialPostsLoading ? (state.lang === 'bn' ? 'আপডেট হচ্ছে...' : 'Syncing...') : (state.lang === 'bn' ? 'রিফ্রেশ' : 'Refresh')}</button>
                   <a href="${esc(igHref)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Instagram ↗</a>
                   <a href="${esc(ttHref)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">TikTok ↗</a>
                 </div>
               </div>
             </div>
-            <div id="social-feed-grid" class="social-feed-grid">
+            <div id="social-feed-grid" class="${getSocialFeedGridClass(filteredCount)}">
               ${renderSocialFeedCardsHTML(filter)}
             </div>
           </div>
@@ -6586,9 +6993,13 @@
           showToast(state.lang === 'bn' ? 'রিভিউ দিতে লগইন করুন' : 'Please sign in to submit a review', 'error');
           return;
         }
-        const orderId = document.getElementById('review-order-id').value.trim().toUpperCase();
-        const rating = Number(document.getElementById('review-rating').value);
-        const comment = document.getElementById('review-comment').value.trim();
+        const orderId = document.getElementById('review-order-id').value.trim().toUpperCase().slice(0, 40);
+        const rating = Math.max(1, Math.min(5, Math.round(Number(document.getElementById('review-rating').value || 5))));
+        const comment = document.getElementById('review-comment').value.trim().slice(0, 1500);
+        if (!comment) {
+          showToast(state.lang === 'bn' ? 'রিভিউ লিখুন' : 'Please write a review comment', 'error');
+          return;
+        }
         try {
           const orderSnap = await getDoc(doc(db, 'orders', orderId));
           const isVerified = orderSnap.exists() && orderSnap.data().userId === state.user.uid &&
@@ -6602,7 +7013,7 @@
             id: revId,
             productId: prod.id,
             userId: state.user.uid,
-            userName: state.userProfile?.name || state.user.displayName || 'Customer',
+            userName: String(state.userProfile?.name || state.user.displayName || 'Customer').trim().slice(0, 120) || 'Customer',
             orderId,
             rating,
             comment,
@@ -6615,7 +7026,10 @@
           showToast(state.lang === 'bn' ? 'রিভিউ জমা হয়েছে! অ্যাডমিন অনুমোদনের পর প্রকাশিত হবে।' : 'Review submitted for admin approval.', 'success');
           e.target.reset();
         } catch (err) {
-          showToast(err.message || 'Review submission failed', 'error');
+          if (isFirestorePermissionError(err)) {
+            console.warn('Review permission issue:', err.message);
+          }
+          showToast(formatFirebaseAdminError(err, 'Review submission failed'), 'error');
         }
       });
     }
@@ -6626,11 +7040,11 @@
     async function persistCart() {
       localStorage.setItem('msf_cart', JSON.stringify(state.cart));
       updateHeaderBadges();
-      if (state.user) {
+      if (state.user && state.user.uid !== 'ms_fashion_admin') {
         try {
           await setDoc(doc(db, 'carts', state.user.uid), {
             userId: state.user.uid,
-            items: state.cart,
+            items: state.cart.slice(0, 100),
             updatedAt: serverTimestamp()
           });
         } catch (err) {
@@ -6642,11 +7056,11 @@
     async function persistWishlist() {
       localStorage.setItem('msf_wishlist', JSON.stringify(state.wishlist));
       updateHeaderBadges();
-      if (state.user) {
+      if (state.user && state.user.uid !== 'ms_fashion_admin') {
         try {
           await setDoc(doc(db, 'wishlists', state.user.uid), {
             userId: state.user.uid,
-            productIds: state.wishlist,
+            productIds: state.wishlist.slice(0, 200),
             updatedAt: serverTimestamp()
           });
         } catch (err) {
@@ -7441,7 +7855,11 @@
           showToast(state.lang === 'bn' ? 'কুপন প্রয়োগ হয়েছে' : 'Coupon applied', 'success');
           renderCheckout();
         } catch (err) {
-          showToast('Coupon check failed', 'error');
+          if (isFirestorePermissionError(err)) {
+            showToast(state.lang === 'bn' ? 'কুপনটি সঠিক নয় বা নিষ্ক্রিয়' : 'Invalid or inactive coupon', 'error');
+          } else {
+            showToast(formatFirebaseAdminError(err, 'Coupon check failed'), 'error');
+          }
         }
       });
 
@@ -7453,20 +7871,24 @@
         submittingOrder = true;
 
         try {
-          const customerName = document.getElementById('chk-name').value.trim();
-          const phone = document.getElementById('chk-phone').value.trim();
-          const email = document.getElementById('chk-email').value.trim();
-          const district = document.getElementById('chk-district').value;
-          const city = document.getElementById('chk-city').value.trim();
-          const address = document.getElementById('chk-address').value.trim();
-          const instructions = document.getElementById('chk-notes').value.trim();
+          const customerName = document.getElementById('chk-name').value.trim().slice(0, 120);
+          const phone = document.getElementById('chk-phone').value.trim().slice(0, 30);
+          const email = document.getElementById('chk-email').value.trim().slice(0, 160);
+          const district = String(document.getElementById('chk-district').value || 'Dhaka').trim().slice(0, 80);
+          const city = document.getElementById('chk-city').value.trim().slice(0, 80);
+          const address = document.getElementById('chk-address').value.trim().slice(0, 400);
+          const instructions = document.getElementById('chk-notes').value.trim().slice(0, 500);
           const paymentMethod = document.getElementById('chk-payment-method').value;
-          const paymentReference = document.getElementById('chk-payment-ref').value.trim();
+          const paymentReference = document.getElementById('chk-payment-ref').value.trim().slice(0, 120);
+
+          if (!customerName || phone.length < 6 || address.length < 3) {
+            throw new Error(state.lang === 'bn' ? 'অনুগ্রহ করে নাম, সঠিক ফোন নম্বর এবং সম্পূর্ণ ঠিকানা দিন।' : 'Please enter valid name, phone number, and full delivery address.');
+          }
 
           // Revalidate prices & stock from Firestore before saving
           let verifiedSubtotal = 0;
           const verifiedItems = [];
-          for (const item of state.cart) {
+          for (const item of state.cart.slice(0, 100)) {
             const pSnap = await getDoc(doc(db, 'products', item.productId));
             if (!pSnap.exists() || !pSnap.data().active || !pSnap.data().published) {
               throw new Error(`${item.productName} is currently unavailable`);
@@ -7488,12 +7910,12 @@
             verifiedSubtotal += itemSubtotal;
             verifiedItems.push({
               productId: item.productId,
-              productName: p.name,
-              sku: item.sku || p.sku,
-              imageUrl: getProductMainImage(p),
-              size: item.size || '',
-              color: item.color || '',
-              quantity: item.quantity,
+              productName: String(p.name || item.productName || 'Product').slice(0, 200),
+              sku: String(item.sku || p.sku || '').slice(0, 80),
+              imageUrl: String(getProductMainImage(p) || '').slice(0, 1000),
+              size: String(item.size || '').slice(0, 40),
+              color: String(item.color || '').slice(0, 40),
+              quantity: Math.max(1, Number(item.quantity || 1)),
               unitPrice,
               subtotal: itemSubtotal
             });
@@ -7506,12 +7928,13 @@
           const totalsNow = calculateCartTotals(district);
           const orderId = generateOrderId();
           const paymentStatus = paymentMethod === 'Cash on Delivery' ? 'Unpaid' : 'Pending Verification';
+          const cfBase = getCloudFunctionsBase();
 
           let savedOrder = null;
           // Attempt Cloud Function createOrder first if configured
-          if (CLOUD_FUNCTIONS_BASE) {
+          if (cfBase) {
             const token = state.user ? await state.user.getIdToken() : '';
-            const res = await fetch(`${CLOUD_FUNCTIONS_BASE}/createOrder`, {
+            const res = await fetch(`${cfBase}/createOrder`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -7522,7 +7945,7 @@
                 customerName, phone, email, district, city, address, instructions,
                 items: verifiedItems,
                 paymentMethod, paymentReference,
-                couponCode: state.appliedCoupon?.code || '',
+                couponCode: String(state.appliedCoupon?.code || '').slice(0, 60),
                 orderSource: source
               })
             });
@@ -7533,6 +7956,7 @@
             // Atomic client writeBatch to orders + order_tracking + admin notification
             const batch = writeBatch(db);
             const nowTs = serverTimestamp();
+            const courierName = String(state.settings.defaultCourier || 'Steadfast / Pathao').slice(0, 120);
             const orderPayload = {
               orderId,
               userId: state.user ? state.user.uid : null,
@@ -7546,7 +7970,7 @@
               items: verifiedItems,
               subtotal: verifiedSubtotal,
               discount: totalsNow.discount,
-              couponCode: state.appliedCoupon?.code || '',
+              couponCode: String(state.appliedCoupon?.code || '').slice(0, 60),
               deliveryCharge: totalsNow.deliveryCharge,
               finalTotal: totalsNow.finalTotal,
               paymentMethod,
@@ -7556,7 +7980,7 @@
               orderSource: source,
               adminNotes: '',
               trackingNumber: '',
-              courier: state.settings.defaultCourier || 'Steadfast / Pathao',
+              courier: courierName,
               createdAt: nowTs,
               updatedAt: nowTs
             };
@@ -7566,24 +7990,31 @@
               orderId,
               orderStatus: 'Pending',
               paymentStatus,
-              courier: orderPayload.courier,
+              courier: courierName,
               trackingNumber: '',
               itemCount: verifiedItems.reduce((s, i) => s + i.quantity, 0),
               finalTotal: totalsNow.finalTotal,
               createdAt: nowTs,
               updatedAt: nowTs
             });
-            const notifId = `notif_${orderId}`;
+            const notifId = `notif_${orderId}`.slice(0, 128);
             batch.set(doc(db, 'notifications', notifId), {
               id: notifId,
               userId: 'admin',
               orderId,
-              title: `New Order ${orderId}`,
-              message: `${customerName} (${phone}) placed a ${formatPrice(totalsNow.finalTotal)} order via ${source}.`,
+              title: `New Order ${orderId}`.slice(0, 160),
+              message: `${customerName} (${phone}) placed a ${formatPrice(totalsNow.finalTotal)} order via ${source}.`.slice(0, 500),
               read: false,
               createdAt: nowTs
             });
-            await batch.commit();
+            try {
+              await batch.commit();
+            } catch (orderErr) {
+              if (isFirestorePermissionError(orderErr)) {
+                handleFirestoreError(orderErr, OperationType.CREATE, `orders/${orderId}`);
+              }
+              throw orderErr;
+            }
             savedOrder = orderPayload;
           }
 
@@ -7652,17 +8083,47 @@
           <button type="button" id="auth-google-btn" class="btn btn-outline btn-block">Continue with Google</button>
           <div style="text-align:center;font-size:12px;color:var(--text-muted);">OR</div>
           <form id="auth-email-form" style="display:flex;flex-direction:column;gap:10px;">
-            <input type="text" id="auth-name-input" class="form-control hidden" placeholder="Full Name" />
-            <input type="email" id="auth-email-input" class="form-control" required placeholder="Email Address" />
+            <input type="text" id="auth-name-input" class="form-control hidden" maxlength="120" placeholder="Full Name" />
+            <input type="email" id="auth-email-input" class="form-control" maxlength="160" required placeholder="Email Address" />
             <input type="password" id="auth-pass-input" class="form-control" required placeholder="Password" />
             <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">${state.lang === 'bn' ? 'লগইন করুন' : 'Sign In'}</button>
           </form>
+          <div id="auth-modal-feedback" class="hidden" role="alert" style="padding:10px 12px;border-radius:6px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:12.5px;font-weight:600;line-height:1.45;"></div>
           <div style="display:flex;justify-content:space-between;font-size:12px;">
             <button type="button" id="auth-toggle-mode" class="footer-link-btn" style="color:var(--accent);font-weight:600;">Create new account</button>
             <button type="button" id="auth-reset-btn" class="footer-link-btn" style="color:var(--text-secondary);">Forgot password?</button>
           </div>
         </div>
       `;
+
+      const showAuthFeedback = (err, onRetry = null) => {
+        const fb = document.getElementById('auth-modal-feedback');
+        const msg = formatFirebaseAdminError(err, 'Authentication failed');
+        if (fb) {
+          fb.innerHTML = '';
+          const p = document.createElement('div');
+          p.textContent = msg;
+          fb.appendChild(p);
+          if (isUnauthorizedDomainError(err)) {
+            renderAuthDomainHelper(fb, { onRetry });
+          }
+          fb.classList.remove('hidden');
+        }
+        showToast(msg, 'error');
+      };
+
+      const runCustomerGoogleSignIn = async () => {
+        const fb = document.getElementById('auth-modal-feedback');
+        if (fb) { fb.classList.add('hidden'); fb.innerHTML = ''; }
+        try {
+          await signInWithPopup(auth, new GoogleAuthProvider());
+          state.lastUnauthorizedDomain = '';
+          modal.classList.add('hidden');
+          showToast(state.lang === 'bn' ? 'সফলভাবে লগইন হয়েছে!' : 'Signed in successfully', 'success');
+        } catch (err) {
+          showAuthFeedback(err, runCustomerGoogleSignIn);
+        }
+      };
 
       let isRegister = false;
       document.getElementById('auth-toggle-mode').addEventListener('click', (e) => {
@@ -7672,21 +8133,15 @@
         e.target.textContent = isRegister ? 'Already have an account? Sign In' : 'Create new account';
       });
 
-      document.getElementById('auth-google-btn').addEventListener('click', async () => {
-        try {
-          await signInWithPopup(auth, new GoogleAuthProvider());
-          modal.classList.add('hidden');
-          showToast('Signed in successfully', 'success');
-        } catch (err) {
-          showToast(err.message || 'Google sign-in failed', 'error');
-        }
-      });
+      document.getElementById('auth-google-btn').addEventListener('click', runCustomerGoogleSignIn);
 
       document.getElementById('auth-email-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const fb = document.getElementById('auth-modal-feedback');
+        if (fb) { fb.classList.add('hidden'); fb.innerHTML = ''; }
         const email = document.getElementById('auth-email-input').value.trim();
         const password = document.getElementById('auth-pass-input').value;
-        const name = document.getElementById('auth-name-input').value.trim();
+        const name = document.getElementById('auth-name-input').value.trim().slice(0, 120);
         try {
           if (isRegister) {
             const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -7698,7 +8153,7 @@
           modal.classList.add('hidden');
           showToast('Welcome to MS FASHION', 'success');
         } catch (err) {
-          showToast(err.message || 'Authentication failed. Ensure Email/Password provider is enabled in Firebase Console.', 'error');
+          showAuthFeedback(err);
         }
       });
 
@@ -7709,7 +8164,7 @@
           await sendPasswordResetEmail(auth, email);
           showToast('Password reset email sent', 'success');
         } catch (err) {
-          showToast(err.message, 'error');
+          showAuthFeedback(err);
         }
       });
     }
@@ -7721,14 +8176,14 @@
       if (!snap.exists()) {
         const profile = {
           uid: user.uid,
-          name: fallbackName || user.displayName || 'MS FASHION Customer',
-          email: user.email || '',
+          name: String(fallbackName || user.displayName || 'MS FASHION Customer').trim().slice(0, 120) || 'MS FASHION Customer',
+          email: String(user.email || '').trim().slice(0, 160),
           phone: '',
           address: '',
           district: 'Dhaka',
           city: '',
           savedAddresses: [],
-          recentlyViewed: state.recentlyViewed,
+          recentlyViewed: Array.isArray(state.recentlyViewed) ? state.recentlyViewed.slice(0, 30) : [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         };
@@ -7818,18 +8273,22 @@
       document.getElementById('acc-profile-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         try {
+          await ensureUserProfile(state.user);
           await updateDoc(doc(db, 'users', state.user.uid), {
-            name: document.getElementById('acc-name').value.trim(),
-            phone: document.getElementById('acc-phone').value.trim(),
-            district: document.getElementById('acc-district').value,
-            city: document.getElementById('acc-city').value.trim(),
-            address: document.getElementById('acc-address').value.trim(),
+            name: document.getElementById('acc-name').value.trim().slice(0, 120) || 'MS FASHION Customer',
+            phone: document.getElementById('acc-phone').value.trim().slice(0, 30),
+            district: String(document.getElementById('acc-district').value || 'Dhaka').trim().slice(0, 80),
+            city: document.getElementById('acc-city').value.trim().slice(0, 80),
+            address: document.getElementById('acc-address').value.trim().slice(0, 300),
             updatedAt: serverTimestamp()
           });
           await ensureUserProfile(state.user);
           showToast('Profile saved', 'success');
         } catch (err) {
-          showToast(err.message || 'Update failed', 'error');
+          if (isFirestorePermissionError(err)) {
+            console.warn('Profile update permission error:', err.message);
+          }
+          showToast(formatFirebaseAdminError(err, 'Profile update failed'), 'error');
         }
       });
     }
@@ -8409,15 +8868,20 @@
       if (socialTab) {
         const nextFilter = socialTab.getAttribute('data-social-filter') || 'all';
         state.socialFeedFilter = nextFilter;
-        const gridEl = document.getElementById('social-feed-grid');
-        if (gridEl) {
-          gridEl.innerHTML = renderSocialFeedCardsHTML(nextFilter);
-          document.querySelectorAll('#social-feed [data-social-filter]').forEach((btn) => {
-            const active = btn.getAttribute('data-social-filter') === nextFilter;
-            btn.classList.toggle('active', active);
-            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-          });
-        }
+        refreshSocialFeedDOM();
+        document.querySelectorAll('#social-feed [data-social-filter]').forEach((btn) => {
+          const active = btn.getAttribute('data-social-filter') === nextFilter;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        return;
+      }
+      const socialRefreshBtn = e.target.closest('[data-social-refresh]');
+      if (socialRefreshBtn) {
+        fetchLatestSocialPosts({ forceRefresh: true })
+          .then(() => showToast(state.lang === 'bn' ? 'সোশ্যাল ফিড আপডেট হয়েছে!' : 'Social feed synced!', 'success'))
+          .catch(() => showToast(state.lang === 'bn' ? 'সিঙ্ক ব্যর্থ হয়েছে' : 'Failed to sync social feed', 'error'));
+        return;
       }
     });
 
@@ -8425,10 +8889,13 @@
     document.getElementById('storefront-main').addEventListener('submit', async (e) => {
       if (e.target.id !== 'newsletter-form') return;
       e.preventDefault();
-      const email = document.getElementById('newsletter-email').value.trim().toLowerCase();
-      if (!email) return;
+      const email = document.getElementById('newsletter-email').value.trim().toLowerCase().slice(0, 160);
+      if (!email || email.length < 5 || !email.includes('@')) {
+        showToast(state.lang === 'bn' ? 'সঠিক ইমেইল দিন।' : 'Please enter a valid email address.', 'error');
+        return;
+      }
       try {
-        const subId = email.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 120);
+        const subId = `${Date.now().toString(36)}_${email.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 96)}`.slice(0, 120);
         await setDoc(doc(db, 'newsletter_subscribers', subId), {
           email,
           createdAt: serverTimestamp()
@@ -8436,7 +8903,7 @@
         showToast(state.lang === 'bn' ? 'নিউজলেটারে সাবস্ক্রাইব সম্পন্ন হয়েছে!' : 'Subscribed successfully!', 'success');
         e.target.reset();
       } catch (err) {
-        showToast(err.message || 'Subscription failed', 'error');
+        showToast(formatFirebaseAdminError(err, 'Subscription failed'), 'error');
       }
     });
 
@@ -8707,9 +9174,10 @@
       await attemptAdminPasswordUnlock(pw, { silentError: false });
     });
 
-    document.getElementById('admin-google-login-btn').addEventListener('click', async () => {
+    const handleAdminGoogleLoginClick = async () => {
       const errBox = document.getElementById('admin-login-error');
       errBox.classList.add('hidden');
+      errBox.innerHTML = '';
       try {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account', login_hint: BOOTSTRAP_ADMIN_EMAIL });
@@ -8719,13 +9187,22 @@
         }
         state.user = res.user;
         state.adminVerified = true;
+        state.lastUnauthorizedDomain = '';
         document.getElementById('admin-login-modal').classList.add('hidden');
         openAdminDashboard();
       } catch (err) {
-        errBox.textContent = formatFirebaseAdminError(err, 'Google Admin sign-in failed');
+        const msg = formatFirebaseAdminError(err, 'Google Admin sign-in failed');
+        errBox.innerHTML = '';
+        const p = document.createElement('div');
+        p.textContent = msg;
+        errBox.appendChild(p);
+        if (isUnauthorizedDomainError(err)) {
+          renderAuthDomainHelper(errBox, { onRetry: handleAdminGoogleLoginClick });
+        }
         errBox.classList.remove('hidden');
       }
-    });
+    };
+    document.getElementById('admin-google-login-btn').addEventListener('click', handleAdminGoogleLoginClick);
 
     // =========================================================================
     // 16. FULL ADMIN DASHBOARD (18 SECTIONS, REAL-TIME ORDERS, UNLIMITED UPLOADS)
@@ -8752,19 +9229,34 @@
       const pfBanner = document.getElementById('pf-auth-banner');
       if (pfBanner) {
         const connected = isFirebaseAdminUser();
-        pfBanner.style.background = connected ? '#f0fdf4' : '#fffbeb';
-        pfBanner.style.borderColor = connected ? '#86efac' : '#fcd34d';
-        pfBanner.style.color = connected ? '#166534' : '#92400e';
+        const hostName = window.location.hostname || '';
+        const needsDomainFix = !connected && state.lastUnauthorizedDomain === hostName && Boolean(hostName);
+        pfBanner.style.background = connected ? '#f0fdf4' : (needsDomainFix ? '#fef2f2' : '#fffbeb');
+        pfBanner.style.borderColor = connected ? '#86efac' : (needsDomainFix ? '#fca5a5' : '#fcd34d');
+        pfBanner.style.color = connected ? '#166534' : (needsDomainFix ? '#991b1b' : '#92400e');
         const statusEl = document.getElementById('pf-auth-status-text');
         const connectBtn = document.getElementById('pf-connect-google-btn');
         if (statusEl) {
-          statusEl.textContent = connected
-            ? (state.lang === 'bn'
+          statusEl.innerHTML = '';
+          if (connected) {
+            statusEl.textContent = state.lang === 'bn'
               ? `✓ Firebase Admin সংযুক্ত (${BOOTSTRAP_ADMIN_EMAIL}) — এখন সরাসরি পণ্য পাবলিশ করতে পারবেন।`
-              : `✓ Firebase Admin connected (${BOOTSTRAP_ADMIN_EMAIL}) — ready to publish.`)
-            : (state.lang === 'bn'
+              : `✓ Firebase Admin connected (${BOOTSTRAP_ADMIN_EMAIL}) — ready to publish.`;
+          } else if (needsDomainFix) {
+            const msg = document.createElement('div');
+            msg.textContent = state.lang === 'bn'
+              ? `⚠ "${hostName}" ডোমেইনটি Firebase Authorized Domains-এ যোগ করা নেই (auth/unauthorized-domain)। নিচের বাটনে ক্লিক করে যোগ করুন:`
+              : `⚠ "${hostName}" is not added in Firebase Authorized Domains (auth/unauthorized-domain). Add it below to connect:`;
+            statusEl.appendChild(msg);
+            renderAuthDomainHelper(statusEl, {
+              hostName,
+              onRetry: () => document.getElementById('pf-connect-google-btn')?.click()
+            });
+          } else {
+            statusEl.textContent = state.lang === 'bn'
               ? `পণ্য Firebase-এ পাবলিশ করতে Google (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে একবার Connect করুন (অথবা নিচে Save চাপলে পপআপ আসবে)।`
-              : `Connect ${BOOTSTRAP_ADMIN_EMAIL} once to publish products to Firebase (or click Save below).`);
+              : `Connect ${BOOTSTRAP_ADMIN_EMAIL} once to publish products to Firebase (or click Save below).`;
+          }
         }
         if (connectBtn) connectBtn.classList.toggle('hidden', connected);
       }
@@ -8776,6 +9268,7 @@
         showToast(state.lang === 'bn' ? 'Firebase Admin সেশন সংযুক্ত হয়েছে!' : 'Firebase Admin write session connected!', 'success');
         startAdminRealtimeListeners();
       } catch (err) {
+        updateAdminFirebaseSyncBanner();
         showToast(err.message, 'error');
       }
     });
@@ -9440,13 +9933,18 @@
         const showProductSaveError = (err, fallbackMsg = '') => {
           const errBox = document.getElementById('pf-save-error');
           if (!errBox) return;
+          const isUnauthDomain = isUnauthorizedDomainError(err);
           const isPerm = isFirestorePermissionError(err);
           const msg = formatFirebaseAdminError(err, fallbackMsg);
           errBox.innerHTML = '';
           const msgDiv = document.createElement('div');
           msgDiv.textContent = msg;
           errBox.appendChild(msgDiv);
-          if (isPerm) {
+          if (isUnauthDomain) {
+            renderAuthDomainHelper(errBox, {
+              onRetry: () => document.getElementById('pf-connect-google-btn')?.click()
+            });
+          } else if (isPerm) {
             const actionWrap = document.createElement('div');
             actionWrap.style.marginTop = '8px';
             const reconnectBtn = document.createElement('button');
@@ -9463,6 +9961,7 @@
                 await ensureFirebaseAdminSession({ forceRefresh: true });
                 errBox.classList.add('hidden');
                 errBox.innerHTML = '';
+                updateAdminFirebaseSyncBanner();
                 showToast(state.lang === 'bn' ? 'Google Admin সেশন আপডেট হয়েছে! এখন আবার Save চাপুন।' : 'Admin session refreshed! Click Save & Publish again.', 'success');
               } catch (reAuthErr) {
                 showProductSaveError(reAuthErr);
@@ -9481,9 +9980,11 @@
           errBox.innerHTML = '';
           try {
             await ensureFirebaseAdminSession({ forceRefresh: true });
+            updateAdminFirebaseSyncBanner();
             showToast(state.lang === 'bn' ? 'Google Admin সংযুক্ত হয়েছে!' : 'Google Admin connected!', 'success');
             startAdminRealtimeListeners();
           } catch (err) {
+            updateAdminFirebaseSyncBanner();
             showProductSaveError(err);
           }
         });
@@ -10411,10 +10912,28 @@
         `;
         document.getElementById('adm-coupon-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const code = document.getElementById('cp-code').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
-          if (!code) return;
+          const code = document.getElementById('cp-code').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 60);
+          if (!code || code.length < 2) {
+            showToast('Coupon code must be at least 2 characters.', 'error');
+            return;
+          }
           try {
             await ensureFirebaseAdminSession();
+            const existingLocal = state.adminCoupons.find((c) => c.code === code);
+            let existingCreatedAt = existingLocal?.createdAt && typeof existingLocal.createdAt.toDate === 'function'
+              ? existingLocal.createdAt
+              : null;
+            let existingUsedCount = Number(existingLocal?.usedCount || 0);
+            if (!existingCreatedAt) {
+              try {
+                const cSnap = await getDoc(doc(db, 'coupons', code));
+                if (cSnap.exists()) {
+                  const cd = cSnap.data() || {};
+                  if (cd.createdAt) existingCreatedAt = cd.createdAt;
+                  if (Number.isFinite(Number(cd.usedCount))) existingUsedCount = Number(cd.usedCount);
+                }
+              } catch {}
+            }
             await setDoc(doc(db, 'coupons', code), {
               code,
               type: document.getElementById('cp-type').value,
@@ -10422,11 +10941,11 @@
               minOrder: Math.max(0, Number(document.getElementById('cp-min').value || 0)),
               maxDiscount: Math.max(0, Number(document.getElementById('cp-max').value || 0)),
               usageLimit: Math.max(0, Number(document.getElementById('cp-limit').value || 0)),
-              usedCount: 0,
-              startDate: document.getElementById('cp-start').value,
-              expiryDate: document.getElementById('cp-expiry').value,
+              usedCount: Math.max(0, existingUsedCount),
+              startDate: String(document.getElementById('cp-start').value || '').slice(0, 40),
+              expiryDate: String(document.getElementById('cp-expiry').value || '').slice(0, 40),
               active: document.getElementById('cp-active').checked,
-              createdAt: serverTimestamp(),
+              createdAt: existingCreatedAt || serverTimestamp(),
               updatedAt: serverTimestamp()
             });
             showToast('Coupon saved', 'success');
@@ -10507,8 +11026,10 @@
             if (file) {
               const up = await uploadSingleFile(file, `banners/${bid}`);
               imageUrl = up.url;
-              storagePath = up.storagePath;
+              storagePath = up.storagePath || '';
             }
+            imageUrl = await ensureInlineUrlFits(imageUrl, OFFICIAL_BANNER, 220000);
+            const rawOrder = Number(document.getElementById('bn-order').value || 1);
             await setDoc(doc(db, 'banners', bid), {
               id: bid,
               title: document.getElementById('bn-title').value.trim().slice(0, 160),
@@ -10518,9 +11039,9 @@
               buttonText: document.getElementById('bn-btn').value.trim().slice(0, 60),
               buttonTextBn: document.getElementById('bn-btn').value.trim().slice(0, 60),
               buttonUrl: (document.getElementById('bn-url').value.trim() || '#shop').slice(0, 300),
-              imageUrl: imageUrl.slice(0, 1000),
-              storagePath: storagePath.slice(0, 500),
-              order: Number(document.getElementById('bn-order').value || 1),
+              imageUrl,
+              storagePath: String(storagePath || '').slice(0, 500),
+              order: Number.isFinite(rawOrder) ? rawOrder : 1,
               enabled: document.getElementById('bn-enabled').checked,
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
@@ -10549,6 +11070,7 @@
           const currentPassword = document.getElementById('adm-cur-pw').value;
           const newPassword = document.getElementById('adm-new-pw').value;
           try {
+            CLOUD_FUNCTIONS_BASE = getCloudFunctionsBase();
             if (CLOUD_FUNCTIONS_BASE && auth.currentUser) {
               const token = await auth.currentUser.getIdToken();
               const res = await fetch(`${CLOUD_FUNCTIONS_BASE}/changeAdminPassword`, {
@@ -10612,23 +11134,26 @@
         document.getElementById('adm-settings-logo-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           try {
-            let logoUrl = document.getElementById('st-logo').value.trim();
+            let logoUrl = document.getElementById('st-logo').value.trim() || OFFICIAL_LOGO;
             const file = document.getElementById('st-logo-file').files?.[0];
             if (file) {
               await ensureFirebaseAdminSession();
               const up = await uploadSingleFile(file, 'branding');
               logoUrl = up.url;
             }
+            logoUrl = await ensureInlineUrlFits(logoUrl, OFFICIAL_LOGO, 220000);
+            const rawFav = document.getElementById('st-fav').value.trim() || logoUrl;
+            const faviconUrl = await ensureInlineUrlFits(rawFav, logoUrl, 220000);
             await savePublicSettings({
-              brandName: document.getElementById('st-brand').value.trim(),
+              brandName: (document.getElementById('st-brand').value.trim() || 'MS FASHION').slice(0, 100),
               logoUrl,
-              faviconUrl: document.getElementById('st-fav').value.trim() || logoUrl,
+              faviconUrl,
               primaryColor: document.getElementById('st-primary').value,
               accentColor: document.getElementById('st-accent').value,
-              announcementTextBn: document.getElementById('st-ann-bn').value.trim(),
-              announcementText: document.getElementById('st-ann-en').value.trim(),
-              footerAboutBn: document.getElementById('st-foot-bn').value.trim(),
-              footerAbout: document.getElementById('st-foot-en').value.trim()
+              announcementTextBn: document.getElementById('st-ann-bn').value.trim().slice(0, 300),
+              announcementText: document.getElementById('st-ann-en').value.trim().slice(0, 300),
+              footerAboutBn: document.getElementById('st-foot-bn').value.trim().slice(0, 600),
+              footerAbout: document.getElementById('st-foot-en').value.trim().slice(0, 600)
             });
           } catch (err) {
             showToast(formatFirebaseAdminError(err, 'Logo upload failed'), 'error');
@@ -10636,8 +11161,10 @@
         });
       } else if (tab === 'settings') {
         const hs = s.homepageSections || DEFAULT_SETTINGS.homepageSections;
+        const currentHost = window.location.hostname || 'localhost';
+        const authDomainsUrl = getFirebaseAuthorizedDomainsUrl();
         host.innerHTML = `
-          <form id="adm-settings-web-form" class="panel-box" style="max-width:700px;display:flex;flex-direction:column;gap:12px;">
+          <form id="adm-settings-web-form" class="panel-box" style="max-width:740px;display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">
             <h3 style="margin:0;">Website &amp; Homepage Section Visibility</h3>
             <div class="form-grid-2">
               <div><label style="font-size:12px;font-weight:600;">Currency Symbol</label><input type="text" id="sw-curr" class="form-control" value="${esc(s.currencySymbol || '৳')}" /></div>
@@ -10653,8 +11180,36 @@
                 `).join('')}
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Save Website Settings</button>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Save Website Settings</button>
           </form>
+          <div class="panel-box" style="max-width:740px;display:flex;flex-direction:column;gap:12px;">
+            <h3 style="margin:0;">Firebase Connection, Diagnostics &amp; Authorized Domain Setup</h3>
+            <p style="margin:0;font-size:12px;color:var(--text-muted);line-height:1.5;">
+              ${state.lang === 'bn'
+                ? `যদি Google Sign-In-এ <strong>auth/unauthorized-domain</strong> দেখায়, নিচের বর্তমান ডোমেইন কপি করে Firebase Console → Authentication → Settings → Authorized domains-এ যোগ করুন।`
+                : `If Google Sign-In shows <strong>auth/unauthorized-domain</strong>, copy the hostname below and add it under Firebase Console → Authentication → Settings → Authorized domains.`}
+            </p>
+            <div class="form-grid-2" style="font-size:12px;background:var(--bg-surface);padding:12px;border-radius:8px;border:1px solid var(--border-hairline);">
+              <div><strong>Project ID:</strong> <span class="mono">${esc(firebaseConfig.projectId)}</span></div>
+              <div><strong>Database ID:</strong> <span class="mono">${esc(firebaseConfig.firestoreDatabaseId || '(default)')}</span></div>
+              <div><strong>Storage Bucket:</strong> <span class="mono">${esc(firebaseConfig.storageBucket || 'none')}</span></div>
+              <div><strong>Current Host:</strong> <span class="mono">${esc(currentHost)}</span></div>
+              <div style="grid-column:1 / -1;"><strong>Auth User:</strong> <span class="mono">${esc(auth.currentUser?.email || 'Not signed in')}</span></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button type="button" id="sw-copy-host-btn" class="btn btn-outline btn-sm">Copy "${esc(currentHost)}"</button>
+              <a href="${esc(authDomainsUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Open Firebase Authorized Domains ↗</a>
+              <button type="button" id="sw-test-conn-btn" class="btn btn-outline btn-sm">Test Live Firestore Connection</button>
+            </div>
+            <div id="sw-conn-result" class="hidden" style="font-size:12px;padding:10px;border-radius:6px;border:1px solid var(--border-hairline);"></div>
+            <div style="border-top:1px solid var(--border-hairline);padding-top:12px;display:flex;flex-direction:column;gap:8px;">
+              <label for="sw-cf-base" style="font-size:12px;font-weight:600;">Optional Cloud Functions Base URL (Blaze plan only)</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="url" id="sw-cf-base" class="form-control" style="flex:1;min-width:240px;" placeholder="https://asia-south1-turing-reducer-k5v9p.cloudfunctions.net" value="${esc(getCloudFunctionsBase())}" />
+                <button type="button" id="sw-save-cf-btn" class="btn btn-outline btn-sm">Save Functions URL</button>
+              </div>
+            </div>
+          </div>
         `;
         document.getElementById('adm-settings-web-form').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -10669,6 +11224,41 @@
             guestCheckoutEnabled: document.getElementById('sw-guest').checked,
             homepageSections
           });
+        });
+        document.getElementById('sw-copy-host-btn')?.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(currentHost);
+            showToast(`Copied "${currentHost}"`, 'success');
+          } catch {
+            showToast(currentHost, 'info');
+          }
+        });
+        document.getElementById('sw-save-cf-btn')?.addEventListener('click', () => {
+          const val = String(document.getElementById('sw-cf-base')?.value || '').trim().replace(/\/+$/, '');
+          if (val) localStorage.setItem('msf_cf_base', val);
+          else localStorage.removeItem('msf_cf_base');
+          CLOUD_FUNCTIONS_BASE = getCloudFunctionsBase();
+          showToast(val ? 'Cloud Functions URL saved' : 'Cloud Functions URL cleared', 'success');
+        });
+        document.getElementById('sw-test-conn-btn')?.addEventListener('click', async () => {
+          const resEl = document.getElementById('sw-conn-result');
+          if (!resEl) return;
+          resEl.classList.remove('hidden');
+          resEl.style.background = '#f9fafb';
+          resEl.style.color = '#111111';
+          resEl.textContent = 'Testing live Firestore connection...';
+          try {
+            const snap = await getDocFromServer(doc(db, 'test', 'connection'));
+            resEl.style.background = '#ecfdf5';
+            resEl.style.borderColor = '#86efac';
+            resEl.style.color = '#166534';
+            resEl.textContent = `Firestore reachable (${snap.exists() ? 'document exists' : 'online ping OK'}). Auth session: ${auth.currentUser?.email || 'signed out'}.`;
+          } catch (err) {
+            resEl.style.background = '#fef2f2';
+            resEl.style.borderColor = '#fca5a5';
+            resEl.style.color = '#991b1b';
+            resEl.textContent = formatFirebaseAdminError(err, 'Firestore connection test failed');
+          }
         });
       } else if (tab === 'shipping') {
         host.innerHTML = `
@@ -10731,25 +11321,35 @@
           });
         });
       } else if (tab === 'social') {
-        const activeFeedPosts = (Array.isArray(s.socialPosts) && s.socialPosts.length) ? s.socialPosts : DEFAULT_SOCIAL_POSTS;
+        const savedSocial = Array.isArray(s.socialPosts) ? s.socialPosts : [];
+        const isLegacySocial = savedSocial.length > 0 && savedSocial.every(
+          (item) => item && LEGACY_PLACEHOLDER_SOCIAL_IDS.has(item.id) && !String(item.postUrl || '').trim()
+        );
+        const activeFeedPosts = (savedSocial.length && !isLegacySocial) ? savedSocial : DEFAULT_SOCIAL_POSTS;
         host.innerHTML = `
-          <form id="adm-settings-soc-form" class="panel-box" style="max-width:740px;display:flex;flex-direction:column;gap:14px;">
-            <h3 style="margin:0;">Social Media, WhatsApp &amp; Homepage Social Feed</h3>
+          <form id="adm-settings-soc-form" class="panel-box" style="max-width:760px;display:flex;flex-direction:column;gap:14px;">
+            <h3 style="margin:0;">Social Media, WhatsApp &amp; Live Homepage Social Feed</h3>
             <div class="form-grid-2">
               <div><label style="font-size:12px;font-weight:600;">WhatsApp Number (with country code)</label><input type="text" id="sc-wa" class="form-control" value="${esc(s.whatsappNumber)}" required /></div>
               <div><label style="font-size:12px;font-weight:600;">Facebook URL</label><input type="url" id="sc-fb" class="form-control" value="${esc(s.facebookUrl)}" /></div>
-              <div><label style="font-size:12px;font-weight:600;">TikTok URL</label><input type="url" id="sc-tt" class="form-control" value="${esc(s.tiktokUrl)}" /></div>
+              <div><label style="font-size:12px;font-weight:600;">TikTok Profile URL</label><input type="url" id="sc-tt" class="form-control" value="${esc(s.tiktokUrl)}" /></div>
               <div><label style="font-size:12px;font-weight:600;">Instagram URL</label><input type="url" id="sc-ig" class="form-control" value="${esc(s.instagramUrl || '')}" /></div>
               <div><label style="font-size:12px;font-weight:600;">YouTube URL</label><input type="url" id="sc-yt" class="form-control" value="${esc(s.youtubeUrl || '')}" /></div>
             </div>
             <div style="border-top:1px solid var(--border-hairline);padding-top:14px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-                <strong style="font-size:14px;">Instagram &amp; TikTok Homepage Feed Posts</strong>
-                <button type="button" id="sc-add-post-btn" class="btn btn-outline btn-sm">+ Add Social Post</button>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                <div>
+                  <strong style="font-size:14px;display:block;">Live Embedded TikTok &amp; Instagram Posts</strong>
+                  <span style="font-size:12px;color:var(--text-muted);">Paste any TikTok video URL or Instagram Reel/Post URL below—the live video embeds directly on your homepage (image URL is optional).</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button type="button" id="sc-reset-posts-btn" class="btn btn-outline btn-sm">Load Latest Defaults</button>
+                  <button type="button" id="sc-add-post-btn" class="btn btn-outline btn-sm">+ Add Social Post</button>
+                </div>
               </div>
               <div id="sc-posts-list" style="display:flex;flex-direction:column;gap:10px;"></div>
             </div>
-            <button type="submit" class="btn btn-primary">Save Social Settings</button>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Save Social Settings</button>
           </form>
         `;
         let editablePosts = structuredClone(activeFeedPosts).slice(0, 24);
@@ -10759,19 +11359,19 @@
           listEl.innerHTML = editablePosts.map((p, idx) => `
             <div style="padding:12px;border:1px solid var(--border-hairline);border-radius:8px;background:var(--bg-surface);display:flex;flex-direction:column;gap:8px;" data-sc-row="${idx}">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                <strong style="font-size:12px;">Post #${idx + 1}</strong>
+                <strong style="font-size:12px;">Live Post #${idx + 1}</strong>
                 <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger);" data-sc-remove="${idx}">Remove</button>
               </div>
               <div class="form-grid-2">
                 <select class="form-control" data-sc-field="platform" data-sc-idx="${idx}">
-                  <option value="instagram" ${p.platform === 'instagram' ? 'selected' : ''}>Instagram</option>
                   <option value="tiktok" ${p.platform === 'tiktok' ? 'selected' : ''}>TikTok</option>
+                  <option value="instagram" ${p.platform === 'instagram' ? 'selected' : ''}>Instagram</option>
                 </select>
-                <input type="text" class="form-control" data-sc-field="handle" data-sc-idx="${idx}" placeholder="@handle" value="${esc(p.handle || '')}" />
-                <input type="text" class="form-control" data-sc-field="imageUrl" data-sc-idx="${idx}" placeholder="Image URL" value="${esc(p.imageUrl || '')}" />
-                <input type="url" class="form-control" data-sc-field="postUrl" data-sc-idx="${idx}" placeholder="Post / Reel URL (optional)" value="${esc(p.postUrl || '')}" />
-                <input type="text" class="form-control" data-sc-field="caption" data-sc-idx="${idx}" placeholder="Caption (English)" value="${esc(p.caption || '')}" />
-                <input type="text" class="form-control" data-sc-field="captionBn" data-sc-idx="${idx}" placeholder="Caption (Bengali)" value="${esc(p.captionBn || '')}" />
+                <input type="text" class="form-control" data-sc-field="handle" data-sc-idx="${idx}" placeholder="@msafashion20" value="${esc(p.handle || '')}" />
+                <input type="url" class="form-control" style="grid-column:1 / -1;" data-sc-field="postUrl" data-sc-idx="${idx}" placeholder="Paste TikTok Video URL or Instagram Reel/Post URL (auto-embeds)" value="${esc(p.postUrl || '')}" />
+                <input type="text" class="form-control" data-sc-field="caption" data-sc-idx="${idx}" placeholder="Caption (English, optional)" value="${esc(p.caption || '')}" />
+                <input type="text" class="form-control" data-sc-field="captionBn" data-sc-idx="${idx}" placeholder="Caption (Bengali, optional)" value="${esc(p.captionBn || '')}" />
+                <input type="text" class="form-control" style="grid-column:1 / -1;" data-sc-field="imageUrl" data-sc-idx="${idx}" placeholder="Fallback Image URL (optional for live TikTok/Instagram links)" value="${esc(p.imageUrl || '')}" />
               </div>
             </div>
           `).join('');
@@ -10783,7 +11383,21 @@
           if (!inp) return;
           const idx = Number(inp.getAttribute('data-sc-idx'));
           const field = inp.getAttribute('data-sc-field');
-          if (editablePosts[idx]) editablePosts[idx][field] = inp.value;
+          if (!editablePosts[idx]) return;
+          editablePosts[idx][field] = inp.value;
+          if (field === 'postUrl') {
+            const parsed = parseSocialPostEmbed(inp.value, editablePosts[idx].platform || 'instagram');
+            if (/tiktok\.com|instagram\.com/i.test(inp.value)) {
+              editablePosts[idx].platform = parsed.platform;
+              const sel = document.querySelector(`[data-sc-field="platform"][data-sc-idx="${idx}"]`);
+              if (sel) sel.value = parsed.platform;
+              if (parsed.handle) {
+                editablePosts[idx].handle = parsed.handle;
+                const handleInp = document.querySelector(`[data-sc-field="handle"][data-sc-idx="${idx}"]`);
+                if (handleInp) handleInp.value = parsed.handle;
+              }
+            }
+          }
         });
         document.getElementById('sc-posts-list').addEventListener('change', (e) => {
           const inp = e.target.closest('[data-sc-field]');
@@ -10798,18 +11412,23 @@
           editablePosts.splice(Number(rmBtn.getAttribute('data-sc-remove')), 1);
           renderSocialPostRows();
         });
+        document.getElementById('sc-reset-posts-btn').addEventListener('click', () => {
+          editablePosts = structuredClone(DEFAULT_SOCIAL_POSTS);
+          renderSocialPostRows();
+          showToast('Latest TikTok & Instagram defaults loaded. Click Save Social Settings to sync.', 'info');
+        });
         document.getElementById('sc-add-post-btn').addEventListener('click', () => {
           if (editablePosts.length >= 24) {
             showToast('Maximum 24 social posts allowed.', 'error');
             return;
           }
-          editablePosts.push({
+          editablePosts.unshift({
             id: `post_${Date.now()}`,
-            platform: 'instagram',
-            handle: '@msfashion.bd',
-            typeLabel: 'Post',
-            typeLabelBn: 'পোস্ট',
-            imageUrl: DEFAULT_SOCIAL_POSTS[0].imageUrl,
+            platform: 'tiktok',
+            handle: '@msafashion20',
+            typeLabel: 'Latest Post',
+            typeLabelBn: 'সর্বশেষ পোস্ট',
+            imageUrl: '',
             caption: '',
             captionBn: '',
             postUrl: ''
@@ -10820,19 +11439,25 @@
         document.getElementById('adm-settings-soc-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           const cleanedPosts = editablePosts
-            .filter((p) => String(p.imageUrl || '').trim())
+            .filter((p) => String(p.postUrl || '').trim() || String(p.imageUrl || '').trim())
             .slice(0, 24)
-            .map((p, idx) => ({
-              id: String(p.id || `post_${idx}`).slice(0, 80),
-              platform: p.platform === 'tiktok' ? 'tiktok' : 'instagram',
-              handle: String(p.handle || (p.platform === 'tiktok' ? '@msafashion20' : '@msfashion.bd')).trim().slice(0, 80),
-              typeLabel: String(p.typeLabel || (p.platform === 'tiktok' ? 'Reel' : 'Post')).trim().slice(0, 40),
-              typeLabelBn: String(p.typeLabelBn || (p.platform === 'tiktok' ? 'রিলস' : 'পোস্ট')).trim().slice(0, 40),
-              imageUrl: String(p.imageUrl || '').trim().slice(0, 1000),
-              caption: String(p.caption || '').trim().slice(0, 300),
-              captionBn: String(p.captionBn || '').trim().slice(0, 300),
-              postUrl: String(p.postUrl || '').trim().slice(0, 1000)
-            }));
+            .map((p, idx) => {
+              const parsed = parseSocialPostEmbed(p.postUrl, p.platform === 'tiktok' ? 'tiktok' : 'instagram');
+              const platform = /tiktok\.com|instagram\.com/i.test(String(p.postUrl || ''))
+                ? parsed.platform
+                : (p.platform === 'tiktok' ? 'tiktok' : 'instagram');
+              return {
+                id: String(p.id || `post_${idx}`).slice(0, 80),
+                platform,
+                handle: String(p.handle || parsed.handle || '@msafashion20').trim().slice(0, 80),
+                typeLabel: String(p.typeLabel || (platform === 'tiktok' ? 'Latest Video' : 'Latest Reel')).trim().slice(0, 40),
+                typeLabelBn: String(p.typeLabelBn || (platform === 'tiktok' ? 'সর্বশেষ ভিডিও' : 'সর্বশেষ রিলস')).trim().slice(0, 40),
+                imageUrl: String(p.imageUrl || '').trim().slice(0, 1000),
+                caption: String(p.caption || '').trim().slice(0, 300),
+                captionBn: String(p.captionBn || '').trim().slice(0, 300),
+                postUrl: String(p.postUrl || '').trim().slice(0, 1000)
+              };
+            });
           await savePublicSettings({
             whatsappNumber: document.getElementById('sc-wa').value.trim(),
             facebookUrl: document.getElementById('sc-fb').value.trim(),
@@ -10845,13 +11470,43 @@
       }
     }
 
+    const ALLOWED_SETTINGS_KEYS = [
+      'brandName', 'logoUrl', 'faviconUrl', 'announcementText', 'announcementTextBn',
+      'primaryColor', 'accentColor', 'whatsappNumber', 'facebookUrl', 'tiktokUrl',
+      'instagramUrl', 'youtubeUrl', 'footerAbout', 'footerAboutBn', 'currencySymbol',
+      'defaultLanguage', 'guestCheckoutEnabled', 'minOrderValue', 'dhakaDeliveryCharge',
+      'outsideDhakaDeliveryCharge', 'freeDeliveryThreshold', 'dhakaDeliveryEstimate',
+      'outsideDhakaDeliveryEstimate', 'defaultCourier', 'districtCharges',
+      'paymentMethods', 'homepageSections', 'socialPosts', 'stockAlertConfig'
+    ];
+
     async function savePublicSettings(partial) {
       try {
         await ensureFirebaseAdminSession();
-        const merged = { ...state.settings, ...partial, updatedAt: serverTimestamp() };
-        await setDoc(doc(db, 'settings', 'public'), merged);
+        const combined = { ...state.settings, ...partial };
+        const cleanPayload = {};
+        for (const key of ALLOWED_SETTINGS_KEYS) {
+          if (combined[key] !== undefined) cleanPayload[key] = combined[key];
+        }
+        cleanPayload.brandName = String(cleanPayload.brandName || 'MS FASHION').trim().slice(0, 100) || 'MS FASHION';
+        cleanPayload.logoUrl = await ensureInlineUrlFits(cleanPayload.logoUrl, OFFICIAL_LOGO, 220000);
+        if (cleanPayload.faviconUrl !== undefined) {
+          cleanPayload.faviconUrl = await ensureInlineUrlFits(cleanPayload.faviconUrl, cleanPayload.logoUrl, 220000);
+        }
+        cleanPayload.whatsappNumber = String(cleanPayload.whatsappNumber || OFFICIAL_WHATSAPP).trim().slice(0, 30);
+        if (cleanPayload.stockAlertConfig && typeof cleanPayload.stockAlertConfig === 'object') {
+          cleanPayload.stockAlertConfig = {
+            defaultThreshold: Math.max(0, Number(cleanPayload.stockAlertConfig.defaultThreshold ?? 5)),
+            alertEmail: String(cleanPayload.stockAlertConfig.alertEmail || '').trim().slice(0, 160)
+          };
+        }
+        cleanPayload.updatedAt = serverTimestamp();
+        await setDoc(doc(db, 'settings', 'public'), cleanPayload);
         state.settings = { ...state.settings, ...partial };
         applyDynamicBranding();
+        if (partial.socialPosts !== undefined || partial.tiktokUrl !== undefined || partial.instagramUrl !== undefined) {
+          fetchLatestSocialPosts({ forceRefresh: true }).catch(() => {});
+        }
         showToast('Settings saved & synced!', 'success');
       } catch (err) {
         showToast(formatFirebaseAdminError(err, 'Settings save failed'), 'error');
@@ -10909,14 +11564,21 @@
         e.preventDefault();
         const name = document.getElementById('cm-name').value.trim().slice(0, 120);
         const id = catId || slugify(name);
+        if (!name || !id) {
+          showToast('Category name is required.', 'error');
+          return;
+        }
         let imageUrl = document.getElementById('cm-img').value.trim() || OFFICIAL_LOGO;
+        let catStoragePath = String(c?.storagePath || '').slice(0, 500);
         const file = document.getElementById('cm-file').files?.[0];
         try {
           await ensureFirebaseAdminSession();
           if (file) {
             const up = await uploadSingleFile(file, `categories/${id}`);
             imageUrl = up.url;
+            catStoragePath = String(up.storagePath || '').slice(0, 500);
           }
+          imageUrl = await ensureInlineUrlFits(imageUrl, OFFICIAL_LOGO, 220000);
           let catCreatedAt = serverTimestamp();
           if (catId) {
             if (c?.createdAt && typeof c.createdAt.toDate === 'function') {
@@ -10928,17 +11590,18 @@
               } catch {}
             }
           }
+          const rawOrder = Number(document.getElementById('cm-order').value || 1);
           await setDoc(doc(db, 'categories', id), {
             id,
             name,
             nameBn: document.getElementById('cm-name-bn').value.trim().slice(0, 120),
             slug: slugify(name).slice(0, 128),
             parentId: document.getElementById('cm-parent').value.trim().slice(0, 128),
-            order: Number(document.getElementById('cm-order').value || 1),
-            imageUrl: imageUrl.slice(0, 1000),
-            storagePath: '',
+            order: Number.isFinite(rawOrder) ? rawOrder : 1,
+            imageUrl,
+            storagePath: catStoragePath,
             description: document.getElementById('cm-desc').value.trim().slice(0, 500),
-            descriptionBn: '',
+            descriptionBn: String(c?.descriptionBn || '').slice(0, 500),
             enabled: document.getElementById('cm-enabled').checked,
             createdAt: catCreatedAt,
             updatedAt: serverTimestamp()
@@ -11463,14 +12126,15 @@
         e.preventDefault();
         const nextStatus = document.getElementById('ao-status').value;
         const nextPay = document.getElementById('ao-pay-status').value;
-        const courier = document.getElementById('ao-courier').value.trim();
-        const trackingNumber = document.getElementById('ao-tracking').value.trim();
-        const adminNotes = document.getElementById('ao-notes').value.trim();
+        const courier = document.getElementById('ao-courier').value.trim().slice(0, 120);
+        const trackingNumber = document.getElementById('ao-tracking').value.trim().slice(0, 120);
+        const adminNotes = document.getElementById('ao-notes').value.trim().slice(0, 1000);
         const saveBtn = document.getElementById('ao-save-btn');
         saveBtn.disabled = true;
 
         try {
           await ensureFirebaseAdminSession();
+          CLOUD_FUNCTIONS_BASE = getCloudFunctionsBase();
 
           if (CLOUD_FUNCTIONS_BASE && auth.currentUser) {
             const token = await auth.currentUser.getIdToken();
@@ -11499,9 +12163,16 @@
                   batch.update(doc(db, 'products', it.productId), { stock: newStock, updatedAt: serverTimestamp() });
                   const logId = `restore_${o.orderId}_${it.productId}_${Date.now()}`.slice(0, 120);
                   batch.set(doc(db, 'inventoryLogs', logId), {
-                    id: logId, productId: it.productId, productName: it.productName, sku: it.sku,
-                    change: Number(it.quantity || 0), previousStock: prevStock, newStock,
-                    reason: `Restored (${nextStatus}) ${o.orderId}`, orderId: o.orderId, createdAt: serverTimestamp()
+                    id: logId,
+                    productId: String(it.productId || '').slice(0, 128),
+                    productName: String(it.productName || '').slice(0, 200),
+                    sku: String(it.sku || '').slice(0, 80),
+                    change: Number(it.quantity || 0),
+                    previousStock: prevStock,
+                    newStock,
+                    reason: `Restored (${nextStatus}) ${o.orderId}`.slice(0, 300),
+                    orderId: String(o.orderId || '').slice(0, 40),
+                    createdAt: serverTimestamp()
                   });
                 }
               }
@@ -11509,9 +12180,9 @@
             if (o.userId) {
               const nid = `status_${o.orderId}_${Date.now()}`.slice(0, 120);
               batch.set(doc(db, 'notifications', nid), {
-                id: nid, userId: o.userId, orderId: o.orderId,
-                title: `Order ${o.orderId}: ${nextStatus}`,
-                message: `Your MS FASHION order status is now ${nextStatus}.`,
+                id: nid, userId: String(o.userId).slice(0, 128), orderId: String(o.orderId).slice(0, 40),
+                title: `Order ${o.orderId}: ${nextStatus}`.slice(0, 160),
+                message: `Your MS FASHION order status is now ${nextStatus}.`.slice(0, 500),
                 read: false, createdAt: serverTimestamp()
               });
             }
@@ -11548,14 +12219,47 @@
         try {
           await ensureFirebaseAdminSession();
           const newId = `prod_${Date.now()}`;
-          await setDoc(doc(db, 'products', newId), {
-            ...orig,
+          const dupName = `${String(orig.name || 'Product').trim()} (Copy)`.slice(0, 200);
+          const dupPayload = {
             id: newId,
-            name: `${orig.name} (Copy)`.slice(0, 200),
-            sku: `${orig.sku}-COPY`.slice(0, 80),
+            name: dupName,
+            nameBn: String(orig.nameBn || '').slice(0, 200),
+            slug: slugify(dupName).slice(0, 200),
+            sku: `${String(orig.sku || newId).trim()}-COPY`.slice(0, 80),
+            categoryId: String(orig.categoryId || 'mens-fashion').slice(0, 128),
+            subcategory: String(orig.subcategory || '').slice(0, 120),
+            brand: String(orig.brand || 'MS FASHION').slice(0, 100),
+            shortDesc: String(orig.shortDesc || '').slice(0, 400),
+            description: String(orig.description || '').slice(0, 5000),
+            descriptionBn: String(orig.descriptionBn || '').slice(0, 5000),
+            fabric: String(orig.fabric || '').slice(0, 160),
+            care: String(orig.care || '').slice(0, 300),
+            fit: String(orig.fit || '').slice(0, 160),
+            keywords: Array.isArray(orig.keywords) ? orig.keywords.slice(0, 50).map((x) => String(x)) : [],
+            regularPrice: Math.max(0, Number(orig.regularPrice || 0)),
+            salePrice: Math.max(0, Number(orig.salePrice || 0)),
+            wholesalePrice: Math.max(0, Number(orig.wholesalePrice || 0)),
+            discountPercent: Math.max(0, Math.min(100, Number(orig.discountPercent || 0))),
+            images: Array.isArray(orig.images) ? orig.images.slice(0, 500) : [],
+            sizes: Array.isArray(orig.sizes) ? orig.sizes.slice(0, 30).map((x) => String(x)) : [],
+            colors: Array.isArray(orig.colors) ? orig.colors.slice(0, 30).map((x) => String(x)) : [],
+            variants: Array.isArray(orig.variants) ? orig.variants.slice(0, 200) : [],
+            stock: Math.max(0, Number(orig.stock || 0)),
+            soldCount: 0,
+            ratingAvg: 0,
+            reviewCount: 0,
+            isFeatured: Boolean(orig.isFeatured),
+            isBestSeller: Boolean(orig.isBestSeller),
+            isNewArrival: Boolean(orig.isNewArrival),
+            isTrending: Boolean(orig.isTrending),
+            isSpecialCollection: Boolean(orig.isSpecialCollection),
+            isFlashSale: Boolean(orig.isFlashSale),
+            active: Boolean(orig.active ?? true),
+            published: Boolean(orig.published ?? true),
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
-          });
+          };
+          await setDoc(doc(db, 'products', newId), dupPayload);
           showToast('Product duplicated', 'success');
           await loadAdminCollections();
           renderAdminTab('products');
