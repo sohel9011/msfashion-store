@@ -1669,6 +1669,277 @@
       border-radius: var(--radius-md);
     }
 
+    .reviews-carousel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .reviews-carousel-summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reviews-carousel-summary strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .reviews-carousel-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .reviews-nav-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .reviews-nav-btn:hover:not(:disabled) {
+      background: var(--bg-dark);
+      color: #ffffff;
+      border-color: var(--bg-dark);
+    }
+
+    .reviews-nav-btn:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 2px;
+    }
+
+    .reviews-nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .reviews-carousel-viewport {
+      position: relative;
+    }
+
+    .reviews-track {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scroll-padding-inline: 2px;
+      padding: 4px 2px 10px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .reviews-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .reviews-track:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 4px;
+      border-radius: var(--radius-md);
+    }
+
+    .review-slide-card {
+      flex: 0 0 85%;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 200px;
+      padding: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+    }
+
+    @media (min-width: 640px) {
+      .review-slide-card {
+        flex: 0 0 calc((100% - 16px) / 2);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .review-slide-card {
+        flex: 0 0 calc((100% - 32px) / 3);
+      }
+    }
+
+    .review-slide-card:hover {
+      transform: translateY(-2px);
+      background: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .review-slide-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .review-slide-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #b45309;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .review-slide-score {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .review-slide-quote {
+      margin: 0;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .review-slide-product-link {
+      align-self: flex-start;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .review-slide-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-hairline);
+      min-width: 0;
+    }
+
+    .review-slide-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .review-slide-author-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .review-slide-author-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .review-slide-verified {
+      font-size: 11.5px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .reviews-carousel-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reviews-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reviews-dot {
+      width: 22px;
+      height: 6px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.16);
+      cursor: pointer;
+      transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+    }
+
+    .reviews-dot.active {
+      width: 34px;
+      background: var(--bg-dark);
+    }
+
+    .reviews-dot:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 2px;
+    }
+
+    .reviews-counter {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reviews-track {
+        scroll-behavior: auto;
+      }
+      .review-slide-card,
+      .reviews-nav-btn,
+      .reviews-dot {
+        transition: none;
+      }
+    }
+
     /* Dedicated Homepage Social Feed (Instagram & TikTok) */
     .social-feed-section {
       border-top: 1px solid var(--border-hairline);
@@ -1882,10 +2153,222 @@
       text-underline-offset: 3px;
     }
 
+    .social-card-play-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border: 0;
+      padding: 16px;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(17, 17, 17, 0.28) 0%, rgba(17, 17, 17, 0.04) 45%, transparent 100%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      cursor: pointer;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-card-play-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.86);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-card-play-overlay:hover .social-card-play-btn {
+      transform: scale(1.04);
+    }
+
+    .social-card-play-overlay:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: -3px;
+    }
+
+    .social-post-card.is-playing .social-card-play-overlay,
+    .social-post-card.is-embed-error .social-card-play-overlay {
+      display: none;
+    }
+
+    .social-post-card.is-embed-error .social-embed-frame {
+      display: none;
+    }
+
+    .social-post-fallback-card {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(254, 44, 85, 0.22), transparent 52%),
+        radial-gradient(circle at 82% 84%, rgba(37, 244, 238, 0.16), transparent 52%),
+        linear-gradient(165deg, #16181d 0%, #0d0e12 100%);
+    }
+
+    .social-post-card.is-embed-error .social-post-fallback-card {
+      display: flex;
+    }
+
+    .social-post-fallback-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .social-post-fallback-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .social-post-fallback-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      margin: auto 0;
+    }
+
+    .social-post-fallback-play {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #111111;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .social-post-fallback-play:hover {
+      transform: scale(1.06);
+    }
+
+    .social-post-fallback-caption {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.86);
+      max-width: 28ch;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .social-post-fallback-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .social-post-fallback-retry {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .social-post-fallback-retry:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .social-skeleton-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .social-skeleton-block {
+      position: relative;
+      overflow: hidden;
+      background: #efefef;
+      border: 1px solid var(--border-hairline);
+    }
+
+    .social-skeleton-block::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+      animation: socialSkeletonShimmer 1.35s infinite;
+    }
+
+    .social-skeleton-media {
+      width: 100%;
+      aspect-ratio: 9 / 15;
+      min-height: 480px;
+      max-height: 620px;
+      border-radius: var(--radius-md);
+    }
+
+    .social-skeleton-line {
+      height: 12px;
+      border-radius: 4px;
+      border: 0;
+    }
+
+    .social-skeleton-line--meta {
+      width: 52%;
+      height: 11px;
+    }
+
+    .social-skeleton-line--title {
+      width: 88%;
+      height: 14px;
+    }
+
+    .social-skeleton-line--cta {
+      width: 36%;
+      height: 12px;
+    }
+
+    @keyframes socialSkeletonShimmer {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .social-post-card,
-      .social-post-media img {
+      .social-post-media img,
+      .social-card-play-overlay,
+      .social-card-play-btn {
         transition: none;
+      }
+      .social-skeleton-block::after {
+        animation: none;
+        display: none;
       }
     }
 
@@ -4496,9 +4979,12 @@
       currentHeroIndex: 0,
       socialFeedFilter: 'all',
       dynamicSocialPosts: [],
-      socialPostsLoading: false,
+      socialPostsLoading: true,
       socialPostsSyncedAt: 0,
       socialPostsOembedCache: {},
+      socialActivePlayIds: {},
+      socialEmbedErrors: {},
+      socialEmbedReady: {},
       catalogFilters: {
         search: '',
         category: '',
@@ -4727,6 +5213,19 @@
       if (isFirestorePermissionError(err)) {
         const curEmail = structured?.authInfo?.email || (auth.currentUser || state.user)?.email || 'none';
         const opPath = structured?.path ? ` [${structured.operationType}: ${structured.path}]` : '';
+        const lowerFallback = String(fallbackMsg || '').toLowerCase();
+        const isCustomerReview = String(structured?.path || '').startsWith('reviews') || lowerFallback.includes('review');
+        const isCustomerProfile = String(structured?.path || '').startsWith('users') || lowerFallback.includes('profile') || lowerFallback.includes('coupon');
+        if (isCustomerReview) {
+          return state.lang === 'bn'
+            ? `রিভিউ জমা দিতে সমস্যা হয়েছে (${curEmail})${opPath}: অনুগ্রহ করে আপনার নিজের ইমেইল দিয়ে সাইন-ইন করে আবার চেষ্টা করুন।`
+            : `Unable to submit review (${curEmail})${opPath}. Please sign in with your email account and try again.`;
+        }
+        if (isCustomerProfile) {
+          return state.lang === 'bn'
+            ? `অ্যাকাউন্টের তথ্য আপডেট করতে অনুগ্রহ করে লগইন করুন (${curEmail})।`
+            : `Permission denied (${curEmail}). Please sign in to continue.`;
+        }
         return state.lang === 'bn'
           ? `Firestore Permission Error (${curEmail})${opPath}: পণ্য পাবলিশ করতে ভেরিফায়েড অ্যাডমিন জিমেইল (${BOOTSTRAP_ADMIN_EMAIL}) দিয়ে লগইন থাকতে হবে এবং সব ফিল্ড সঠিক ফরম্যাট/সীমার মধ্যে থাকতে হবে।`
           : `Firestore Permission Denied (signed in: ${curEmail})${opPath}. Publishing requires verified ${BOOTSTRAP_ADMIN_EMAIL} and schema-valid fields.`;
@@ -4806,12 +5305,91 @@
       return activeAdminSessionPromise;
     }
 
+    function isUsableImageUrl(url) {
+      const s = String(url || '').trim();
+      if (!s) return false;
+      if (s.startsWith('data:image/')) {
+        const commaIdx = s.indexOf(',');
+        if (commaIdx === -1) return false;
+        const header = s.slice(0, commaIdx + 1).toLowerCase();
+        const body = s.slice(commaIdx + 1).replace(/\s+/g, '');
+        if (!body) return false;
+        if (header.includes(';base64,')) {
+          if (body.length < 32) return false;
+          // Reject base64 data URLs chopped at legacy 1,000-char limit or non-quad length
+          if ((s.length >= 995 && s.length <= 1005) || (body.length % 4 !== 0)) return false;
+          return /^[A-Za-z0-9+/=]+$/.test(body);
+        }
+        if (header.includes('svg')) {
+          return /<\/svg>/i.test(body) || /%3c%2fsvg%3e/i.test(body);
+        }
+        return body.length >= 16;
+      }
+      if (/^(https?:\/\/|blob:|\/|\.\.?\/)/i.test(s)) return true;
+      return false;
+    }
+
     function getProductMainImage(product) {
       if (Array.isArray(product?.images) && product.images.length > 0) {
-        const main = product.images.find((i) => i.isMain) || product.images[0];
-        return main?.url || OFFICIAL_LOGO;
+        const normalized = product.images
+          .map((img) => (typeof img === 'string' ? { url: img, isMain: false } : img))
+          .filter((img) => img && isUsableImageUrl(img.url));
+        const main = normalized.find((i) => i.isMain) || normalized[0];
+        if (main?.url) return main.url;
       }
+      if (isUsableImageUrl(product?.imageUrl)) return String(product.imageUrl).trim();
       return OFFICIAL_LOGO;
+    }
+
+    function findCatalogProductForOrderItem(item) {
+      if (!item) return null;
+      const catalogs = [...(state.adminProducts || []), ...(state.products || [])];
+      if (!catalogs.length) return null;
+      if (item.productId) {
+        const byId = catalogs.find((p) => p && p.id === item.productId);
+        if (byId) return byId;
+      }
+      if (item.sku) {
+        const targetSku = String(item.sku).trim();
+        const bySku = catalogs.find((p) =>
+          p && (p.sku === targetSku || (Array.isArray(p.variants) && p.variants.some((v) => v && v.sku === targetSku)))
+        );
+        if (bySku) return bySku;
+      }
+      if (item.productName) {
+        const targetName = String(item.productName).trim().toLowerCase();
+        const byName = catalogs.find((p) => p && String(p.name || '').trim().toLowerCase() === targetName);
+        if (byName) return byName;
+      }
+      return null;
+    }
+
+    function resolveOrderItemImageUrl(item) {
+      const prod = findCatalogProductForOrderItem(item);
+      let catalogImg = OFFICIAL_LOGO;
+      if (prod) {
+        let variantImg = '';
+        if (Array.isArray(prod.variants) && prod.variants.length && (item?.size || item?.color)) {
+          const mv = prod.variants.find((v) =>
+            (!item.size || v.size === item.size) && (!item.color || v.color === item.color)
+          );
+          if (mv && isUsableImageUrl(mv.imageUrl)) variantImg = String(mv.imageUrl).trim();
+        }
+        catalogImg = variantImg || getProductMainImage(prod);
+      }
+      if (isUsableImageUrl(item?.imageUrl)) {
+        return { src: String(item.imageUrl).trim(), fallback: catalogImg };
+      }
+      return { src: catalogImg, fallback: OFFICIAL_LOGO };
+    }
+
+    function renderOrderImgTag(item, styleAttr = '', extraClass = '', altFallback = 'Product') {
+      const resolved = resolveOrderItemImageUrl(item);
+      const altText = esc(item?.productName || altFallback);
+      const clsAttr = extraClass ? ` class="${esc(extraClass)}"` : '';
+      const stlAttr = styleAttr ? ` style="${esc(styleAttr)}"` : '';
+      const onErr = `const fb=this.dataset.fallback||'';this.dataset.fallback='';if(fb&&this.src!==fb){this.src=fb;}else{this.onerror=null;this.src='${OFFICIAL_LOGO}';}`;
+      return `<img src="${esc(resolved.src)}" data-fallback="${esc(resolved.fallback)}" alt="${altText}"${clsAttr}${stlAttr} loading="lazy" referrerpolicy="no-referrer" onerror="${onErr}" />`;
     }
 
     function getProductPrice(product) {
@@ -5261,9 +5839,15 @@
 
     async function loadApprovedReviews() {
       try {
-        const q = query(collection(db, 'reviews'), where('status', '==', 'approved'), limit(12));
+        const q = query(collection(db, 'reviews'), where('status', '==', 'approved'), limit(24));
         const snap = await getDocs(q);
-        state.reviews = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        list.sort((a, b) => {
+          const ta = typeof a.createdAt?.toMillis === 'function' ? a.createdAt.toMillis() : (Number(a.createdAt?.seconds || 0) * 1000);
+          const tb = typeof b.createdAt?.toMillis === 'function' ? b.createdAt.toMillis() : (Number(b.createdAt?.seconds || 0) * 1000);
+          return tb - ta;
+        });
+        state.reviews = list;
       } catch {
         state.reviews = [];
       }
@@ -5452,6 +6036,32 @@
       `;
     }
 
+    function buildTikTokPlayerUrl(videoId, { autoplay = false, variant = 'player' } = {}) {
+      const cleanId = String(videoId || '').trim();
+      if (!cleanId) return '';
+      const base = variant === 'embed-v2'
+        ? `https://www.tiktok.com/embed/v2/${cleanId}`
+        : `https://www.tiktok.com/player/v1/${cleanId}`;
+      const u = new URL(base);
+      if (variant === 'embed-v2') {
+        u.searchParams.set('lang', 'en');
+        u.searchParams.set('force_muted', '1');
+      } else {
+        u.searchParams.set('embed_from', 'oembed');
+      }
+      u.searchParams.set('music_info', '1');
+      u.searchParams.set('description', '1');
+      u.searchParams.set('controls', '1');
+      u.searchParams.set('play_button', '1');
+      u.searchParams.set('volume_control', '1');
+      u.searchParams.set('fullscreen_button', '1');
+      u.searchParams.set('rel', '0');
+      u.searchParams.set('muted', '1');
+      u.searchParams.set('loop', '1');
+      u.searchParams.set('autoplay', autoplay ? '1' : '0');
+      return u.toString();
+    }
+
     function parseSocialPostEmbed(rawUrl, fallbackPlatform = 'instagram') {
       const cleanUrl = String(rawUrl || '').trim();
       if (!/^https?:\/\//i.test(cleanUrl)) {
@@ -5465,9 +6075,7 @@
           platform: 'tiktok',
           handle: handleMatch ? `@${handleMatch[1]}` : '',
           contentId: videoId,
-          embedUrl: videoId
-            ? `https://www.tiktok.com/player/v1/${videoId}?embed_from=oembed&music_info=1&description=1&autoplay=0`
-            : ''
+          embedUrl: videoId ? buildTikTokPlayerUrl(videoId, { autoplay: false, variant: 'player' }) : ''
         };
       }
       if (/instagram\.com/i.test(cleanUrl)) {
@@ -5541,6 +6149,16 @@
         try {
           const u = new URL(rawSrc);
           if (u.hostname.includes('tiktok.com')) {
+            if (!u.searchParams.has('embed_from')) u.searchParams.set('embed_from', 'oembed');
+            u.searchParams.set('music_info', '1');
+            u.searchParams.set('description', '1');
+            u.searchParams.set('controls', '1');
+            u.searchParams.set('play_button', '1');
+            u.searchParams.set('volume_control', '1');
+            u.searchParams.set('fullscreen_button', '1');
+            u.searchParams.set('rel', '0');
+            u.searchParams.set('muted', '1');
+            u.searchParams.set('loop', '1');
             u.searchParams.set('autoplay', '0');
           }
           return u.toString();
@@ -5628,6 +6246,7 @@
         platform,
         handle: parsed.handle || item?.handle || (platform === 'tiktok' ? '@msafashion20' : '@msfas_ion20'),
         authorUrl: parsed.authorUrl || '',
+        contentId: String(parsed.contentId || '').trim(),
         typeLabel: item?.typeLabel || (platform === 'tiktok' ? 'Latest Video' : 'Latest Reel'),
         typeLabelBn: item?.typeLabelBn || (platform === 'tiktok' ? 'সর্বশেষ ভিডিও' : 'সর্বশেষ রিলস'),
         imageUrl: String(parsed.thumbnailUrl || item?.imageUrl || '').trim(),
@@ -5643,8 +6262,9 @@
       const gridEl = document.getElementById('social-feed-grid');
       if (gridEl) {
         const filter = state.socialFeedFilter || 'all';
-        const filteredCount = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter).length;
+        const filteredCount = getSocialGridExpectedCount(filter);
         gridEl.className = getSocialFeedGridClass(filteredCount);
+        gridEl.setAttribute('aria-busy', state.socialPostsLoading ? 'true' : 'false');
         gridEl.innerHTML = renderSocialFeedCardsHTML(filter);
       }
       const refreshBtn = document.getElementById('social-feed-refresh-btn');
@@ -5656,37 +6276,45 @@
       }
     }
 
+    let socialFetchPromise = null;
+
     async function fetchLatestSocialPosts({ forceRefresh = false } = {}) {
-      if (state.socialPostsLoading && !forceRefresh) return state.dynamicSocialPosts;
+      if (socialFetchPromise && !forceRefresh) return socialFetchPromise;
       state.socialPostsLoading = true;
       refreshSocialFeedDOM();
 
-      try {
-        const seeds = collectConfiguredSocialSeeds().filter(
-          (item) => item && (String(item.postUrl || '').trim() || String(item.imageUrl || '').trim())
-        );
+      const run = (async () => {
+        try {
+          const seeds = collectConfiguredSocialSeeds().filter(
+            (item) => item && (String(item.postUrl || '').trim() || String(item.imageUrl || '').trim())
+          );
 
-        const settled = await Promise.allSettled(
-          seeds.map(async (item, idx) => {
-            const fallbackPlatform = String(item.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
-            const liveMeta = String(item.postUrl || '').trim()
-              ? await fetchSocialPostOembedMetadata(item.postUrl, fallbackPlatform, { forceRefresh })
-              : null;
-            return normalizeSeedToSocialPost(item, idx, liveMeta);
-          })
-        );
+          const settled = await Promise.allSettled(
+            seeds.map(async (item, idx) => {
+              const fallbackPlatform = String(item.platform || '').toLowerCase() === 'tiktok' ? 'tiktok' : 'instagram';
+              const liveMeta = String(item.postUrl || '').trim()
+                ? await fetchSocialPostOembedMetadata(item.postUrl, fallbackPlatform, { forceRefresh })
+                : null;
+              return normalizeSeedToSocialPost(item, idx, liveMeta);
+            })
+          );
 
-        const nextPosts = settled
-          .filter((r) => r.status === 'fulfilled' && r.value)
-          .map((r) => r.value);
+          const nextPosts = settled
+            .filter((r) => r.status === 'fulfilled' && r.value)
+            .map((r) => r.value);
 
-        state.dynamicSocialPosts = nextPosts;
-        state.socialPostsSyncedAt = Date.now();
-        return nextPosts;
-      } finally {
-        state.socialPostsLoading = false;
-        refreshSocialFeedDOM();
-      }
+          state.dynamicSocialPosts = nextPosts;
+          state.socialPostsSyncedAt = Date.now();
+          return nextPosts;
+        } finally {
+          state.socialPostsLoading = false;
+          socialFetchPromise = null;
+          refreshSocialFeedDOM();
+        }
+      })();
+
+      socialFetchPromise = run;
+      return run;
     }
 
     function getActiveSocialPosts() {
@@ -5698,19 +6326,153 @@
         .map((item, idx) => normalizeSeedToSocialPost(item, idx, null));
     }
 
+    function getSocialGridExpectedCount(filter = state.socialFeedFilter || 'all') {
+      const list = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter);
+      return list.length || (state.socialPostsLoading ? 2 : 0);
+    }
+
     function getSocialFeedGridClass(count) {
       if (count <= 1) return 'social-feed-grid social-feed-grid--single';
       if (count === 2) return 'social-feed-grid social-feed-grid--compact';
       return 'social-feed-grid';
     }
 
+    function buildSocialAutoplayEmbedUrl(rawEmbedUrl, platform = 'instagram') {
+      const clean = String(rawEmbedUrl || '').trim();
+      if (!clean) return '';
+      try {
+        const u = new URL(clean);
+        u.searchParams.set('autoplay', '1');
+        if (platform === 'tiktok' || u.hostname.includes('tiktok.com')) {
+          if (!u.searchParams.has('embed_from')) u.searchParams.set('embed_from', 'oembed');
+          u.searchParams.set('music_info', '1');
+          u.searchParams.set('description', '1');
+          u.searchParams.set('controls', '1');
+          u.searchParams.set('play_button', '1');
+          u.searchParams.set('volume_control', '1');
+          u.searchParams.set('fullscreen_button', '1');
+          u.searchParams.set('rel', '0');
+          u.searchParams.set('muted', '1');
+          u.searchParams.set('loop', '1');
+        }
+        return u.toString();
+      } catch {
+        const sep = clean.includes('?') ? '&' : '?';
+        return clean.includes('autoplay=')
+          ? clean.replace(/([?&])autoplay=[^&]*/i, '$1autoplay=1')
+          : `${clean}${sep}autoplay=1`;
+      }
+    }
+
+    function sendTikTokPlayerCommand(iframeEl, type, value) {
+      if (!iframeEl || !iframeEl.contentWindow) return;
+      try {
+        iframeEl.contentWindow.postMessage(
+          value === undefined
+            ? { 'x-tiktok-player': true, type }
+            : { 'x-tiktok-player': true, type, value },
+          '*'
+        );
+      } catch {
+        // Cross-origin frame might still be initializing
+      }
+    }
+
+    function handleTikTokPlayerMessage(event) {
+      if (!event || !event.data || typeof event.data !== 'object') return;
+      if (event.data['x-tiktok-player'] !== true) return;
+      const iframes = document.querySelectorAll('#social-feed-grid iframe.social-embed-frame');
+      let targetIframe = null;
+      for (const frame of iframes) {
+        if (frame.contentWindow === event.source) {
+          targetIframe = frame;
+          break;
+        }
+      }
+      if (!targetIframe) return;
+      const cardEl = targetIframe.closest('[data-social-card]');
+      if (!cardEl) return;
+      const cardId = cardEl.getAttribute('data-social-card') || '';
+      const contentId = cardEl.getAttribute('data-social-content-id') || '';
+      const msgType = String(event.data.type || '');
+
+      if (msgType === 'onPlayerReady') {
+        if (cardId) {
+          state.socialEmbedReady[cardId] = true;
+          delete state.socialEmbedErrors[cardId];
+        }
+        cardEl.classList.remove('is-embed-error');
+        if (cardId && state.socialActivePlayIds[cardId]) {
+          sendTikTokPlayerCommand(targetIframe, 'mute');
+          sendTikTokPlayerCommand(targetIframe, 'play');
+        }
+        return;
+      }
+
+      if (msgType === 'onStateChange') {
+        const st = Number(event.data.value);
+        if (st === 1 || st === 3) {
+          if (cardId) {
+            state.socialEmbedReady[cardId] = true;
+            state.socialActivePlayIds[cardId] = true;
+            delete state.socialEmbedErrors[cardId];
+          }
+          cardEl.classList.add('is-playing');
+          cardEl.classList.remove('is-embed-error');
+        }
+        return;
+      }
+
+      if (msgType === 'onError' || msgType === 'onPlayerError') {
+        const now = Date.now();
+        const changedAt = Number(targetIframe.dataset.stageChangedAt || 0);
+        if (now - changedAt < 650) return;
+
+        const stage = targetIframe.dataset.fallbackStage || '';
+        if (!stage && contentId) {
+          targetIframe.dataset.fallbackStage = 'embed-v2';
+          targetIframe.dataset.stageChangedAt = String(now);
+          if (cardId) delete state.socialEmbedReady[cardId];
+          targetIframe.src = buildTikTokPlayerUrl(contentId, {
+            autoplay: Boolean(cardId && state.socialActivePlayIds[cardId]),
+            variant: 'embed-v2'
+          });
+          return;
+        }
+
+        if (cardId) state.socialEmbedErrors[cardId] = true;
+        cardEl.classList.add('is-embed-error');
+      }
+    }
+
+    if (!window.__msfTikTokPlayerMsgBound) {
+      window.__msfTikTokPlayerMsgBound = true;
+      window.addEventListener('message', handleTikTokPlayerMessage);
+    }
+
+    function renderSocialFeedSkeletonHTML(count = 2) {
+      const safeCount = Math.max(1, Math.min(6, Number(count) || 2));
+      return Array.from({ length: safeCount }, () => `
+        <div class="social-skeleton-card" aria-hidden="true">
+          <div class="social-skeleton-block social-skeleton-media"></div>
+          <div class="social-skeleton-block social-skeleton-line social-skeleton-line--meta"></div>
+          <div class="social-skeleton-block social-skeleton-line social-skeleton-line--title"></div>
+          <div class="social-skeleton-block social-skeleton-line social-skeleton-line--cta"></div>
+        </div>
+      `).join('');
+    }
+
     function renderSocialFeedCardsHTML(filter = state.socialFeedFilter || 'all') {
+      if (state.socialPostsLoading) {
+        return renderSocialFeedSkeletonHTML(getSocialGridExpectedCount(filter));
+      }
       const posts = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter);
       if (!posts.length) {
         return `<div class="empty-state">${state.lang === 'bn' ? 'এই প্ল্যাটফর্মে এখনো কোনো পোস্ট যোগ করা হয়নি।' : 'No posts added for this platform yet.'}</div>`;
       }
       const igIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
       const ttIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>`;
+      const playSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
 
       return posts.map((post) => {
         const isTikTok = post.platform === 'tiktok';
@@ -5720,6 +6482,18 @@
         const ctaText = isTikTok
           ? (state.lang === 'bn' ? 'TikTok-এ সরাসরি দেখুন ↗' : 'Watch on TikTok ↗')
           : (state.lang === 'bn' ? 'Instagram-এ সরাসরি দেখুন ↗' : 'View on Instagram ↗');
+        const isPlaying = Boolean(post.embedUrl && state.socialActivePlayIds[post.id]);
+        const isEmbedError = Boolean(isTikTok && state.socialEmbedErrors[post.id]);
+        const iframeSrc = isPlaying
+          ? buildSocialAutoplayEmbedUrl(post.embedUrl, post.platform)
+          : post.embedUrl;
+        const playBtnLabel = isTikTok
+          ? (state.lang === 'bn' ? 'চালান' : 'Play Video')
+          : (state.lang === 'bn' ? 'রিলস চালান' : 'Play Reel');
+        const fallbackWatchLabel = isTikTok
+          ? (state.lang === 'bn' ? 'TikTok-এ ভিডিও দেখুন ↗' : 'Watch on TikTok ↗')
+          : (state.lang === 'bn' ? 'Instagram-এ দেখুন ↗' : 'Watch on Instagram ↗');
+        const fallbackRetryLabel = state.lang === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry Player';
         const mediaInner = post.embedUrl
           ? `
             <div class="social-media-fallback" aria-hidden="true">
@@ -5729,13 +6503,35 @@
             </div>
             <iframe
               class="social-embed-frame"
-              src="${esc(post.embedUrl)}"
+              src="${esc(iframeSrc)}"
+              data-autoplay="${isPlaying ? '1' : '0'}"
               title="${esc(`${platformLabel} ${post.handle} live post`)}"
-              loading="lazy"
+              loading="eager"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
               allowfullscreen
               referrerpolicy="strict-origin-when-cross-origin"
             ></iframe>
+            <button type="button" class="social-card-play-overlay" data-social-play-trigger="${esc(post.id)}" aria-label="${esc(`${platformLabel}: ${playBtnLabel}`)}">
+              <span class="social-card-play-btn">${playSvg}<span>${esc(playBtnLabel)}</span></span>
+            </button>
+            ${isTikTok ? `
+              <div class="social-post-fallback-card">
+                <div class="social-post-fallback-top">
+                  <span class="social-post-fallback-brand">${ttIcon}<span>${esc(post.handle)}</span></span>
+                  <span>TikTok</span>
+                </div>
+                <div class="social-post-fallback-center">
+                  <a href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" class="social-post-fallback-play social-fallback-link" aria-label="${esc(fallbackWatchLabel)}">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7 4 21 12 7 20 7 4"/></svg>
+                  </a>
+                  ${caption ? `<p class="social-post-fallback-caption">${esc(caption)}</p>` : ''}
+                </div>
+                <div class="social-post-fallback-actions">
+                  <a href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm social-fallback-link" style="background:#ffffff;color:#111111;border-color:#ffffff;">${esc(fallbackWatchLabel)}</a>
+                  <button type="button" class="social-post-fallback-retry" data-social-retry="${esc(post.id)}">${esc(fallbackRetryLabel)}</button>
+                </div>
+              </div>
+            ` : ''}
           `
           : `
             <a href="${esc(post.href)}" target="_blank" rel="noopener noreferrer" style="display:block;width:100%;height:100%;">
@@ -5750,7 +6546,7 @@
             </a>
           `;
         return `
-          <article class="social-post-card">
+          <article class="social-post-card ${isPlaying ? 'is-playing' : ''} ${isEmbedError ? 'is-embed-error' : ''}" data-social-card="${esc(post.id)}" data-social-platform="${esc(post.platform)}" data-social-content-id="${esc(post.contentId || '')}" data-social-embed="${esc(post.embedUrl || '')}">
             <div class="social-post-media ${post.embedUrl ? 'social-post-media--embed' : ''}">
               ${mediaInner}
             </div>
@@ -5771,7 +6567,7 @@
 
     function renderSocialFeedSectionHTML() {
       const filter = state.socialFeedFilter || 'all';
-      const filteredCount = getActiveSocialPosts().filter((p) => filter === 'all' || p.platform === filter).length;
+      const filteredCount = getSocialGridExpectedCount(filter);
       const igHref = state.settings.instagramUrl || OFFICIAL_INSTAGRAM;
       const ttHref = state.settings.tiktokUrl || OFFICIAL_TIKTOK;
       return `
@@ -5796,7 +6592,7 @@
                 </div>
               </div>
             </div>
-            <div id="social-feed-grid" class="${getSocialFeedGridClass(filteredCount)}">
+            <div id="social-feed-grid" class="${getSocialFeedGridClass(filteredCount)}" aria-busy="${state.socialPostsLoading ? 'true' : 'false'}">
               ${renderSocialFeedCardsHTML(filter)}
             </div>
           </div>
@@ -5902,29 +6698,7 @@
       if (sec.random !== false) productSectionsHtml += renderProductSection('sec-random', t('sec_random'), randomPicks, '#shop');
       if (sec.youMayLike !== false) productSectionsHtml += renderProductSection('sec-also-like', t('sec_also_like'), alsoLike, '#shop');
 
-      const reviewsHtml = sec.reviews !== false ? `
-        <section class="section-block">
-          <div class="container">
-            <div class="section-header">
-              <h2 class="section-title">${t('sec_reviews')}</h2>
-            </div>
-            ${state.reviews.length ? `
-              <div class="reviews-grid">
-                ${state.reviews.slice(0, 6).map((r) => `
-                  <div class="review-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                      <strong>${esc(r.userName)}</strong>
-                      <span style="color:#b45309;font-weight:700;">${'★'.repeat(Math.round(r.rating || 5))}</span>
-                    </div>
-                    <p style="margin:0 0 6px;font-size:14px;color:var(--text-secondary);">${esc(r.comment)}</p>
-                    <div style="font-size:11px;color:var(--success);font-weight:600;">${r.verifiedPurchase ? (state.lang === 'bn' ? 'ভেরিফায়েড ক্রেতা' : 'Verified Purchase') : ''}</div>
-                  </div>
-                `).join('')}
-              </div>
-            ` : `<div class="empty-state">${state.lang === 'bn' ? 'প্রথম গ্রাহক হিসেবে রিভিউ দিন কোনো পণ্য অর্ডার করে।' : 'Verified customer reviews will appear here after orders are reviewed.'}</div>`}
-          </div>
-        </section>
-      ` : '';
+      const reviewsHtml = sec.reviews !== false ? renderHomepageReviewsSectionHTML() : '';
 
       const socialFeedHtml = sec.socialFeed !== false ? renderSocialFeedSectionHTML() : '';
 
@@ -5970,6 +6744,198 @@
       ` : '';
 
       host.innerHTML = heroHtml + catHtml + productSectionsHtml + reviewsHtml + socialFeedHtml + newsletterHtml + socialWhatsappHtml;
+      mountReviewsCarousel();
+    }
+
+    function formatReviewShortDate(rawTs) {
+      try {
+        let d = null;
+        if (rawTs && typeof rawTs.toDate === 'function') d = rawTs.toDate();
+        else if (rawTs && typeof rawTs.seconds === 'number') d = new Date(rawTs.seconds * 1000);
+        else if (rawTs) d = new Date(rawTs);
+        if (!d || Number.isNaN(d.getTime())) return '';
+        return d.toLocaleDateString(state.lang === 'bn' ? 'bn-BD' : 'en-US', { month: 'short', day: 'numeric' });
+      } catch {
+        return '';
+      }
+    }
+
+    function renderHomepageReviewsSectionHTML() {
+      const reviews = Array.isArray(state.reviews) ? state.reviews.slice(0, 24) : [];
+      const total = reviews.length;
+      const avgRating = total
+        ? (reviews.reduce((sum, r) => sum + Math.max(1, Math.min(5, Number(r.rating || 5))), 0) / total).toFixed(1)
+        : '';
+      const bn = state.lang === 'bn';
+      const prevSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>`;
+      const nextSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+      return `
+        <section class="section-block" aria-labelledby="home-reviews-heading">
+          <div class="container">
+            <div class="reviews-carousel-header">
+              <div>
+                <h2 id="home-reviews-heading" class="section-title">${t('sec_reviews')}</h2>
+                ${total ? `
+                  <div class="reviews-carousel-summary">
+                    <span><strong>${avgRating} ★</strong></span>
+                    <span aria-hidden="true">·</span>
+                    <span>${bn ? `${total}টি যাচাইকৃত মতামত` : `${total} customer testimonials`}</span>
+                  </div>
+                ` : ''}
+              </div>
+              ${total > 1 ? `
+                <div class="reviews-carousel-controls">
+                  <button type="button" class="reviews-nav-btn" data-reviews-prev aria-label="${bn ? 'পূর্ববর্তী রিভিউ' : 'Previous reviews'}">${prevSvg}</button>
+                  <button type="button" class="reviews-nav-btn" data-reviews-next aria-label="${bn ? 'পরবর্তী রিভিউ' : 'Next reviews'}">${nextSvg}</button>
+                </div>
+              ` : ''}
+            </div>
+            ${total ? `
+              <div class="reviews-carousel-viewport">
+                <div
+                  class="reviews-track"
+                  data-reviews-track
+                  tabindex="0"
+                  role="region"
+                  aria-roledescription="carousel"
+                  aria-label="${esc(t('sec_reviews'))}"
+                >
+                  ${reviews.map((r, idx) => {
+                    const starsCount = Math.max(1, Math.min(5, Math.round(Number(r.rating || 5))));
+                    const scoreStr = Math.max(1, Math.min(5, Number(r.rating || 5))).toFixed(1);
+                    const authorName = String(r.userName || (bn ? 'সম্মানিত ক্রেতা' : 'Verified Buyer')).trim();
+                    const initial = authorName.charAt(0) || 'M';
+                    const dateStr = formatReviewShortDate(r.createdAt);
+                    const matchedProd = r.productId ? state.products.find((p) => p.id === r.productId) : null;
+                    const prodLabel = matchedProd
+                      ? (bn ? (matchedProd.nameBn || matchedProd.name) : (matchedProd.name || matchedProd.nameBn))
+                      : '';
+                    return `
+                      <article class="review-slide-card" data-review-slide="${idx}">
+                        <div>
+                          <div class="review-slide-top">
+                            <span class="review-slide-stars" aria-label="${starsCount} out of 5 stars">
+                              <span>${'★'.repeat(starsCount)}${'☆'.repeat(5 - starsCount)}</span>
+                              <span class="review-slide-score">${scoreStr}</span>
+                            </span>
+                            ${dateStr ? `<span>${esc(dateStr)}</span>` : ''}
+                          </div>
+                          <p class="review-slide-quote" style="margin-top:12px;">“${esc(r.comment || '')}”</p>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                          ${matchedProd && prodLabel ? `
+                            <a href="#product/${encodeURIComponent(matchedProd.id)}" class="review-slide-product-link">${esc(prodLabel)} ↗</a>
+                          ` : ''}
+                          <div class="review-slide-author">
+                            <span class="review-slide-avatar" aria-hidden="true">${esc(initial)}</span>
+                            <div class="review-slide-author-info">
+                              <span class="review-slide-author-name">${esc(authorName)}</span>
+                              ${r.verifiedPurchase ? `<span class="review-slide-verified">✓ ${bn ? 'ভেরিফায়েড ক্রেতা' : 'Verified Purchase'}</span>` : ''}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+              ${total > 1 ? `
+                <div class="reviews-carousel-footer">
+                  <div class="reviews-dots" role="tablist" aria-label="${bn ? 'রিভিউ পেজ সূচক' : 'Review slide navigation'}">
+                    ${reviews.map((_, idx) => `
+                      <button type="button" class="reviews-dot ${idx === 0 ? 'active' : ''}" data-reviews-dot="${idx}" aria-label="${bn ? `রিভিউ ${idx + 1}` : `Review ${idx + 1}`}" aria-pressed="${idx === 0 ? 'true' : 'false'}"></button>
+                    `).join('')}
+                  </div>
+                  <span class="reviews-counter" data-reviews-counter>1 / ${total}</span>
+                </div>
+              ` : ''}
+            ` : `<div class="empty-state">${bn ? 'প্রথম গ্রাহক হিসেবে রিভিউ দিন কোনো পণ্য অর্ডার করে।' : 'Verified customer reviews will appear here after orders are reviewed.'}</div>`}
+          </div>
+        </section>
+      `;
+    }
+
+    function syncReviewsCarouselUI() {
+      const track = document.querySelector('#view-home [data-reviews-track]');
+      if (!track) return;
+      const slides = Array.from(track.querySelectorAll('[data-review-slide]'));
+      if (!slides.length) return;
+      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+      const scrollLeft = track.scrollLeft;
+
+      const hasOverflow = maxScroll > 4;
+      const controlsEl = document.querySelector('#view-home .reviews-carousel-controls');
+      const footerEl = document.querySelector('#view-home .reviews-carousel-footer');
+      if (controlsEl) controlsEl.style.display = hasOverflow ? 'inline-flex' : 'none';
+      if (footerEl) footerEl.style.display = hasOverflow ? 'flex' : 'none';
+
+      const prevBtn = document.querySelector('#view-home [data-reviews-prev]');
+      const nextBtn = document.querySelector('#view-home [data-reviews-next]');
+      if (prevBtn) prevBtn.disabled = scrollLeft <= 4;
+      if (nextBtn) nextBtn.disabled = !hasOverflow || scrollLeft >= maxScroll - 4;
+
+      let activeIdx = 0;
+      if (maxScroll > 4 && scrollLeft >= maxScroll - 4) {
+        activeIdx = slides.length - 1;
+      } else {
+        let minDiff = Infinity;
+        slides.forEach((slide, i) => {
+          const diff = Math.abs(slide.offsetLeft - scrollLeft);
+          if (diff < minDiff) {
+            minDiff = diff;
+            activeIdx = i;
+          }
+        });
+      }
+
+      document.querySelectorAll('#view-home [data-reviews-dot]').forEach((dot, i) => {
+        const isActive = i === activeIdx;
+        dot.classList.toggle('active', isActive);
+        dot.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+      const counterEl = document.querySelector('#view-home [data-reviews-counter]');
+      if (counterEl) {
+        counterEl.textContent = `${activeIdx + 1} / ${slides.length}`;
+      }
+    }
+
+    function scrollReviewsCarouselBy(direction) {
+      const track = document.querySelector('#view-home [data-reviews-track]');
+      if (!track) return;
+      const firstSlide = track.querySelector('[data-review-slide]');
+      const slideWidth = firstSlide ? firstSlide.getBoundingClientRect().width + 16 : track.clientWidth * 0.85;
+      const step = track.clientWidth >= 640 ? Math.max(slideWidth, track.clientWidth * 0.85) : slideWidth;
+      track.scrollBy({ left: direction * step, behavior: 'smooth' });
+    }
+
+    function mountReviewsCarousel() {
+      const track = document.querySelector('#view-home [data-reviews-track]');
+      if (!track) return;
+      let rafId = 0;
+      track.addEventListener('scroll', () => {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          syncReviewsCarouselUI();
+        });
+      }, { passive: true });
+
+      track.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          scrollReviewsCarouselBy(1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          scrollReviewsCarouselBy(-1);
+        }
+      });
+
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => syncReviewsCarouselUI());
+        ro.observe(track);
+      }
+      requestAnimationFrame(() => syncReviewsCarouselUI());
     }
 
     // =========================================================================
@@ -6619,6 +7585,17 @@
       } catch {
         prodReviews = state.reviews.filter((r) => r.productId === prod.id);
       }
+      if (auth.currentUser) {
+        try {
+          const myRevSnap = await getDocs(query(collection(db, 'reviews'), where('productId', '==', prod.id), where('userId', '==', auth.currentUser.uid)));
+          const existingIds = new Set(prodReviews.map((r) => r.id));
+          myRevSnap.docs.forEach((d) => {
+            if (!existingIds.has(d.id)) {
+              prodReviews.unshift({ id: d.id, ...d.data() });
+            }
+          });
+        } catch {}
+      }
 
       const related = state.products.filter((p) => p.id !== prod.id && p.categoryId === prod.categoryId).slice(0, 4);
       const recentProds = state.recentlyViewed.map((id) => state.products.find((p) => p.id === id)).filter((p) => p && p.id !== prod.id).slice(0, 4);
@@ -6736,18 +7713,33 @@
               <div style="display:flex;flex-direction:column;gap:12px;">
                 ${prodReviews.length ? prodReviews.map((r) => `
                   <div class="review-card">
-                    <div style="display:flex;justify-content:space-between;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                       <strong>${esc(r.userName)}</strong>
-                      <span style="color:#b45309;">${'★'.repeat(Math.round(r.rating))}</span>
+                      <span style="color:#b45309;">${'★'.repeat(Math.max(1, Math.min(5, Math.round(r.rating || 5))))}</span>
                     </div>
                     <p style="margin:6px 0;font-size:14px;">${esc(r.comment)}</p>
-                    ${r.verifiedPurchase ? `<div style="font-size:11px;color:var(--success);font-weight:600;">Verified Purchase</div>` : ''}
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:11px;">
+                      ${r.verifiedPurchase ? `<span style="color:var(--success);font-weight:600;">${state.lang === 'bn' ? 'ভেরিফায়েড ক্রেতা' : 'Verified Purchase'}</span>` : ''}
+                      ${r.status === 'pending' ? `<span style="color:#b45309;font-weight:600;">${state.lang === 'bn' ? 'অ্যাডমিন অনুমোদনের অপেক্ষায়' : 'Pending Approval'}</span>` : ''}
+                    </div>
                   </div>
                 `).join('') : `<div class="empty-state">${state.lang === 'bn' ? 'এখনো কোনো রিভিউ নেই।' : 'No reviews yet.'}</div>`}
               </div>
 
               <form id="pdp-review-form" class="panel-box" style="display:flex;flex-direction:column;gap:10px;">
-                <h3 style="margin:0;font-size:16px;">${state.lang === 'bn' ? 'রিভিউ লিখুন (ভেরিফায়েড ক্রেতা)' : 'Write a Review (Verified Purchasers)'}</h3>
+                <h3 style="margin:0;font-size:16px;">${state.lang === 'bn' ? 'রিভিউ লিখুন' : 'Write a Review'}</h3>
+                ${auth.currentUser ? `
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--bg-surface);border:1px solid var(--border-hairline);border-radius:6px;font-size:12.5px;">
+                    <span>${state.lang === 'bn' ? 'আপনার ইমেইল:' : 'Signed in as:'} <strong>${esc(auth.currentUser.email || auth.currentUser.displayName || 'Customer')}</strong></span>
+                    <button type="button" id="review-switch-account" class="footer-link-btn" style="font-size:12px;color:var(--accent);font-weight:600;">${state.lang === 'bn' ? 'অ্যাকাউন্ট পরিবর্তন' : 'Switch Account'}</button>
+                  </div>
+                ` : `
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:var(--bg-surface);border:1px solid var(--border-hairline);border-radius:6px;font-size:12.5px;">
+                    <span>${state.lang === 'bn' ? 'আপনার নিজের ইমেইল দিয়ে রিভিউ দিতে লগইন করুন' : 'Sign in with your email to submit a review'}</span>
+                    <button type="button" id="review-signin-btn" class="btn btn-outline btn-sm">${state.lang === 'bn' ? 'ইমেইল / Google লগইন' : 'Sign In with Email'}</button>
+                  </div>
+                `}
+                <input type="text" id="review-user-name" class="form-control" maxlength="120" value="${esc(state.userProfile?.name || auth.currentUser?.displayName || (auth.currentUser?.email ? auth.currentUser.email.split('@')[0] : ''))}" placeholder="${state.lang === 'bn' ? 'আপনার নাম *' : 'Your Name *'}" />
                 <select id="review-rating" class="form-control" required>
                   <option value="5">5 Stars - Excellent</option>
                   <option value="4">4 Stars - Good</option>
@@ -6755,9 +7747,9 @@
                   <option value="2">2 Stars - Fair</option>
                   <option value="1">1 Star - Poor</option>
                 </select>
-                <input type="text" id="review-order-id" class="form-control" placeholder="Order ID (e.g. MSF-20261119-1234)" required />
-                <textarea id="review-comment" class="form-control" placeholder="${state.lang === 'bn' ? 'আপনার মতামত লিখুন...' : 'Share your experience...'}" required></textarea>
-                <button type="submit" class="btn btn-primary">${state.lang === 'bn' ? 'রিভিউ সাবমিট করুন' : 'Submit Review'}</button>
+                <input type="text" id="review-order-id" class="form-control" maxlength="40" placeholder="${state.lang === 'bn' ? 'Order ID (ঐচ্ছিক — যেমন: MSF-20261120-10001)' : 'Order ID (Optional, e.g. MSF-20261120-10001)'}" />
+                <textarea id="review-comment" class="form-control" maxlength="1500" placeholder="${state.lang === 'bn' ? 'আপনার মতামত লিখুন...' : 'Share your experience...'}" required></textarea>
+                <button type="submit" id="review-submit-btn" class="btn btn-primary">${state.lang === 'bn' ? 'রিভিউ সাবমিট করুন' : 'Submit Review'}</button>
               </form>
             </div>
           </div>
@@ -6965,19 +7957,22 @@
 
       document.getElementById('pdp-add-cart')?.addEventListener('click', () => {
         if (!validateVariant()) return;
-        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku);
+        const selectedImgUrl = imgs[activePdpState.imgIdx]?.url || getProductMainImage(prod);
+        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku, selectedImgUrl);
         openCartDrawer();
       });
 
       document.getElementById('pdp-buy-now')?.addEventListener('click', () => {
         if (!validateVariant()) return;
-        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku);
+        const selectedImgUrl = imgs[activePdpState.imgIdx]?.url || getProductMainImage(prod);
+        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku, selectedImgUrl);
         navigateTo('#checkout');
       });
 
       document.getElementById('pdp-whatsapp-btn')?.addEventListener('click', () => {
         if (!validateVariant()) return;
-        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku);
+        const selectedImgUrl = imgs[activePdpState.imgIdx]?.url || getProductMainImage(prod);
+        addToCart(prod, activePdpState.size, activePdpState.color, activePdpState.qty, unitPrice, variantSku, selectedImgUrl);
         navigateTo('#checkout');
       });
 
@@ -6986,50 +7981,80 @@
         renderPDP(prod.id);
       });
 
+      document.getElementById('review-signin-btn')?.addEventListener('click', () => {
+        openAuthModal();
+      });
+      document.getElementById('review-switch-account')?.addEventListener('click', () => {
+        openAuthModal();
+      });
+
       document.getElementById('pdp-review-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!state.user) {
+        const activeAuthUser = auth.currentUser;
+        if (!activeAuthUser) {
           openAuthModal();
-          showToast(state.lang === 'bn' ? 'রিভিউ দিতে লগইন করুন' : 'Please sign in to submit a review', 'error');
+          showToast(state.lang === 'bn' ? 'রিভিউ দিতে আপনার ইমেইল দিয়ে লগইন করুন' : 'Please sign in with your email to submit a review', 'error');
           return;
         }
-        const orderId = document.getElementById('review-order-id').value.trim().toUpperCase().slice(0, 40);
-        const rating = Math.max(1, Math.min(5, Math.round(Number(document.getElementById('review-rating').value || 5))));
-        const comment = document.getElementById('review-comment').value.trim().slice(0, 1500);
+        const orderId = String(document.getElementById('review-order-id')?.value || '').trim().toUpperCase().slice(0, 40);
+        const rating = Math.max(1, Math.min(5, Math.round(Number(document.getElementById('review-rating')?.value || 5))));
+        const comment = String(document.getElementById('review-comment')?.value || '').trim().slice(0, 1500);
+        const typedName = String(document.getElementById('review-user-name')?.value || '').trim();
+        const fallbackEmailName = activeAuthUser.email ? activeAuthUser.email.split('@')[0] : '';
+        const userName = (typedName || String(state.userProfile?.name || activeAuthUser.displayName || fallbackEmailName || 'Customer').trim()).slice(0, 120) || 'Customer';
         if (!comment) {
-          showToast(state.lang === 'bn' ? 'রিভিউ লিখুন' : 'Please write a review comment', 'error');
+          showToast(state.lang === 'bn' ? 'অনুগ্রহ করে আপনার রিভিউ লিখুন' : 'Please write a review comment', 'error');
           return;
         }
+        const submitBtn = document.getElementById('review-submit-btn');
+        if (submitBtn) submitBtn.disabled = true;
         try {
-          const orderSnap = await getDoc(doc(db, 'orders', orderId));
-          const isVerified = orderSnap.exists() && orderSnap.data().userId === state.user.uid &&
-            Array.isArray(orderSnap.data().items) && orderSnap.data().items.some((i) => i.productId === prod.id);
-          if (!isVerified) {
-            showToast(state.lang === 'bn' ? 'শুধুমাত্র ভেরিফায়েড ক্রেতারা রিভিউ দিতে পারবেন।' : 'Only verified purchasers of this item can submit a verified review.', 'error');
-            return;
+          let verifiedPurchase = false;
+          if (orderId && /^[a-zA-Z0-9_\-]+$/.test(orderId)) {
+            try {
+              const orderSnap = await getDoc(doc(db, 'orders', orderId));
+              if (orderSnap.exists()) {
+                const od = orderSnap.data();
+                if (od.userId === activeAuthUser.uid && Array.isArray(od.items) && od.items.some((i) => i.productId === prod.id)) {
+                  verifiedPurchase = true;
+                }
+              }
+            } catch {
+              // Guest or non-linked order IDs should never block a customer review
+              verifiedPurchase = false;
+            }
           }
-          const revId = `rev_${Date.now()}_${state.user.uid.slice(0, 6)}`;
+          const safeUidPart = String(activeAuthUser.uid || 'user').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 8) || 'user';
+          const revId = `rev_${Date.now()}_${safeUidPart}`;
           await setDoc(doc(db, 'reviews', revId), {
             id: revId,
             productId: prod.id,
-            userId: state.user.uid,
-            userName: String(state.userProfile?.name || state.user.displayName || 'Customer').trim().slice(0, 120) || 'Customer',
+            userId: activeAuthUser.uid,
+            userName,
             orderId,
             rating,
             comment,
             images: [],
-            verifiedPurchase: true,
+            verifiedPurchase,
             status: 'pending',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });
-          showToast(state.lang === 'bn' ? 'রিভিউ জমা হয়েছে! অ্যাডমিন অনুমোদনের পর প্রকাশিত হবে।' : 'Review submitted for admin approval.', 'success');
+          showToast(
+            state.lang === 'bn'
+              ? 'ধন্যবাদ! আপনার রিভিউ জমা হয়েছে। অ্যাডমিন অনুমোদনের পর সবার জন্য প্রকাশিত হবে।'
+              : 'Thank you! Your review has been submitted for admin approval.',
+            'success'
+          );
           e.target.reset();
+          await renderPDP(prod.id);
         } catch (err) {
           if (isFirestorePermissionError(err)) {
             console.warn('Review permission issue:', err.message);
           }
           showToast(formatFirebaseAdminError(err, 'Review submission failed'), 'error');
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
         }
       });
     }
@@ -7069,16 +8094,22 @@
       }
     }
 
-    function addToCart(product, size = '', color = '', qty = 1, overridePrice = null, overrideSku = null) {
+    function addToCart(product, size = '', color = '', qty = 1, overridePrice = null, overrideSku = null, overrideImageUrl = null) {
       const unitPrice = overridePrice ?? getProductPrice(product);
       const sku = overrideSku || product.sku;
-      const imageUrl = getProductMainImage(product);
+      const pickedImg = overrideImageUrl || getProductMainImage(product);
+      const imageUrl = isUsableImageUrl(pickedImg) ? String(pickedImg).trim() : getProductMainImage(product);
       const key = `${product.id}__${size}__${color}`;
       const existing = state.cart.find((i) => i.key === key);
       const maxStock = Number(product.stock || 999);
 
       if (existing) {
         existing.quantity = Math.min(maxStock, existing.quantity + qty);
+        if (overrideImageUrl && isUsableImageUrl(overrideImageUrl)) {
+          existing.imageUrl = String(overrideImageUrl).trim();
+        } else if (!isUsableImageUrl(existing.imageUrl)) {
+          existing.imageUrl = imageUrl;
+        }
       } else {
         state.cart.push({
           key,
@@ -7608,7 +8639,7 @@
       itemsHost.innerHTML = state.cart.map((item, idx) => `
         <div class="cart-item">
           <div class="cart-item-img">
-            <img src="${esc(item.imageUrl || OFFICIAL_LOGO)}" alt="${esc(item.productName)}" referrerpolicy="no-referrer" />
+            ${renderOrderImgTag(item, '', '')}
           </div>
           <div style="min-width:0;">
             <div style="font-weight:600;font-size:14px;">${esc(state.lang === 'bn' ? (item.productNameBn || item.productName) : item.productName)}</div>
@@ -7782,7 +8813,7 @@
               <div style="display:flex;flex-direction:column;gap:10px;">
                 ${state.cart.map((item) => `
                   <div style="display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
-                    <img src="${esc(item.imageUrl)}" alt="${esc(item.productName)}" style="width:52px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border-radius:4px;" referrerpolicy="no-referrer" />
+                    ${renderOrderImgTag(item, 'width:52px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border-radius:4px;border:1px solid var(--border-hairline);flex-shrink:0;', '')}
                     <div style="flex:1;min-width:0;">
                       <div style="font-size:13px;font-weight:600;">${esc(item.productName)}</div>
                       <div style="font-size:12px;color:var(--text-muted);" class="mono">${esc(item.sku)} ${item.size ? `· ${esc(item.size)}` : ''} ${item.color ? `· ${esc(item.color)}` : ''} × ${item.quantity}</div>
@@ -7896,11 +8927,12 @@
             const p = pSnap.data();
             let unitPrice = getProductPrice(p);
             let availStock = Number(p.stock || 0);
+            let matchedVariant = null;
             if (Array.isArray(p.variants) && p.variants.length && (item.size || item.color)) {
-              const mv = p.variants.find((v) => (!item.size || v.size === item.size) && (!item.color || v.color === item.color));
-              if (mv) {
-                if (Number(mv.price) > 0) unitPrice = Number(mv.price);
-                if (mv.stock !== undefined) availStock = Number(mv.stock);
+              matchedVariant = p.variants.find((v) => (!item.size || v.size === item.size) && (!item.color || v.color === item.color)) || null;
+              if (matchedVariant) {
+                if (Number(matchedVariant.price) > 0) unitPrice = Number(matchedVariant.price);
+                if (matchedVariant.stock !== undefined) availStock = Number(matchedVariant.stock);
               }
             }
             if (availStock < item.quantity) {
@@ -7908,11 +8940,28 @@
             }
             const itemSubtotal = unitPrice * item.quantity;
             verifiedSubtotal += itemSubtotal;
+
+            const prodMainImg = getProductMainImage(p);
+            const rawChosenImg = isUsableImageUrl(item.imageUrl)
+              ? String(item.imageUrl).trim()
+              : (isUsableImageUrl(matchedVariant?.imageUrl) ? String(matchedVariant.imageUrl).trim() : prodMainImg);
+            let finalItemImg = OFFICIAL_LOGO;
+            try {
+              finalItemImg = await ensureInlineUrlFits(rawChosenImg, prodMainImg, 75000);
+            } catch {
+              try {
+                finalItemImg = await ensureInlineUrlFits(prodMainImg, OFFICIAL_LOGO, 75000);
+              } catch {
+                finalItemImg = OFFICIAL_LOGO;
+              }
+            }
+
             verifiedItems.push({
               productId: item.productId,
               productName: String(p.name || item.productName || 'Product').slice(0, 200),
-              sku: String(item.sku || p.sku || '').slice(0, 80),
-              imageUrl: String(getProductMainImage(p) || '').slice(0, 1000),
+              productNameBn: String(p.nameBn || p.name || item.productNameBn || item.productName || 'Product').slice(0, 200),
+              sku: String(item.sku || matchedVariant?.sku || p.sku || '').slice(0, 80),
+              imageUrl: finalItemImg,
               size: String(item.size || '').slice(0, 40),
               color: String(item.color || '').slice(0, 40),
               quantity: Math.max(1, Number(item.quantity || 1)),
@@ -8025,9 +9074,12 @@
           let waUrl = '';
           if (source === 'WhatsApp') {
             const waNum = (state.settings.whatsappNumber || OFFICIAL_WHATSAPP).replace(/[^0-9]/g, '');
-            const itemsLines = verifiedItems.map((it, idx) =>
-              `${idx + 1}. ${it.productName} (SKU: ${it.sku}) | Size: ${it.size || '-'} | Color: ${it.color || '-'} | Qty: ${it.quantity} × ৳${it.unitPrice} = ৳${it.subtotal}\nImage: ${it.imageUrl}`
-            ).join('\n\n');
+            const itemsLines = verifiedItems.map((it, idx) => {
+              const imgLine = String(it.imageUrl || '').startsWith('data:')
+                ? `Product: ${window.location.origin}${window.location.pathname}#product/${encodeURIComponent(it.productId)}`
+                : `Image: ${it.imageUrl}`;
+              return `${idx + 1}. ${it.productName} (SKU: ${it.sku}) | Size: ${it.size || '-'} | Color: ${it.color || '-'} | Qty: ${it.quantity} × ৳${it.unitPrice} = ৳${it.subtotal}\n${imgLine}`;
+            }).join('\n\n');
             const msg = [
               `*${state.settings.brandName || 'MS FASHION'} — New Order*`,
               `Order ID: ${orderId}`,
@@ -8249,13 +9301,24 @@
             <div class="panel-box">
               <h3 style="margin:0 0 12px;font-size:16px;">${state.lang === 'bn' ? 'আমার অর্ডারসমূহ' : 'My Order History'} (${myOrders.length})</h3>
               ${myOrders.length ? myOrders.map((o) => `
-                <div style="border-bottom:1px solid var(--border-hairline);padding:10px 0;">
-                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="border-bottom:1px solid var(--border-hairline);padding:12px 0;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <strong class="mono">${esc(o.orderId)}</strong>
                     <span class="status-text status-${esc((o.orderStatus || '').split(' ')[0])}">${esc(o.orderStatus)}</span>
                   </div>
-                  <div style="font-size:13px;color:var(--text-secondary);margin:4px 0;">
-                    ${o.items.length} items · <strong>${formatPrice(o.finalTotal)}</strong> · ${esc(o.paymentMethod)}
+                  <div style="display:flex;flex-direction:column;gap:6px;margin:6px 0;">
+                    ${(o.items || []).map((it) => `
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        ${renderOrderImgTag(it, 'width:38px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border:1px solid var(--border-hairline);border-radius:4px;flex-shrink:0;', '')}
+                        <div style="min-width:0;flex:1;">
+                          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(state.lang === 'bn' ? (it.productNameBn || it.productName) : it.productName)}</div>
+                          <div style="font-size:11.5px;color:var(--text-muted);" class="mono">${it.size ? esc(it.size) : ''}${it.size && it.color ? ' · ' : ''}${it.color ? esc(it.color) : ''} × ${Number(it.quantity || 1)}</div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                  <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">
+                    ${(o.items || []).length} items · <strong>${formatPrice(o.finalTotal)}</strong> · ${esc(o.paymentMethod)}
                   </div>
                 </div>
               `).join('') : `<div class="empty-state">${state.lang === 'bn' ? 'কোনো অর্ডার পাওয়া যায়নি।' : 'No orders yet.'}</div>`}
@@ -8864,6 +9927,26 @@
         renderHome();
         return;
       }
+      const reviewsPrev = e.target.closest('[data-reviews-prev]');
+      if (reviewsPrev) {
+        scrollReviewsCarouselBy(-1);
+        return;
+      }
+      const reviewsNext = e.target.closest('[data-reviews-next]');
+      if (reviewsNext) {
+        scrollReviewsCarouselBy(1);
+        return;
+      }
+      const reviewsDot = e.target.closest('[data-reviews-dot]');
+      if (reviewsDot) {
+        const idx = Number(reviewsDot.getAttribute('data-reviews-dot') || 0);
+        const track = document.querySelector('#view-home [data-reviews-track]');
+        const slide = track?.querySelector(`[data-review-slide="${idx}"]`);
+        if (track && slide) {
+          track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+        }
+        return;
+      }
       const socialTab = e.target.closest('[data-social-filter]');
       if (socialTab) {
         const nextFilter = socialTab.getAttribute('data-social-filter') || 'all';
@@ -8878,9 +9961,57 @@
       }
       const socialRefreshBtn = e.target.closest('[data-social-refresh]');
       if (socialRefreshBtn) {
+        state.socialEmbedErrors = {};
+        state.socialEmbedReady = {};
         fetchLatestSocialPosts({ forceRefresh: true })
           .then(() => showToast(state.lang === 'bn' ? 'সোশ্যাল ফিড আপডেট হয়েছে!' : 'Social feed synced!', 'success'))
           .catch(() => showToast(state.lang === 'bn' ? 'সিঙ্ক ব্যর্থ হয়েছে' : 'Failed to sync social feed', 'error'));
+        return;
+      }
+      const socialRetryBtn = e.target.closest('[data-social-retry]');
+      if (socialRetryBtn) {
+        const card = socialRetryBtn.closest('[data-social-card]');
+        const cardId = socialRetryBtn.getAttribute('data-social-retry');
+        const rawEmbed = card?.getAttribute('data-social-embed') || '';
+        const platform = card?.getAttribute('data-social-platform') || 'tiktok';
+        if (card && cardId && rawEmbed) {
+          delete state.socialEmbedErrors[cardId];
+          delete state.socialEmbedReady[cardId];
+          state.socialActivePlayIds[cardId] = true;
+          card.classList.remove('is-embed-error');
+          card.classList.add('is-playing');
+          const iframe = card.querySelector('iframe.social-embed-frame');
+          if (iframe) {
+            delete iframe.dataset.fallbackStage;
+            iframe.dataset.stageChangedAt = String(Date.now());
+            iframe.src = buildSocialAutoplayEmbedUrl(rawEmbed, platform);
+          }
+        }
+        return;
+      }
+      const socialCard = e.target.closest('[data-social-card]');
+      if (socialCard && !e.target.closest('a.social-post-cta, a.social-fallback-link')) {
+        const cardId = socialCard.getAttribute('data-social-card');
+        const rawEmbed = socialCard.getAttribute('data-social-embed');
+        const platform = socialCard.getAttribute('data-social-platform') || 'instagram';
+        if (cardId && rawEmbed) {
+          delete state.socialEmbedErrors[cardId];
+          state.socialActivePlayIds[cardId] = true;
+          socialCard.classList.remove('is-embed-error');
+          socialCard.classList.add('is-playing');
+          const iframe = socialCard.querySelector('iframe.social-embed-frame');
+          if (iframe) {
+            const autoplayUrl = buildSocialAutoplayEmbedUrl(rawEmbed, platform);
+            iframe.setAttribute('data-autoplay', '1');
+            if (iframe.src !== autoplayUrl) {
+              delete state.socialEmbedReady[cardId];
+              iframe.src = autoplayUrl;
+            } else if (platform === 'tiktok') {
+              sendTikTokPlayerCommand(iframe, 'mute');
+              sendTikTokPlayerCommand(iframe, 'play');
+            }
+          }
+        }
         return;
       }
     });
@@ -9573,7 +10704,7 @@
             } else {
               evaluateStockAlerts(state.adminProducts, { triggerEmail: true });
             }
-            if (state.adminTab === 'inventory' || state.adminTab === 'overview') {
+            if (state.adminTab === 'inventory' || state.adminTab === 'overview' || state.adminTab === 'orders') {
               renderAdminTab(state.adminTab);
             }
           },
@@ -10552,7 +11683,10 @@
           });
           document.getElementById('adm-ord-tbody').innerHTML = filtered.map((o) => {
             const dt = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString() : '';
-            const firstImg = o.items?.[0]?.imageUrl || OFFICIAL_LOGO;
+            const itemsList = Array.isArray(o.items) ? o.items : [];
+            const firstItem = itemsList[0] || null;
+            const totalUnits = itemsList.reduce((s, it) => s + Number(it.quantity || 1), 0);
+            const variantTxt = firstItem ? [firstItem.size, firstItem.color].filter(Boolean).join(' · ') : '';
             const stKey = getOrderStatusClassKey(o.orderStatus || 'Pending');
             const payKey = getOrderStatusClassKey(o.paymentStatus || 'Unpaid');
             return `
@@ -10562,9 +11696,14 @@
                 <td>${esc(o.customerName)}</td>
                 <td class="mono">${esc(o.phone)}</td>
                 <td>
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <img src="${esc(firstImg)}" alt="" style="width:30px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;" referrerpolicy="no-referrer" />
-                    <span>${o.items?.length || 0}</span>
+                  <div style="display:flex;align-items:center;gap:8px;min-width:150px;max-width:230px;">
+                    ${firstItem ? renderOrderImgTag(firstItem, 'width:44px;height:48px;aspect-ratio:39/43;object-fit:contain;background:#f7f7f7;border:1px solid var(--border-hairline);border-radius:6px;flex-shrink:0;', '') : `<img src="${OFFICIAL_LOGO}" alt="" style="width:44px;height:48px;object-fit:contain;background:#f7f7f7;border:1px solid var(--border-hairline);border-radius:6px;flex-shrink:0;" />`}
+                    <div style="min-width:0;flex:1;">
+                      <div style="font-size:12.5px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(firstItem?.productName || '')}">${esc(firstItem?.productName || 'Order Item')}</div>
+                      <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${variantTxt ? `${esc(variantTxt)} · ` : ''}${totalUnits} pc${totalUnits !== 1 ? 's' : ''}${itemsList.length > 1 ? ` (+${itemsList.length - 1} more)` : ''}
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td class="tabular-nums"><strong>${formatPrice(o.finalTotal)}</strong></td>
@@ -10959,10 +12098,16 @@
             <table class="data-table">
               <thead><tr><th>Product ID</th><th>Customer</th><th>Rating</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
-                ${state.adminReviews.map((r) => `
+                ${state.adminReviews.map((r) => {
+                  const cust = state.adminCustomers.find((u) => u.uid === r.userId || u.id === r.userId);
+                  return `
                   <tr>
                     <td class="mono">${esc(r.productId)}</td>
-                    <td>${esc(r.userName)}</td>
+                    <td>
+                      <strong>${esc(r.userName)}</strong>
+                      ${cust?.email ? `<div style="font-size:11.5px;color:var(--text-muted);">${esc(cust.email)}</div>` : ''}
+                      ${r.orderId ? `<div class="mono" style="font-size:11px;color:var(--text-muted);">Order: ${esc(r.orderId)}${r.verifiedPurchase ? ' · Verified' : ''}</div>` : ''}
+                    </td>
                     <td>${r.rating} ★</td>
                     <td>${esc(r.comment)}</td>
                     <td><span class="status-text status-${esc(r.status)}">${esc(r.status)}</span></td>
@@ -10972,7 +12117,8 @@
                       <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger);" data-rev-del="${esc(r.id)}">Delete</button>
                     </td>
                   </tr>
-                `).join('') || '<tr><td colspan="6">No customer reviews yet.</td></tr>'}
+                `;
+                }).join('') || '<tr><td colspan="6">No customer reviews yet.</td></tr>'}
               </tbody>
             </table>
           </div>
@@ -11690,8 +12836,13 @@
                   <tr>
                     <td>${idx + 1}</td>
                     <td>
-                      <strong>${esc(it.productName)}</strong>
-                      <div style="font-size:11.5px;color:#52525b;">Size: ${esc(it.size || '-')} · Color: ${esc(it.color || '-')}</div>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        ${renderOrderImgTag(it, 'width:36px;aspect-ratio:39/43;object-fit:contain;background:#f7f7f7;border:1px solid #e4e4e7;border-radius:4px;flex-shrink:0;', '')}
+                        <div>
+                          <strong>${esc(it.productName)}</strong>
+                          <div style="font-size:11.5px;color:#52525b;">Size: ${esc(it.size || '-')} · Color: ${esc(it.color || '-')}</div>
+                        </div>
+                      </div>
                     </td>
                     <td class="mono">${esc(it.sku || '-')}</td>
                     <td style="text-align:center;" class="tabular-nums">${Number(it.quantity || 1)}</td>
@@ -11954,7 +13105,7 @@
                   ${(o.items || []).map((it) => `
                     <tr>
                       <td>
-                        <img src="${esc(it.imageUrl || OFFICIAL_LOGO)}" alt="${esc(it.productName)}" style="width:54px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border-radius:4px;" referrerpolicy="no-referrer" onerror="this.src='${OFFICIAL_LOGO}'" />
+                        ${renderOrderImgTag(it, 'width:58px;aspect-ratio:39/43;object-fit:contain;background:#f5f5f5;border:1px solid var(--border-hairline);border-radius:6px;', '')}
                       </td>
                       <td>
                         <strong>${esc(it.productName)}</strong><br>
@@ -12416,7 +13567,7 @@
           const [rid, status] = revStatus.getAttribute('data-rev-status').split(':');
           await updateDoc(doc(db, 'reviews', rid), { status, updatedAt: serverTimestamp() });
           showToast(`Review ${status}`);
-          await loadAdminCollections();
+          await Promise.all([loadAdminCollections(), loadApprovedReviews()]);
           renderAdminTab('reviews');
         } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
@@ -12428,7 +13579,7 @@
           await ensureFirebaseAdminSession();
           await deleteDoc(doc(db, 'reviews', revDel.getAttribute('data-rev-del')));
           showToast('Review deleted');
-          await loadAdminCollections();
+          await Promise.all([loadAdminCollections(), loadApprovedReviews()]);
           renderAdminTab('reviews');
         } catch (err) { showToast(formatFirebaseAdminError(err), 'error'); }
         return;
@@ -12490,6 +13641,8 @@
     // =========================================================================
     // 17. AUTH STATE SYNC & INITIAL BOOT
     // =========================================================================
+    let appBootstrapped = false;
+
     onAuthStateChanged(auth, async (user) => {
       state.user = user;
       if (user) {
@@ -12513,9 +13666,17 @@
           } catch {}
         }
         updateHeaderBadges();
+      } else {
+        state.userProfile = null;
+        updateHeaderBadges();
       }
       if (!document.getElementById('admin-app').classList.contains('hidden')) {
         updateAdminFirebaseSyncBanner();
+      } else if (appBootstrapped) {
+        const hash = window.location.hash || '#home';
+        if (hash.startsWith('#product/') || hash === '#account') {
+          handleRoute().catch(() => {});
+        }
       }
     });
 
@@ -12531,6 +13692,7 @@
       await Promise.allSettled([loadSettings(), loadCategories(), loadBanners(), loadProducts(true), loadApprovedReviews()]);
       applyTranslations();
       await handleRoute();
+      appBootstrapped = true;
     }
 
     bootstrapApp();

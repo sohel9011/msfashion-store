@@ -299,16 +299,23 @@ exports.createOrder = onRequest((req, res) => {
           const itemSubtotal = unitPrice * qty;
           subtotal += itemSubtotal;
 
+          const prodImages = Array.isArray(prod.images)
+            ? prod.images.map((i) => (typeof i === 'string' ? i : i?.url || '')).filter(Boolean)
+            : [];
           const mainImg = Array.isArray(prod.images) && prod.images.length > 0
-            ? (prod.images.find((i) => i.isMain)?.url || prod.images[0].url || '')
+            ? (prod.images.find((i) => i.isMain)?.url || prodImages[0] || '')
             : '';
+          const reqImg = typeof item.imageUrl === 'string' ? item.imageUrl.trim() : '';
+          const selectedImg = (reqImg && (prodImages.includes(reqImg) || /^https?:\/\//i.test(reqImg) || /^data:image\//.test(reqImg)))
+            ? reqImg
+            : mainImg;
 
           verifiedItems.push({
             productId,
             productName: prod.name,
             productNameBn: prod.nameBn || prod.name,
             sku: variantSku,
-            imageUrl: mainImg,
+            imageUrl: selectedImg,
             size,
             color,
             quantity: qty,
